@@ -47,6 +47,14 @@ BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+void CChildFrame::ActivateFrame(int nCmdShow)
+{
+	// 항상 최대화로 시작
+	nCmdShow = SW_SHOWMAXIMIZED;
+
+	CMDIChildWndEx::ActivateFrame(nCmdShow);
+}
+
 // CChildFrame 진단
 
 #ifdef _DEBUG

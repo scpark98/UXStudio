@@ -6,6 +6,7 @@
 
 #include "Common/directx/CSCD2Context/SCD2Context.h"
 #include "Common/directx/CSCD2Image/SCD2Image.h"
+#include "Common/data_types/CSCUIElement/SCUIElement.h"
 #include <dwrite.h>
 #pragma comment(lib, "dwrite")
 
@@ -17,10 +18,42 @@ protected: // serialization에서만 만들어집니다.
 	DECLARE_DYNCREATE(CUXStudioView)
 
 	CSCD2Context			m_d2dc;
-	ID2D1SolidColorBrush*	m_brush = NULL;
-	ID2D1SolidColorBrush*	m_br_grid = NULL;
+
+	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
+	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
+	ComPtr<ID2D1SolidColorBrush>	m_br_element;
+	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
+	ComPtr<ID2D1SolidColorBrush>	m_br_selected;
+
 	IDWriteFactory*			m_WriteFactory = NULL;
 	IDWriteTextFormat*		m_WriteFormat = NULL;
+
+	CSize					m_sz_grid;
+
+	bool					m_lbutton_down = false;
+	CPoint					m_pt_lbutton_down;
+	CPoint					m_pt_cur;
+	CRect					m_resize_handle[9];
+	void					draw_resize_handle(ID2D1DeviceContext* d2dc);
+
+	std::vector<CSCUIElement*>	m_data;
+	CSCUIElement*			m_el_hover = NULL;
+	CSCUIElement*			m_el_selected = NULL;
+	CSCUIElement*			m_el_cur = NULL;
+
+	CSCUIElement*			get_hover_item(CPoint pt);
+
+	CPoint					get_near_grid(CPoint pt);
+
+	template <class T> void	offset_scroll(T& value)
+	{
+		CPoint sp(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+
+		if constexpr (std::is_same_v<T, CPoint>)
+			((CPoint)value).Offset(sp);
+		else if constexpr (std::is_same_v<T, Gdiplus::Rect>)
+			((CPoint)value).Offset(sp);
+	}
 
 public:
 #ifdef AFX_DESIGN_TIME
@@ -65,6 +98,14 @@ protected:
 public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+//	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+//	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
+//	virtual void OnActivateFrame(UINT nState, CFrameWnd* pDeactivateFrame);
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

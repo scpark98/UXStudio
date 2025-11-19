@@ -19,6 +19,7 @@ public:
 
 // 작업입니다.
 public:
+	void			set_cursor_info(CPoint pt);
 
 // 재정의입니다.
 public:
@@ -56,6 +57,9 @@ protected:
 
 	BOOL CreateDockingWindows();
 	void SetDockingWindowIcons(BOOL bHiColorIcons);
+public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnClose();
 };
 
 

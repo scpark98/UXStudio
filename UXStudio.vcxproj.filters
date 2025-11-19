@@ -22,6 +22,9 @@
     <Filter Include="Common\CSCD2Image">
       <UniqueIdentifier>{09ae5f7c-86e8-497b-b14f-11fe1e03230f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common\CSCUIElement">
+      <UniqueIdentifier>{129f0bd1-cc35-4256-a4a9-498e66061128}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UXStudio.h">
@@ -84,6 +87,9 @@
     <ClInclude Include="..\Common\directx\CSCD2Context\SCD2Context.h">
       <Filter>Common\CSCD2Context</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\data_types\CSCUIElement\SCUIElement.h">
+      <Filter>Common\CSCUIElement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UXStudio.cpp">
@@ -133,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\directx\CSCD2Context\SCD2Context.cpp">
       <Filter>Common\CSCD2Context</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\data_types\CSCUIElement\SCUIElement.cpp">
+      <Filter>Common\CSCUIElement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,5 +231,10 @@
     <Image Include="res\Toolbar256.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Common\data_types\CSCUIElement\readme.txt">
+      <Filter>Common\CSCUIElement</Filter>
+    </Text>
   </ItemGroup>
 </Project>

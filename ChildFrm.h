@@ -22,6 +22,7 @@ public:
 	public:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual void ActivateFrame(int nCmdShow);
 
 // 구현입니다.
 public:
