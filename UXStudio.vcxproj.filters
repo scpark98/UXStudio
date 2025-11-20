@@ -90,6 +90,9 @@
     <ClInclude Include="..\Common\data_types\CSCUIElement\SCUIElement.h">
       <Filter>Common\CSCUIElement</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Json\rapid_json\json.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UXStudio.cpp">
@@ -142,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\data_types\CSCUIElement\SCUIElement.cpp">
       <Filter>Common\CSCUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Json\rapid_json\json.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -236,5 +242,6 @@
     <Text Include="..\Common\data_types\CSCUIElement\readme.txt">
       <Filter>Common\CSCUIElement</Filter>
     </Text>
+    <Text Include="readme.txt" />
   </ItemGroup>
 </Project>

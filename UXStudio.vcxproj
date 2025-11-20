@@ -204,6 +204,7 @@
     <ClInclude Include="..\Common\directx\CSCD2Context\SCD2Context.h" />
     <ClInclude Include="..\Common\directx\CSCD2Image\SCD2Image.h" />
     <ClInclude Include="..\Common\Functions.h" />
+    <ClInclude Include="..\Common\Json\rapid_json\json.h" />
     <ClInclude Include="..\Common\MemoryDC.h" />
     <ClInclude Include="..\Common\SCGdiplusBitmap.h" />
     <ClInclude Include="ChildFrm.h" />
@@ -247,6 +248,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\Common\Functions.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Common\Json\rapid_json\json.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -311,6 +318,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Common\data_types\CSCUIElement\readme.txt" />
+    <Text Include="readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

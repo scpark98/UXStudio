@@ -14,6 +14,9 @@
 
 #include <propkey.h>
 
+#include "Common/Functions.h"
+#include "Common/Json/rapid_json/json.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -23,6 +26,7 @@
 IMPLEMENT_DYNCREATE(CUXStudioDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CUXStudioDoc, CDocument)
+	ON_COMMAND(ID_FILE_SAVE, &CUXStudioDoc::OnFileSave)
 END_MESSAGE_MAP()
 
 
@@ -136,3 +140,115 @@ void CUXStudioDoc::Dump(CDumpContext& dc) const
 
 
 // CUXStudioDoc 명령
+void CUXStudioDoc::release_data()
+{
+	for (int i = 0; i < m_data.size(); i++)
+	{
+		delete m_data[i];
+	}
+
+	m_data.clear();
+}
+
+BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
+{
+	//if (!CDocument::OnOpenDocument(lpszPathName))
+	//	return FALSE;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+	m_filepath = lpszPathName;
+
+	release_data();
+
+	Json json;
+	json.load(m_filepath);
+	//json.get_all_data();
+
+	SetTitle(m_filepath);
+
+	AfxGetApp()->WriteProfileString(_T("setting"), _T("recent file"), m_filepath);
+
+	rapidjson::Value& items = json.doc["items"];
+
+	for (int i = 0; i < items.Size(); i++)
+	{
+		CSCUIElement* el = new CSCUIElement;
+
+		el->m_type = json.get_array_member("items", i, "type", 0);
+		el->m_selected = json.get_array_member("items", i, "selected", false);
+
+		rapidjson::Value& r = items[i]["r"];
+		el->m_r.X = r[0].GetFloat();
+		el->m_r.Y = r[1].GetFloat();
+		el->m_r.Width = r[2].GetFloat();
+		el->m_r.Height = r[3].GetFloat();
+
+		el->m_round = json.get_array_member("items", i, "round", 0);
+		el->m_label = json.get_array_member("items", i, "label", "");
+		el->m_label_align = json.get_array_member("items", i, "label align", UINT(0));
+		el->m_label_visible = json.get_array_member("items", i, "label visible", true);
+		el->m_cr_stroke = Gdiplus::Color(json.get_array_member("items", i, "cr_stroke", (UINT)(Gdiplus::Color::RoyalBlue)));
+		el->m_cr_fill = Gdiplus::Color(json.get_array_member("items", i, "cr_fill", (UINT)(Gdiplus::Color::Transparent)));
+
+		m_data.push_back(el);
+	}
+
+	return TRUE;
+}
+
+BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	Json json;
+	rapidjson::Document::AllocatorType& allocator = json.doc.GetAllocator();
+
+	rapidjson::Value items(rapidjson::kArrayType);
+
+	m_filepath = lpszPathName;
+
+	for (int i = 0; i < m_data.size(); i++)
+	{
+		rapidjson::Value item;
+		item.SetObject();
+
+		item.AddMember("type", m_data[i]->m_type, allocator);
+
+		rapidjson::Value r(rapidjson::kArrayType);
+		r.PushBack(m_data[i]->m_r.X, allocator);
+		r.PushBack(m_data[i]->m_r.Y, allocator);
+		r.PushBack(m_data[i]->m_r.Width, allocator);
+		r.PushBack(m_data[i]->m_r.Height, allocator);
+
+
+		item.AddMember("r", r, allocator);
+
+		item.AddMember(rapidjson::Value("selected", allocator).Move(), m_data[i]->m_selected, allocator);
+		item.AddMember(rapidjson::Value("round", allocator).Move(), m_data[i]->m_round, allocator);
+
+		//CT2CA(m_data[i]->m_label)을 직접 파라미터로 넘기면 컴파일 에러가 발생한다.
+		std::string sstr = CT2CA(m_data[i]->m_label);
+		item.AddMember(rapidjson::Value("label", allocator).Move(), sstr, allocator);
+		item.AddMember(rapidjson::Value("label align", allocator).Move(), m_data[i]->m_label_align, allocator);
+		item.AddMember(rapidjson::Value("label visible", allocator).Move(), m_data[i]->m_label_visible, allocator);
+
+		item.AddMember(rapidjson::Value("cr_stroke", allocator).Move(), (UINT)m_data[i]->m_cr_stroke.GetValue(), allocator);
+		item.AddMember(rapidjson::Value("cr_fill", allocator).Move(), (UINT)m_data[i]->m_cr_fill.GetValue(), allocator);
+
+		//하나의 item에 모든 항목값이 채워지면 전체 array인 items에 넣는다.
+		items.PushBack(item, allocator);
+	}
+
+	json.doc.AddMember("items", items, allocator);
+	json.get_all_data();
+
+	json.save(m_filepath);
+	AfxGetApp()->WriteProfileString(_T("setting"), _T("recent file"), m_filepath);
+
+	return TRUE;
+	return CDocument::OnSaveDocument(lpszPathName);
+}
+
+void CUXStudioDoc::OnFileSave()
+{
+	OnSaveDocument(m_filepath);
+}

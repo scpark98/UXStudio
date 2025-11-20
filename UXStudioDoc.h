@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <vector>
+#include "Common/data_types/CSCUIElement/SCUIElement.h"
+
 
 class CUXStudioDoc : public CDocument
 {
@@ -14,9 +17,12 @@ protected: // serialization에서만 만들어집니다.
 
 // 특성입니다.
 public:
+	CString							m_filepath;
+	std::vector<CSCUIElement*>		m_data;
 
 // 작업입니다.
 public:
+	void							release_data();
 
 // 재정의입니다.
 public:
@@ -45,4 +51,8 @@ protected:
 	// 검색 처리기에 대한 검색 콘텐츠를 설정하는 도우미 함수
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
+public:
+	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
+	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
+	afx_msg void OnFileSave();
 };

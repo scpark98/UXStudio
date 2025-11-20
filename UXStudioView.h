@@ -21,30 +21,45 @@ protected: // serialization에서만 만들어집니다.
 
 	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
 	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
-	ComPtr<ID2D1SolidColorBrush>	m_br_element;
+	ComPtr<ID2D1SolidColorBrush>	m_br_item;
 	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
 	ComPtr<ID2D1SolidColorBrush>	m_br_selected;
 
-	IDWriteFactory*			m_WriteFactory = NULL;
-	IDWriteTextFormat*		m_WriteFormat = NULL;
+	IDWriteFactory*					m_WriteFactory = NULL;
+	IDWriteTextFormat*				m_WriteFormat = NULL;
 
-	CSize					m_sz_grid;
+	CSize							m_sz_grid;
 
-	bool					m_lbutton_down = false;
-	CPoint					m_pt_lbutton_down;
-	CPoint					m_pt_cur;
-	CRect					m_resize_handle[9];
-	void					draw_resize_handle(ID2D1DeviceContext* d2dc);
+	bool							m_lbutton_down = false;
+	CPoint							m_pt_lbutton_down;
+	CPoint							m_pt_cur;
 
-	std::vector<CSCUIElement*>	m_data;
-	CSCUIElement*			m_el_hover = NULL;
-	CSCUIElement*			m_el_selected = NULL;
-	CSCUIElement*			m_el_cur = NULL;
+	int								m_handle_index = -1;
+	CRect							m_resize_handle[9];
+	void							draw_resize_handle(ID2D1DeviceContext* d2dc);
+	bool							m_is_resizing = false;
 
-	CSCUIElement*			get_hover_item(CPoint pt);
+	//max rect of all selected items
+	Gdiplus::RectF					m_r_selected;
+	//선택된 모든 항목의 최대 사각형인 m_r_selected를 구한다. new_rect가 NULL이 아니면 이것까지 포함해서 구한다.
+	void							get_bound_selected_rect(Gdiplus::RectF* new_rect = NULL);
+	//m_r_selected를 clear하고 모든 항목의 선택 플래그도 리셋시킨다.
+	void							set_selected_flag(bool selected);
+	void							delete_selected_items();
 
-	CPoint					get_near_grid(CPoint pt);
+	CSCUIElement*					m_item_hover = NULL;
+	//std::vector<CSCUIElement*>		m_item_selected;
+	CSCUIElement*					m_item_current = NULL;
 
+	CSCUIElement*					get_hover_item(CPoint pt);
+	CPoint							get_near_grid(CPoint pt);
+
+//load, save
+
+	//spacebar를 누른 채 화면을 드래그하면 스크롤된다.
+	bool							m_spacebar_down = false;
+
+	//point, rect 등을 현재 스크롤바 위치만큼 보정한다.
 	template <class T> void	offset_scroll(T& value)
 	{
 		CPoint sp(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
@@ -87,6 +102,7 @@ public:
 #endif
 
 protected:
+	CUXStudioDoc* pDoc = NULL;
 
 // 생성된 메시지 맵 함수
 protected:
@@ -106,6 +122,8 @@ public:
 //	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 //	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 //	virtual void OnActivateFrame(UINT nState, CFrameWnd* pDeactivateFrame);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

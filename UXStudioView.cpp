@@ -42,6 +42,7 @@ BEGIN_MESSAGE_MAP(CUXStudioView, CFormView)
 	ON_WM_MOUSEMOVE()
 //	ON_WM_ACTIVATE()
 //	ON_WM_ACTIVATEAPP()
+ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -58,9 +59,9 @@ CUXStudioView::~CUXStudioView()
 	SAFE_RELEASE(m_WriteFactory);
 	SAFE_RELEASE(m_WriteFormat);
 
-	for (int i = 0; i < m_data.size(); i++)
+	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
-		CSCUIElement* el = m_data[i];
+		CSCUIElement* el = pDoc->m_data[i];
 		delete el;
 	}
 }
@@ -82,6 +83,8 @@ void CUXStudioView::OnInitialUpdate()
 	CFormView::OnInitialUpdate();
 	ResizeParentToFit();
 
+	pDoc = GetDocument();
+
 	m_d2dc.init(m_hWnd);
 
 	HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_WriteFactory));
@@ -94,7 +97,7 @@ void CUXStudioView::OnInitialUpdate()
 
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_draw.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(.5f, .5f, .5f, 0.6f), m_br_grid.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_element.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_item.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
 
@@ -205,12 +208,13 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	}
 
 
-	if (m_lbutton_down)
+	//도형을 그리는 중이면
+	if (m_lbutton_down && !m_spacebar_down)
 		d2dc->DrawRectangle(D2D1::RectF(m_pt_lbutton_down.x, m_pt_lbutton_down.y, m_pt_cur.x, m_pt_cur.y), m_br_draw.Get());
 
-	for (int i = 0; i < m_data.size(); i++)
+	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
-		CSCUIElement* el = m_data[i];
+		CSCUIElement* el = pDoc->m_data[i];
 		Gdiplus::RectF r = el->m_r;
 
 		r.Offset(-hs, -vs);
@@ -219,24 +223,30 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		if (el->m_cr_fill.GetValue() != Gdiplus::Color::Transparent)
 		{
-			m_br_element->SetColor(get_d2color(el->m_cr_fill));
-			d2dc->FillRectangle(rf, m_br_element.Get());
+			m_br_item->SetColor(get_d2color(el->m_cr_fill));
+			d2dc->FillRectangle(rf, m_br_item.Get());
 		}
 
-		if (el == m_el_selected)
+		if (m_r_selected.IsEmptyArea())
 		{
-			d2dc->DrawRectangle(rf, m_br_selected.Get(), (el == m_el_hover ? 2.0f : 1.0f));
-			get_resizable_handle(r, m_resize_handle, 3);
+
+		}
+		else
+		{
+			D2D1_RECT_F rselected = { m_r_selected.X, m_r_selected.Y, m_r_selected.GetRight(), m_r_selected.GetBottom() };
+			d2dc->DrawRectangle(rselected, m_br_selected.Get());
+			get_resizable_handle(m_r_selected, m_resize_handle, 3);
 			draw_resize_handle(d2dc);
 		}
-		else if (el == m_el_hover)
+
+		if (el == m_item_hover)
 		{
 			d2dc->DrawRectangle(rf, m_br_hover.Get(), 2.0f);
 		}
 		else if (el->m_cr_stroke.GetValue() != Gdiplus::Color::Transparent)
 		{
-			m_br_element->SetColor(get_d2color(el->m_cr_stroke));
-			d2dc->DrawRectangle(rf, m_br_element.Get());
+			m_br_item->SetColor(get_d2color(el->m_cr_stroke));
+			d2dc->DrawRectangle(rf, m_br_item.Get());
 		}
 	}
 
@@ -245,6 +255,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	if (SUCCEEDED(hr))
 		hr = m_d2dc.get_swapchain()->Present(0, 0);
 
+	//for test dc drawing
 	//if (m_lbutton_down)
 	//	draw_line(pDC, m_pt_lbutton_down, m_pt_cur, red, 1, PS_SOLID, R2_XORPEN);
 	//else
@@ -255,7 +266,8 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 void CUXStudioView::draw_resize_handle(ID2D1DeviceContext* d2dc)
 {
-	//0번은 inside이므로 생략한다.
+	//0번은 inside이므로 별도로 그려주는 것이 없으므로 1번부터 그린다.
+	//요즘은 left, top, right, bottom에는 handle을 그리지 않고 resize커서로만 표시하는게 깔끔하다.
 	for (int i = 1; i < RECT_RESIZE_HANDLE_COUNT; i++)
 	{
 		CRect r = m_resize_handle[i];
@@ -313,22 +325,48 @@ CPoint CUXStudioView::get_near_grid(CPoint pt)
 
 void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	SetCapture();
+
 	//hover인 항목을 클릭하면 편집모드로 전환된다.
 	CPoint pt = point;
 	pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
 
-	if (m_el_hover && m_el_hover->pt_in_rect(pt.x, pt.y))
+	if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
 	{
-		m_el_selected = m_el_hover;
-		get_resizable_handle(m_el_selected->m_r, m_resize_handle, 3);
+		m_is_resizing = true;
+		trace(m_is_resizing);
+		m_pt_lbutton_down = point;
+		//offset_scroll(m_pt_lbutton_down);
+		return;
+	}
+	else
+	{
+		m_is_resizing = false;
+		trace(m_is_resizing);
+	}
+
+	if (m_item_hover)
+	{
+		if (m_item_hover->pt_in_rect(pt.x, pt.y))
+		{
+			m_item_hover->m_selected = true;
+			get_bound_selected_rect();
+			get_resizable_handle(m_r_selected, m_resize_handle, 3);
+		}
+		else
+		{
+			m_r_selected.Width = 0;
+		}
 		Invalidate();
 		return;
+	}
+	else
+	{
+		m_r_selected.Width = 0;
 	}
 
 	m_lbutton_down = true;
 	m_pt_lbutton_down = get_near_grid(point);
-	SetCapture();
 
 	CFormView::OnLButtonDown(nFlags, point);
 }
@@ -336,20 +374,36 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	ReleaseCapture();
+
+	if (m_is_resizing)
+	{
+		m_is_resizing = false;
+		m_pt_lbutton_down = CPoint(-1, -1);
+		//normalize_rect(m_item_selected->m_r);
+	}
+
 	if (m_lbutton_down)
 	{
 		m_lbutton_down = false;
-		ReleaseCapture();
 
-		point = get_near_grid(point);
-		Gdiplus::RectF r(m_pt_lbutton_down.x, m_pt_lbutton_down.y, point.x - m_pt_lbutton_down.x, point.y - m_pt_lbutton_down.y);
-		normalize_rect(r);
-
-		if (r.Width < 20 && r.Height < 20)
+		if (m_spacebar_down)
+		{
+			m_spacebar_down = false;
 			return;
+		}
+		else
+		{
+			point = get_near_grid(point);
+			Gdiplus::RectF r(m_pt_lbutton_down.x, m_pt_lbutton_down.y, point.x - m_pt_lbutton_down.x, point.y - m_pt_lbutton_down.y);
+			normalize_rect(r);
 
-		r.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
-		m_data.push_back(new CSCUIElement(r));
+			if (r.Width < 20 && r.Height < 20)
+				return;
+
+			r.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+			pDoc->m_data.push_back(new CSCUIElement(r));
+		}
 		Invalidate();
 	}
 
@@ -363,15 +417,72 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_cursor_info(pt);
 
-	if (m_lbutton_down)
+	//trace(m_lbutton_down);
+	//trace(m_spacebar_down);
+
+	if (m_is_resizing)
 	{
-		m_pt_cur = get_near_grid(point);
+		trace(m_is_resizing);
+		//trace(m_handle_index);
+		switch (m_handle_index)
+		{
+			/*
+			case corner_inside:
+				m_item_selected->m_r.X += (point.x - m_pt_lbutton_down.x);
+				m_item_selected->m_r.Y += (point.y - m_pt_lbutton_down.y);
+				//adjust_rect_range(m_screen_roi, CRect2GpRectF(m_r_display));
+				m_pt_lbutton_down = point;
+				break;
+			case corner_left:
+				set_left(m_item_selected->m_r, point.x);
+				break;
+			case corner_right:
+				m_item_selected->m_r.Width = point.x - m_item_selected->m_r.X;
+				break;
+			case corner_top:
+				set_top(m_item_selected->m_r, point.y);
+				break;
+			case corner_bottom:
+				m_item_selected->m_r.Height = point.y - m_item_selected->m_r.Y;
+				break;
+			case corner_topleft:
+				set_top(m_item_selected->m_r, point.y);
+				set_left(m_item_selected->m_r, point.x);
+				break;
+			case corner_topright:
+				set_top(m_item_selected->m_r, point.y);
+				m_item_selected->m_r.Width = point.x - m_item_selected->m_r.X;
+				break;
+			case corner_bottomleft:
+				m_item_selected->m_r.Height = point.y - m_item_selected->m_r.Y;
+				set_left(m_item_selected->m_r, point.x);
+				break;
+			case corner_bottomright:
+				m_item_selected->m_r.Height = point.y - m_item_selected->m_r.Y;
+				m_item_selected->m_r.Width = point.x - m_item_selected->m_r.X;
+				break;
+			*/
+		}
+
+		Invalidate();
+	}
+	else if (m_lbutton_down)
+	{
+		if (m_spacebar_down)
+		{
+			SetScrollPos(SB_HORZ, m_pt_lbutton_down.x - point.x);
+			SetScrollPos(SB_VERT, m_pt_lbutton_down.y - point.y);
+		}
+		else
+		{
+			m_pt_cur = get_near_grid(point);
+		}
 		Invalidate();
 	}
 	else
 	{
-		m_el_hover = get_hover_item(pt);
-		TRACE(_T("hover = %p\n"), m_el_hover);
+		m_item_hover = get_hover_item(pt);
+		TRACE(_T("hover = %p\n"), m_item_hover);
 		Invalidate();
 	}
 
@@ -380,9 +491,9 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 
 CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 {
-	m_el_hover = NULL;
+	m_item_hover = NULL;
 	
-	auto res = std::find_if(m_data.begin(), m_data.end(),
+	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
 		[&](const auto& el)
 		{
 			if (pt_in_rect(el->m_r, pt))
@@ -391,8 +502,137 @@ CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 			}
 		});
 
-	if (res != m_data.end())
-		m_el_hover = *res;
+	if (res != pDoc->m_data.end())
+		m_item_hover = *res;
 
-	return m_el_hover;
+	return m_item_hover;
+}
+
+BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		switch (pMsg->wParam)
+		{
+			case VK_SPACE:
+				m_spacebar_down = true;
+				break;
+			case VK_DELETE:
+				delete_selected_items();
+				return true;
+		}
+	}
+	else if (pMsg->message == WM_KEYUP)
+	{
+		switch (pMsg->wParam)
+		{
+			case VK_SPACE:
+				m_spacebar_down = false;
+				break;
+		}
+	}
+
+	return CFormView::PreTranslateMessage(pMsg);
+}
+
+//선택된 모든 항목의 최대 사각형인 m_r_selected를 구한다. new_rect가 NULL이 아니면 이것까지 포함해서 구한다.
+void CUXStudioView::get_bound_selected_rect(Gdiplus::RectF* new_rect)
+{
+	m_r_selected = Gdiplus::RectF();
+
+	for (auto el : pDoc->m_data)
+	{
+		if (el->m_selected)
+		{
+			if (m_r_selected.IsEmptyArea())
+				m_r_selected = el->m_r;
+			else
+				m_r_selected.Union(m_r_selected, m_r_selected, el->m_r);
+		}
+	}
+}
+
+//m_r_selected를 clear하고 모든 항목의 선택 플래그도 리셋시킨다.
+void CUXStudioView::set_selected_flag(bool selected)
+{
+	for (auto el : pDoc->m_data)
+		el->m_selected = selected;
+
+	get_bound_selected_rect();
+
+	Invalidate();
+}
+
+void CUXStudioView::delete_selected_items()
+{
+	for (int i = pDoc->m_data.size() - 1; i >= 0; i--)
+	{
+		if (pDoc->m_data[i]->m_selected)
+		{
+			delete pDoc->m_data[i];
+			pDoc->m_data.erase(pDoc->m_data.begin() + i);
+		}
+	}
+
+	Invalidate();
+}
+
+BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CPoint pt;
+	CRect rc;
+
+	GetCursorPos(&pt);
+	ScreenToClient(&pt);
+
+	m_handle_index = -1;
+
+	for (int i = 0; i < RECT_RESIZE_HANDLE_COUNT; i++)
+	{
+		if (m_resize_handle[i].PtInRect(pt))
+		{
+			m_handle_index = i;
+			break;
+		}
+	}
+
+	trace(m_handle_index);
+
+	if (m_handle_index != -1)
+	{
+		//마우스 커서 모양을 변경한다.
+		switch (m_handle_index)
+		{
+			case corner_inside :
+				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZEALL));
+				break;
+			case corner_left :
+			case corner_right :
+				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZEWE));
+				break;
+			case corner_top :
+			case corner_bottom :
+				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENS));
+				break;
+			case corner_topleft :
+			case corner_bottomright :
+				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENWSE));
+				break;
+			case corner_topright :
+			case corner_bottomleft :
+				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENESW));
+				break;
+		}
+
+		return TRUE;
+	}
+	else
+	{
+		//SetCursor(m_cursor_cross);
+		//return TRUE;
+	}
+
+	return CFormView::OnSetCursor(pWnd, nHitTest, message);
 }

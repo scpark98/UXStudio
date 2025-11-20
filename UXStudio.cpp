@@ -13,6 +13,8 @@
 #include "UXStudioDoc.h"
 #include "UXStudioView.h"
 
+#include "Common/Functions.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -152,8 +154,17 @@ BOOL CUXStudioApp::InitInstance()
 
 	// 명령줄에 지정된 명령을 디스패치합니다.
 	// 응용 프로그램이 /RegServer, /Register, /Unregserver 또는 /Unregister로 시작된 경우 FALSE를 반환합니다.
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
+	//if (!ProcessShellCommand(cmdInfo))
+	//	return FALSE;
+
+	CUXStudioDoc* pDoc = (CUXStudioDoc*)pDocTemplate->OpenDocumentFile(NULL);
+	CString recent = GetProfileString(_T("setting"), _T("recent file"), get_exe_directory() + _T("\\UXStudio.json"));
+	if (PathFileExists(recent))
+		pDoc->OnOpenDocument(recent);
+	else
+		pDoc->OnNewDocument();
+
+
 	// 주 창이 초기화되었으므로 이를 표시하고 업데이트합니다.
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
