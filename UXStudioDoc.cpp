@@ -250,5 +250,10 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 
 void CUXStudioDoc::OnFileSave()
 {
+	if (m_filepath.IsEmpty())
+	{
+		m_filepath.Format(_T("%s\\UXStudio.json"), get_exe_directory());
+	}
+
 	OnSaveDocument(m_filepath);
 }
