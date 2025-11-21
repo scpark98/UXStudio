@@ -100,6 +100,7 @@ void CUXStudioView::OnInitialUpdate()
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_item.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), m_br_multi_selected.GetAddressOf());
 
 	m_sz_grid.cx = AfxGetApp()->GetProfileInt(_T("setting"), _T("grid cx"), 8);
 	m_sz_grid.cy = AfxGetApp()->GetProfileInt(_T("setting"), _T("grid cy"), 8);
@@ -208,9 +209,17 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	}
 
 
-	//도형을 그리는 중이면
+	//도형을 그리는 중에는 스크롤 보정된 실제 좌표이므로 보정을 하지 않은 좌표를 스크린에 그려줘야 한다.
 	if (m_lbutton_down && !m_spacebar_down)
-		d2dc->DrawRectangle(D2D1::RectF(m_pt_lbutton_down.x, m_pt_lbutton_down.y, m_pt_cur.x, m_pt_cur.y), m_br_draw.Get());
+	{
+		CPoint pt_lbutton_down = m_pt_lbutton_down;
+		CPoint pt_cur = m_pt_cur;
+		TRACE(_T("old = %d, %d\n"), pt_cur.x, pt_cur.y);
+		adjust_scroll_offset(pt_lbutton_down, true);
+		adjust_scroll_offset(pt_cur, true);
+		TRACE(_T("new = %d, %d\n"), pt_cur.x, pt_cur.y);
+		d2dc->DrawRectangle(D2D1::RectF(pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y), m_br_draw.Get());
+	}
 
 	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
@@ -221,25 +230,18 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
+		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, (el == m_item_hover && !el->m_selected) ? 2.0f : 1.0f);
+		CString text;
+		text.Format(_T("%d. %s"), i, get_rect_info_str(gpRectF_to_CRect(el->m_r), 0));
+		d2dc->DrawText(text, text.GetLength(), m_WriteFormat, gpRectF_to_d2Rect(el->m_r), m_br_selected.Get());
+		/*
 		if (el->m_cr_fill.GetValue() != Gdiplus::Color::Transparent)
 		{
 			m_br_item->SetColor(get_d2color(el->m_cr_fill));
 			d2dc->FillRectangle(rf, m_br_item.Get());
 		}
 
-		if (m_r_selected.IsEmptyArea())
-		{
-
-		}
-		else
-		{
-			D2D1_RECT_F rselected = { m_r_selected.X, m_r_selected.Y, m_r_selected.GetRight(), m_r_selected.GetBottom() };
-			d2dc->DrawRectangle(rselected, m_br_selected.Get());
-			get_resizable_handle(m_r_selected, m_resize_handle, 3);
-			draw_resize_handle(d2dc);
-		}
-
-		if (el == m_item_hover)
+		if (el == m_item_hover)// || m_handle_index >= 0)
 		{
 			d2dc->DrawRectangle(rf, m_br_hover.Get(), 2.0f);
 		}
@@ -248,6 +250,17 @@ void CUXStudioView::OnDraw(CDC* pDC)
 			m_br_item->SetColor(get_d2color(el->m_cr_stroke));
 			d2dc->DrawRectangle(rf, m_br_item.Get());
 		}
+		*/
+	}
+
+	if (m_item_selected)
+	{
+		Gdiplus::RectF r_selected = m_item_selected->m_r;
+		r_selected.Offset(-hs, -vs);
+		D2D1_RECT_F rf_selected = { r_selected.X, r_selected.Y, r_selected.GetRight(), r_selected.GetBottom() };
+		d2dc->DrawRectangle(rf_selected, m_br_multi_selected.Get(), 2.0f);
+		get_resizable_handle(r_selected, m_resize_handle);
+		draw_resize_handle(d2dc);
 	}
 
 	HRESULT hr = d2dc->EndDraw();
@@ -271,7 +284,7 @@ void CUXStudioView::draw_resize_handle(ID2D1DeviceContext* d2dc)
 	for (int i = 1; i < RECT_RESIZE_HANDLE_COUNT; i++)
 	{
 		CRect r = m_resize_handle[i];
-		draw_rect(d2dc, CRect2GpRectF(r), Gdiplus::Color::RoyalBlue, Gdiplus::Color::White);
+		draw_rect(d2dc, CRect_to_gpRectF(r), Gdiplus::Color::RoyalBlue, Gdiplus::Color::White);
 	}
 }
 
@@ -296,9 +309,6 @@ BOOL CUXStudioView::OnEraseBkgnd(CDC* pDC)
 void CUXStudioView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	//CRect rc;
-	//GetClientRect(rc);
-	//m_d2dc.on_size_changed(rc.Width(), rc.Height());
 	Invalidate();
 	CFormView::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -306,17 +316,15 @@ void CUXStudioView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CUXStudioView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	//CRect rc;
-	//GetClientRect(rc);
-	//m_d2dc.on_size_changed(rc.Width(), rc.Height());
 	Invalidate();
 	CFormView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
+//가장 가까운 grid 좌표를 리턴한다.
+//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
 CPoint CUXStudioView::get_near_grid(CPoint pt)
 {
 	CPoint res = pt;
-	res.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
 	res.x = (res.x / m_sz_grid.cx) * m_sz_grid.cx;
 	res.y = (res.y / m_sz_grid.cy) * m_sz_grid.cy;
 
@@ -329,14 +337,17 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	//hover인 항목을 클릭하면 편집모드로 전환된다.
 	CPoint pt = point;
-	pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+	//pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+	adjust_scroll_offset(pt);
 
-	if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
+	//선택된 항목들을 이동, 크기를 변경 모드 시작
+	//if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
+	if (m_item_selected && m_handle_index >= corner_inside)
 	{
 		m_is_resizing = true;
 		trace(m_is_resizing);
 		m_pt_lbutton_down = point;
-		//offset_scroll(m_pt_lbutton_down);
+		//adjust_scroll_offset(m_pt_lbutton_down);
 		return;
 	}
 	else
@@ -349,14 +360,21 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		if (m_item_hover->pt_in_rect(pt.x, pt.y))
 		{
+			if (!IsShiftPressed())
+				select_all(false);
+
 			m_item_hover->m_selected = true;
-			get_bound_selected_rect();
-			get_resizable_handle(m_r_selected, m_resize_handle, 3);
+			//get_bound_selected_rect();
+			//get_resizable_handle(m_r_selected, m_resize_handle);
+			m_item_selected = m_item_hover;
+			//get_resizable_handle(m_item_selected->m_r, m_resize_handle);
 		}
 		else
 		{
+			m_item_selected = NULL;
 			m_r_selected.Width = 0;
 		}
+
 		Invalidate();
 		return;
 	}
@@ -366,9 +384,46 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 
 	m_lbutton_down = true;
-	m_pt_lbutton_down = get_near_grid(point);
+	m_pt_lbutton_down = get_near_grid(pt);
 
 	CFormView::OnLButtonDown(nFlags, point);
+}
+
+void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CPoint pt = point;
+	pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_cursor_info(pt);
+
+	//trace(m_lbutton_down);
+	//trace(m_spacebar_down);
+
+	if (m_is_resizing)
+	{
+		resize_items(pt);
+	}
+	else if (m_lbutton_down)
+	{
+		if (m_spacebar_down)
+		{
+			SetScrollPos(SB_HORZ, m_pt_lbutton_down.x - point.x);
+			SetScrollPos(SB_VERT, m_pt_lbutton_down.y - point.y);
+		}
+		else
+		{
+			m_pt_cur = get_near_grid(pt);
+		}
+		Invalidate();
+	}
+	else
+	{
+		m_item_hover = get_hover_item(pt);
+		TRACE(_T("hover = %p\n"), m_item_hover);
+		Invalidate();
+	}
+
+	CFormView::OnMouseMove(nFlags, point);
 }
 
 void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
@@ -394,14 +449,15 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		else
 		{
-			point = get_near_grid(point);
-			Gdiplus::RectF r(m_pt_lbutton_down.x, m_pt_lbutton_down.y, point.x - m_pt_lbutton_down.x, point.y - m_pt_lbutton_down.y);
+			m_pt_cur = point;
+			adjust_scroll_offset(m_pt_cur);
+			m_pt_cur = get_near_grid(m_pt_cur);
+			Gdiplus::RectF r(m_pt_lbutton_down.x, m_pt_lbutton_down.y, m_pt_cur.x - m_pt_lbutton_down.x, m_pt_cur.y - m_pt_lbutton_down.y);
 			normalize_rect(r);
 
 			if (r.Width < 20 && r.Height < 20)
 				return;
 
-			r.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
 			pDoc->m_data.push_back(new CSCUIElement(r));
 		}
 		Invalidate();
@@ -410,97 +466,97 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	CFormView::OnLButtonUp(nFlags, point);
 }
 
-void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
+void CUXStudioView::resize_items(CPoint pt)
 {
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	CPoint pt = point;
-	pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
-	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_cursor_info(pt);
+	CSCUIElement* item = NULL;
 
-	//trace(m_lbutton_down);
-	//trace(m_spacebar_down);
+	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
+		[&](const auto& el)
+		{
+			if (el->m_selected)
+			{
+				return el;
+			}
+		});
 
-	if (m_is_resizing)
-	{
-		trace(m_is_resizing);
-		//trace(m_handle_index);
-		switch (m_handle_index)
-		{
-			/*
-			case corner_inside:
-				m_item_selected->m_r.X += (point.x - m_pt_lbutton_down.x);
-				m_item_selected->m_r.Y += (point.y - m_pt_lbutton_down.y);
-				//adjust_rect_range(m_screen_roi, CRect2GpRectF(m_r_display));
-				m_pt_lbutton_down = point;
-				break;
-			case corner_left:
-				set_left(m_item_selected->m_r, point.x);
-				break;
-			case corner_right:
-				m_item_selected->m_r.Width = point.x - m_item_selected->m_r.X;
-				break;
-			case corner_top:
-				set_top(m_item_selected->m_r, point.y);
-				break;
-			case corner_bottom:
-				m_item_selected->m_r.Height = point.y - m_item_selected->m_r.Y;
-				break;
-			case corner_topleft:
-				set_top(m_item_selected->m_r, point.y);
-				set_left(m_item_selected->m_r, point.x);
-				break;
-			case corner_topright:
-				set_top(m_item_selected->m_r, point.y);
-				m_item_selected->m_r.Width = point.x - m_item_selected->m_r.X;
-				break;
-			case corner_bottomleft:
-				m_item_selected->m_r.Height = point.y - m_item_selected->m_r.Y;
-				set_left(m_item_selected->m_r, point.x);
-				break;
-			case corner_bottomright:
-				m_item_selected->m_r.Height = point.y - m_item_selected->m_r.Y;
-				m_item_selected->m_r.Width = point.x - m_item_selected->m_r.X;
-				break;
-			*/
-		}
+	if (res != pDoc->m_data.end())
+		item = *res;
 
-		Invalidate();
-	}
-	else if (m_lbutton_down)
+	if (!item)
+		return;
+
+	switch (m_handle_index)
 	{
-		if (m_spacebar_down)
-		{
-			SetScrollPos(SB_HORZ, m_pt_lbutton_down.x - point.x);
-			SetScrollPos(SB_VERT, m_pt_lbutton_down.y - point.y);
-		}
-		else
-		{
-			m_pt_cur = get_near_grid(point);
-		}
-		Invalidate();
-	}
-	else
-	{
-		m_item_hover = get_hover_item(pt);
-		TRACE(_T("hover = %p\n"), m_item_hover);
-		Invalidate();
+		case corner_inside:
+			item->m_r.X += (pt.x - m_pt_lbutton_down.x);
+			item->m_r.Y += (pt.y - m_pt_lbutton_down.y);
+			//adjust_rect_range(m_screen_roi, CRect_to_gpRectF(m_r_display));
+			m_pt_lbutton_down = pt;
+			break;
+		case corner_left:
+			set_left(item->m_r, pt.x);
+			break;
+		case corner_right:
+			item->m_r.Width = pt.x - item->m_r.X;
+			break;
+		case corner_top:
+			set_top(item->m_r, pt.y);
+			break;
+		case corner_bottom:
+			item->m_r.Height = pt.y - item->m_r.Y;
+			break;
+		case corner_topleft:
+			set_top(item->m_r, pt.y);
+			set_left(item->m_r, pt.x);
+			break;
+		case corner_topright:
+			set_top(item->m_r, pt.y);
+			item->m_r.Width = pt.x - item->m_r.X;
+			break;
+		case corner_bottomleft:
+			item->m_r.Height = pt.y - item->m_r.Y;
+			set_left(item->m_r, pt.x);
+			break;
+		case corner_bottomright:
+			item->m_r.Height = pt.y - item->m_r.Y;
+			item->m_r.Width = pt.x - item->m_r.X;
+			break;
 	}
 
-	CFormView::OnMouseMove(nFlags, point);
+	Invalidate();
 }
 
 CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 {
 	m_item_hover = NULL;
 	
+	//기본적으로 rect안에 커서가 들어오면 hover로 인식하지만
+	//rect안에 또 다른 rect가 있을 경우, 순서가 나중인 rect는 hover로 판정될 수 없다.
+	//따라서 테두리 위에 커서가 위치하는 경우 먼저 hover 판정을 해야 하고
+	//그러한 rect가 없다면 커서가 위치한 rect를 hover 판정해야 한다.
 	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
 		[&](const auto& el)
 		{
-			if (pt_in_rect(el->m_r, pt))
+			Gdiplus::RectF r = el->m_r;
+			if (pt_in_rect_border(r, pt, 2))
 			{
 				return el;
 			}
 		});
+
+	if (res == pDoc->m_data.end())
+	{
+		res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
+			[&](const auto& el)
+			{
+				Gdiplus::RectF r = el->m_r;
+				r.Inflate(3, 3);
+				if (pt_in_rect(r, pt))
+				{
+					return el;
+				}
+			});
+	}
 
 	if (res != pDoc->m_data.end())
 		m_item_hover = *res;
@@ -551,13 +607,15 @@ void CUXStudioView::get_bound_selected_rect(Gdiplus::RectF* new_rect)
 				m_r_selected.Union(m_r_selected, m_r_selected, el->m_r);
 		}
 	}
+
+	//adjust_scroll_offset(m_r_selected, true);
 }
 
-//m_r_selected를 clear하고 모든 항목의 선택 플래그도 리셋시킨다.
-void CUXStudioView::set_selected_flag(bool selected)
+//모든 항목을 선택 또는 해제한다.
+void CUXStudioView::select_all(bool select)
 {
 	for (auto el : pDoc->m_data)
-		el->m_selected = selected;
+		el->m_selected = select;
 
 	get_bound_selected_rect();
 
@@ -598,7 +656,7 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		}
 	}
 
-	trace(m_handle_index);
+	//trace(m_handle_index);
 
 	if (m_handle_index != -1)
 	{

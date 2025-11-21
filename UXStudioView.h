@@ -17,13 +17,14 @@ protected: // serialization에서만 만들어집니다.
 	CUXStudioView() noexcept;
 	DECLARE_DYNCREATE(CUXStudioView)
 
-	CSCD2Context			m_d2dc;
+	CSCD2Context					m_d2dc;
 
 	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
 	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
 	ComPtr<ID2D1SolidColorBrush>	m_br_item;
 	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
 	ComPtr<ID2D1SolidColorBrush>	m_br_selected;
+	ComPtr<ID2D1SolidColorBrush>	m_br_multi_selected;
 
 	IDWriteFactory*					m_WriteFactory = NULL;
 	IDWriteTextFormat*				m_WriteFormat = NULL;
@@ -38,20 +39,24 @@ protected: // serialization에서만 만들어집니다.
 	CRect							m_resize_handle[9];
 	void							draw_resize_handle(ID2D1DeviceContext* d2dc);
 	bool							m_is_resizing = false;
+	void							resize_items(CPoint pt);	//pt = current point
 
 	//max rect of all selected items
 	Gdiplus::RectF					m_r_selected;
 	//선택된 모든 항목의 최대 사각형인 m_r_selected를 구한다. new_rect가 NULL이 아니면 이것까지 포함해서 구한다.
 	void							get_bound_selected_rect(Gdiplus::RectF* new_rect = NULL);
-	//m_r_selected를 clear하고 모든 항목의 선택 플래그도 리셋시킨다.
-	void							set_selected_flag(bool selected);
+	//모든 항목을 선택 또는 해제한다.
+	void							select_all(bool select);
 	void							delete_selected_items();
 
 	CSCUIElement*					m_item_hover = NULL;
-	//std::vector<CSCUIElement*>		m_item_selected;
+	CSCUIElement*					m_item_selected = NULL;
 	CSCUIElement*					m_item_current = NULL;
 
 	CSCUIElement*					get_hover_item(CPoint pt);
+
+	//가장 가까운 grid 좌표를 리턴한다.
+	//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
 	CPoint							get_near_grid(CPoint pt);
 
 //load, save
@@ -60,14 +65,30 @@ protected: // serialization에서만 만들어집니다.
 	bool							m_spacebar_down = false;
 
 	//point, rect 등을 현재 스크롤바 위치만큼 보정한다.
-	template <class T> void	offset_scroll(T& value)
+	//invert = false이면 스크롤 오프셋만큼 더하는 것이고 true이면 적용했던 오프셋을 다시 빼준다.
+	template <class T> void	adjust_scroll_offset(T& value, bool invert = false)
 	{
-		CPoint sp(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+		CPoint sp((invert ? -1 : 1) * GetScrollPos(SB_HORZ), (invert ? -1 : 1) * GetScrollPos(SB_VERT));
 
+		//((CPoint)value).Offset(sp);	//이렇게 하면 value가 변경되지 않는다.
 		if constexpr (std::is_same_v<T, CPoint>)
-			((CPoint)value).Offset(sp);
+		{
+			CPoint pt = value;
+			pt.Offset(sp);
+			value = pt;
+		}
 		else if constexpr (std::is_same_v<T, Gdiplus::Rect>)
-			((CPoint)value).Offset(sp);
+		{
+			Gdiplus::Rect r = value;
+			r.Offset(sp.x, sp.y);
+			value = r;
+		}
+		else if constexpr (std::is_same_v<T, Gdiplus::RectF>)
+		{
+			Gdiplus::RectF r = value;
+			r.Offset(sp.x, sp.y);
+			value = r;
+		}
 	}
 
 public:
