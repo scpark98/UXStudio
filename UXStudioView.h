@@ -43,6 +43,8 @@ protected: // serialization에서만 만들어집니다.
 
 	//max rect of all selected items
 	Gdiplus::RectF					m_r_selected;
+	std::deque<CSCUIElement*>		get_selected_items();
+
 	//선택된 모든 항목의 최대 사각형인 m_r_selected를 구한다. new_rect가 NULL이 아니면 이것까지 포함해서 구한다.
 	void							get_bound_selected_rect(Gdiplus::RectF* new_rect = NULL);
 	//모든 항목을 선택 또는 해제한다.
@@ -145,6 +147,10 @@ public:
 //	virtual void OnActivateFrame(UINT nState, CFrameWnd* pDeactivateFrame);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg void OnMenuViewSendToEnd();
+	afx_msg void OnMenuViewSendToBack();
+	afx_msg void OnMenuViewSendToFore();
+	afx_msg void OnMenuViewSendToTop();
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전
