@@ -41,7 +41,7 @@ CUXStudioApp::CUXStudioApp() noexcept
 
 	m_nAppLook = 0;
 	// 다시 시작 관리자 지원
-	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
+	//m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 #ifdef _MANAGED
 	// 애플리케이션을 공용 언어 런타임 지원을 사용하여 빌드한 경우(/clr):
 	//     1) 이 추가 설정은 다시 시작 관리자 지원이 제대로 작동하는 데 필요합니다.

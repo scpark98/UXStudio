@@ -629,7 +629,10 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 					edit_end(false);
 					return TRUE;
 				}
-				break;
+				//개발단계에서 esc키를 누르면 프로그램을 바로 종료하기 위해 return false;로 하여
+				//CMainFrame에서 이 키를 처리하도록 전달함.
+				//종료를 막으르면 이를 break;로 변경할 것.
+				return false;
 			case VK_SPACE:
 				m_spacebar_down = true;
 				break;
@@ -882,7 +885,7 @@ void CUXStudioView::OnMenuViewLabelEdit()
 	if (m_edit.m_hWnd == NULL)
 	{
 		DWORD dwStyle = ES_CENTER | WS_BORDER | WS_CHILD | WS_VISIBLE /*| ES_AUTOHSCROLL */ | ES_AUTOVSCROLL | ES_MULTILINE;
-		m_edit.Create(dwStyle, CRect(0, 0, 1, 1), this, 0);
+		m_edit.create(dwStyle, CRect(0, 0, 1, 1), this, 0);
 		m_edit.set_draw_border();
 	}
 
@@ -890,6 +893,10 @@ void CUXStudioView::OnMenuViewLabelEdit()
 	CPoint cp = r.CenterPoint();
 	r = make_center_rect(cp.x, cp.y, r.Width() - 10, 20);
 	m_edit.MoveWindow(r);
+
+	m_edit.set_font_name(m_item_selected->m_font_name);
+	m_edit.set_font_size(m_item_selected->m_font_size);
+	m_edit.set_font_bold(m_item_selected->m_font_weight);
 
 	m_edit.set_text(m_item_selected->m_label);
 	m_edit.ShowWindow(SW_SHOW);
