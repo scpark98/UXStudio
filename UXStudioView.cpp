@@ -43,10 +43,13 @@ BEGIN_MESSAGE_MAP(CUXStudioView, CFormView)
 //	ON_WM_ACTIVATE()
 //	ON_WM_ACTIVATEAPP()
 ON_WM_SETCURSOR()
-ON_COMMAND(ID_MENU_VIEW_SEND_TO_END, &CUXStudioView::OnMenuViewSendToEnd)
-ON_COMMAND(ID_MENU_VIEW_SEND_TO_BACK, &CUXStudioView::OnMenuViewSendToBack)
-ON_COMMAND(ID_MENU_VIEW_SEND_TO_FORE, &CUXStudioView::OnMenuViewSendToFore)
 ON_COMMAND(ID_MENU_VIEW_SEND_TO_TOP, &CUXStudioView::OnMenuViewSendToTop)
+ON_COMMAND(ID_MENU_VIEW_SEND_TO_FORE, &CUXStudioView::OnMenuViewSendToFore)
+ON_COMMAND(ID_MENU_VIEW_SEND_TO_BACK, &CUXStudioView::OnMenuViewSendToBack)
+ON_COMMAND(ID_MENU_VIEW_SEND_TO_BOTTOM, &CUXStudioView::OnMenuViewSendToBottom)
+ON_COMMAND(ID_MENU_VIEW_COPY, &CUXStudioView::OnMenuViewCopy)
+ON_COMMAND(ID_MENU_VIEW_PASTE, &CUXStudioView::OnMenuViewPaste)
+ON_COMMAND(ID_MENU_VIEW_LABEL_EDIT, &CUXStudioView::OnMenuViewLabelEdit)
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -105,6 +108,7 @@ void CUXStudioView::OnInitialUpdate()
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), m_br_multi_selected.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), m_br_label.GetAddressOf());
 
 	m_sz_grid.cx = AfxGetApp()->GetProfileInt(_T("setting"), _T("grid cx"), 8);
 	m_sz_grid.cy = AfxGetApp()->GetProfileInt(_T("setting"), _T("grid cy"), 8);
@@ -145,6 +149,17 @@ void CUXStudioView::OnPrint(CDC* pDC, CPrintInfo* /*pInfo*/)
 
 void CUXStudioView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
+	//CSCUIElement* hover_item = get_hover_item(point);
+	//선택되지 않은 항목에서 우클릭하면 선택상태로 만들어준 후 팝업메뉴를 표시한다.
+	if (m_item_hover != m_item_selected)
+	{
+		select_all(false);
+		m_item_selected = m_item_hover;
+		m_item_selected->m_selected = true;
+		Invalidate();
+		Wait(10);
+	}
+
 	ClientToScreen(&point);
 	OnContextMenu(this, point);
 }
@@ -160,7 +175,9 @@ void CUXStudioView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 	menu.LoadMenu(IDR_MENU_VIEW_CONTEXT);
 	pMenu = menu.GetSubMenu(0);
 
+	m_is_context_menu_displaying = true;
 	pMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+	m_is_context_menu_displaying = false;
 }
 
 
@@ -242,9 +259,32 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
 		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, (el == m_item_hover && !el->m_selected) ? 2.0f : 1.0f, el->m_round);
-		CString text;
-		text.Format(_T("%d. %s"), i, get_rect_info_str(gpRectF_to_CRect(el->m_r), 0));
-		d2dc->DrawText(text, text.GetLength(), m_WriteFormat, rf, m_br_selected.Get());
+
+		m_br_label->SetColor(get_d2color(pDoc->m_data[i]->m_cr_label));
+
+		m_WriteFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		d2dc->DrawText(pDoc->m_data[i]->m_label, pDoc->m_data[i]->m_label.GetLength(), m_WriteFormat, rf, m_br_label.Get());
+
+		//좌표 확인용 코드
+		if (true)
+		{
+			CString text;
+			text.Format(_T("%d. %s"), i, get_rect_info_str(gpRectF_to_CRect(el->m_r), 0));
+
+			rf.top -= 20;
+			rf.bottom = rf.bottom + 20;
+
+			if (rf.left < 0)
+				rf.left = 0;
+			if (rf.top < 0)
+				rf.top = 0;
+
+			rf.bottom = rf.top + 20;
+
+			d2dc->DrawText(text, text.GetLength(), m_WriteFormat, rf, m_br_grid.Get());
+		}
 	}
 
 	if (m_item_selected)
@@ -316,6 +356,7 @@ void CUXStudioView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 //가장 가까운 grid 좌표를 리턴한다.
 //스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
+/*
 CPoint CUXStudioView::get_near_grid(CPoint pt)
 {
 	CPoint res = pt;
@@ -324,7 +365,7 @@ CPoint CUXStudioView::get_near_grid(CPoint pt)
 
 	return res;
 }
-
+*/
 void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetCapture();
@@ -395,7 +436,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_is_resizing)
 	{
-		resize_items(pt);
+		move_resize_items(pt);
 	}
 	else if (m_lbutton_down)
 	{
@@ -414,6 +455,10 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	{
 		m_item_hover = get_hover_item(pt);
 		TRACE(_T("hover = %p\n"), m_item_hover);
+
+		CRect rc;
+		GetClientRect(rc);
+		m_d2dc.on_size_changed(rc.Width(), rc.Height());
 		Invalidate();
 	}
 
@@ -460,10 +505,13 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	CFormView::OnLButtonUp(nFlags, point);
 }
 
-void CUXStudioView::resize_items(CPoint pt)
+void CUXStudioView::move_resize_items(CPoint pt)
 {
-	CSCUIElement* item = NULL;
+	if (!m_item_selected)
+		return;
 
+	CSCUIElement* item = m_item_selected;
+	/*
 	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
 		[&](const auto& el)
 		{
@@ -478,13 +526,15 @@ void CUXStudioView::resize_items(CPoint pt)
 
 	if (!item)
 		return;
+	*/
+
+	pt = get_near_grid(pt);
 
 	switch (m_handle_index)
 	{
 		case corner_inside:
-			item->m_r.X += (pt.x - m_pt_lbutton_down.x);
-			item->m_r.Y += (pt.y - m_pt_lbutton_down.y);
-			//adjust_rect_range(m_screen_roi, CRect_to_gpRectF(m_r_display));
+			item->m_r.X += pt.x - m_pt_lbutton_down.x;
+			item->m_r.Y += pt.y - m_pt_lbutton_down.y;
 			m_pt_lbutton_down = pt;
 			break;
 		case corner_left:
@@ -571,6 +621,23 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 			case VK_DELETE:
 				delete_selected_items();
 				return true;
+			case VK_F2:
+				OnMenuViewLabelEdit();
+				return true;
+			case 'C':
+				if (IsCtrlPressed())
+				{
+					OnMenuViewCopy();
+					return true;
+				}
+				break;
+			case 'V':
+				if (IsCtrlPressed())
+				{
+					OnMenuViewPaste();
+					return true;
+				}
+				break;
 		}
 	}
 	else if (pMsg->message == WM_KEYUP)
@@ -627,12 +694,18 @@ void CUXStudioView::delete_selected_items()
 		}
 	}
 
+	m_item_selected = NULL;
 	Invalidate();
 }
 
 BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	//팝업메뉴가 표시중이거나 선택항목이 없다면 커서의 변경은 없다.
+	if (m_is_context_menu_displaying || !m_item_selected)
+		return CFormView::OnSetCursor(pWnd, nHitTest, message);
+
 	CPoint pt;
 	CRect rc;
 
@@ -689,19 +762,53 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	return CFormView::OnSetCursor(pWnd, nHitTest, message);
 }
 
-void CUXStudioView::OnMenuViewSendToEnd()
+void CUXStudioView::OnMenuViewSendToBottom()
 {
-	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	std::deque<CSCUIElement*> selected = get_selected_items();
+	if (selected.size() != 1)
+		return;
+
+	//선택된 항목을 맨 뒤에 넣어주고 0 ~ n-1 중에 있던 해당 아이템을 deque에서 제거한다.
+	pDoc->m_data.push_back(selected[0]);
+	m_item_selected = pDoc->m_data.back();
+	auto res = std::find(pDoc->m_data.begin(), pDoc->m_data.end() - 1, selected[0]);
+
+	CSCUIElement* data = *res;
+	pDoc->m_data.erase(res);
+
+	Invalidate();
 }
 
 void CUXStudioView::OnMenuViewSendToBack()
 {
-	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	std::deque<CSCUIElement*> selected = get_selected_items();
+	if (selected.size() != 1)
+		return;
+
+	//바로 뒤에 있는 항목과 swap 시킨다. 현재 항목이 맨 끝이라면 아무 동작도 하지 않는다.
+	auto res = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), selected[0]);
+	if (res == pDoc->m_data.end() - 1)
+		return;
+
+	std::iter_swap(res, res + 1);
+
+	Invalidate();
 }
 
 void CUXStudioView::OnMenuViewSendToFore()
 {
-	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	std::deque<CSCUIElement*> selected = get_selected_items();
+	if (selected.size() != 1)
+		return;
+
+	//바로 앞에 있는 항목과 swap 시킨다. 현재 항목이 맨 앞이라면 아무 동작도 하지 않는다.
+	auto res = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), selected[0]);
+	if (res == pDoc->m_data.begin())
+		return;
+
+	std::iter_swap(res - 1, res);
+
+	Invalidate();
 }
 
 void CUXStudioView::OnMenuViewSendToTop()
@@ -710,11 +817,15 @@ void CUXStudioView::OnMenuViewSendToTop()
 	if (selected.size() != 1)
 		return;
 
+	//선택된 항목을 맨 앞에 넣어주고 1 ~ n 중에 있던 해당 아이템을 deque에서 제거한다.
 	pDoc->m_data.push_front(selected[0]);
+	m_item_selected = *(pDoc->m_data.begin());
 	auto res = std::find(pDoc->m_data.begin() + 1, pDoc->m_data.end(), selected[0]);
 
 	CSCUIElement* data = *res;
 	pDoc->m_data.erase(res);
+	
+	Invalidate();
 }
 
 std::deque<CSCUIElement*> CUXStudioView::get_selected_items()
@@ -728,4 +839,43 @@ std::deque<CSCUIElement*> CUXStudioView::get_selected_items()
 	}
 
 	return items;
+}
+
+void CUXStudioView::OnMenuViewCopy()
+{
+	m_item_copy_src = m_item_selected;
+}
+
+void CUXStudioView::OnMenuViewPaste()
+{
+	CSCUIElement* new_item = new CSCUIElement();
+	m_item_copy_src->copy(new_item);
+
+	new_item->m_r.Offset(20, 20);
+
+	pDoc->m_data.push_back(new_item);
+	m_item_selected = new_item;
+
+	Invalidate();
+}
+
+void CUXStudioView::OnMenuViewLabelEdit()
+{
+	if (!m_item_selected)
+		return;
+
+	if (m_edit.m_hWnd == NULL)
+	{
+		DWORD dwStyle = ES_CENTER | WS_BORDER | WS_CHILD | WS_VISIBLE /*| ES_AUTOHSCROLL */ | ES_AUTOVSCROLL | ES_MULTILINE;
+		m_edit.Create(dwStyle, CRect(0, 0, 1, 1), this, 0);
+		//m_edit.set_line_align()
+	}
+
+	CRect r = gpRectF_to_CRect(m_item_selected->m_r);
+	CPoint cp = r.CenterPoint();
+	r, make_center_rect(cp.x, cp.y, 60, 20);
+	m_edit.MoveWindow(r);
+
+	m_edit.set_text(m_item_selected->m_label);
+	m_edit.ShowWindow(SW_SHOW);
 }

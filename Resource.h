@@ -85,21 +85,27 @@
 #define IDS_FIND_TAB                    302
 #define IDS_EXPLORER                    305
 #define IDS_EDIT_MENU                   306
-#define IDR_MENU1                       311
 #define IDR_MENU_VIEW_CONTEXT           311
+#define IDC_BUTTON1                     1000
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
 #define ID_MENU_VIEW_SEND_TO_FORE       32774
 #define ID_MENU_VIEW_SEND_TO_TOP        32775
+#define ID_VIEW_32776                   32776
+#define ID_MENU_VIEW_COPY               32777
+#define ID_MENU_VIEW_PASTE              32778
+#define ID_MENU_VIEW_SEND_TO_BOTTOM     32779
+#define ID_VIEW_32780                   32780
+#define ID_MENU_VIEW_LABEL_EDIT         32781
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        312
-#define _APS_NEXT_COMMAND_VALUE         32776
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_COMMAND_VALUE         32782
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

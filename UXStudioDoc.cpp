@@ -162,7 +162,7 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 	Json json;
 	json.load(m_filepath);
-	//json.get_all_data();
+	json.get_all_data();
 
 	SetTitle(m_filepath);
 
@@ -177,6 +177,7 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_type = json.get_array_member("items", i, "type", 0);
 		el->m_selected = json.get_array_member("items", i, "selected", false);
 
+
 		rapidjson::Value& r = items[i]["r"];
 		el->m_r.X = r[0].GetFloat();
 		el->m_r.Y = r[1].GetFloat();
@@ -184,9 +185,20 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_r.Height = r[3].GetFloat();
 
 		el->m_round = json.get_array_member("items", i, "round", 0);
-		el->m_label = json.get_array_member("items", i, "label", "");
-		el->m_label_align = json.get_array_member("items", i, "label align", UINT(0));
-		el->m_label_visible = json.get_array_member("items", i, "label visible", true);
+
+
+		el->m_label = json.get_array_member("items", i, "label", CString());
+		//TRACE(_T("%s\n"), CString(json.get_array_member("items", i, "label", std::string("")).c_str()));
+		//TRACE(_T("%S\n"), json.get_array_member("items", i, "label", ""));
+		el->m_label_align = json.get_array_member("items", i, "label_align", UINT(0));
+		el->m_label_visible = json.get_array_member("items", i, "label_visible", true);
+		el->m_cr_label = Gdiplus::Color(json.get_array_member("items", i, "cr_label", (UINT)(Gdiplus::Color::Black)));
+		el->m_cr_label_back = Gdiplus::Color(json.get_array_member("items", i, "cr_label_back", (UINT)(Gdiplus::Color::Transparent)));
+
+		el->m_font_name = json.get_array_member("items", i, "font_name", "Arial");
+		el->m_font_size = json.get_array_member("items", i, "font_size", 10);
+		el->m_font_weight = json.get_array_member("items", i, "font_weight", FW_NORMAL);
+
 		el->m_cr_stroke = Gdiplus::Color(json.get_array_member("items", i, "cr_stroke", (UINT)(Gdiplus::Color::RoyalBlue)));
 		el->m_cr_fill = Gdiplus::Color(json.get_array_member("items", i, "cr_fill", (UINT)(Gdiplus::Color::Transparent)));
 
@@ -212,24 +224,29 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		item.SetObject();
 
 		item.AddMember("type", m_data[i]->m_type, allocator);
+		item.AddMember(rapidjson::Value("selected", allocator).Move(), m_data[i]->m_selected, allocator);
 
 		rapidjson::Value r(rapidjson::kArrayType);
 		r.PushBack(m_data[i]->m_r.X, allocator);
 		r.PushBack(m_data[i]->m_r.Y, allocator);
 		r.PushBack(m_data[i]->m_r.Width, allocator);
 		r.PushBack(m_data[i]->m_r.Height, allocator);
-
-
 		item.AddMember("r", r, allocator);
 
-		item.AddMember(rapidjson::Value("selected", allocator).Move(), m_data[i]->m_selected, allocator);
 		item.AddMember(rapidjson::Value("round", allocator).Move(), m_data[i]->m_round, allocator);
 
 		//CT2CA(m_data[i]->m_label)을 직접 파라미터로 넘기면 컴파일 에러가 발생한다.
 		std::string sstr = CT2CA(m_data[i]->m_label);
 		item.AddMember(rapidjson::Value("label", allocator).Move(), sstr, allocator);
-		item.AddMember(rapidjson::Value("label align", allocator).Move(), m_data[i]->m_label_align, allocator);
-		item.AddMember(rapidjson::Value("label visible", allocator).Move(), m_data[i]->m_label_visible, allocator);
+		item.AddMember(rapidjson::Value("label_align", allocator).Move(), m_data[i]->m_label_align, allocator);
+		item.AddMember(rapidjson::Value("label_visible", allocator).Move(), m_data[i]->m_label_visible, allocator);
+		item.AddMember(rapidjson::Value("cr_label", allocator).Move(), (UINT)m_data[i]->m_cr_label.GetValue(), allocator);
+		item.AddMember(rapidjson::Value("cr_label_back", allocator).Move(), (UINT)m_data[i]->m_cr_label_back.GetValue(), allocator);
+
+		sstr = CT2CA(m_data[i]->m_font_name);
+		item.AddMember(rapidjson::Value("font_name", allocator).Move(), sstr, allocator);
+		item.AddMember(rapidjson::Value("font_size", allocator).Move(), m_data[i]->m_font_size, allocator);
+		item.AddMember(rapidjson::Value("font_weight", allocator).Move(), m_data[i]->m_font_weight, allocator);
 
 		item.AddMember(rapidjson::Value("cr_stroke", allocator).Move(), (UINT)m_data[i]->m_cr_stroke.GetValue(), allocator);
 		item.AddMember(rapidjson::Value("cr_fill", allocator).Move(), (UINT)m_data[i]->m_cr_fill.GetValue(), allocator);
