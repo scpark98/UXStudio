@@ -55,6 +55,8 @@ protected: // serialization에서만 만들어집니다.
 	void							delete_selected_items();
 
 	CSCEdit							m_edit;
+	LRESULT							on_message_CSCEdit(WPARAM wParam, LPARAM lParam);
+	void							edit_end(bool valid = true);
 
 	CSCUIElement*					m_item_hover = NULL;
 	CSCUIElement*					m_item_selected = NULL;

@@ -50,6 +50,7 @@ ON_COMMAND(ID_MENU_VIEW_SEND_TO_BOTTOM, &CUXStudioView::OnMenuViewSendToBottom)
 ON_COMMAND(ID_MENU_VIEW_COPY, &CUXStudioView::OnMenuViewCopy)
 ON_COMMAND(ID_MENU_VIEW_PASTE, &CUXStudioView::OnMenuViewPaste)
 ON_COMMAND(ID_MENU_VIEW_LABEL_EDIT, &CUXStudioView::OnMenuViewLabelEdit)
+ON_REGISTERED_MESSAGE(Message_CSCEdit, &CUXStudioView::on_message_CSCEdit)
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -615,6 +616,20 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 	{
 		switch (pMsg->wParam)
 		{
+			case VK_RETURN:
+				if (GetFocus() == &m_edit)
+				{
+					edit_end();
+					return TRUE;
+				}
+				break;
+			case VK_ESCAPE:
+				if (GetFocus() == &m_edit)
+				{
+					edit_end(false);
+					return TRUE;
+				}
+				break;
 			case VK_SPACE:
 				m_spacebar_down = true;
 				break;
@@ -702,8 +717,8 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
-	//팝업메뉴가 표시중이거나 선택항목이 없다면 커서의 변경은 없다.
-	if (m_is_context_menu_displaying || !m_item_selected)
+	//팝업메뉴가 표시중이거나 편집중이거나 선택항목이 없다면 커서의 변경은 없다.
+	if (m_is_context_menu_displaying || !m_item_selected || (m_edit.m_hWnd && m_edit.IsWindowVisible()))
 		return CFormView::OnSetCursor(pWnd, nHitTest, message);
 
 	CPoint pt;
@@ -868,14 +883,32 @@ void CUXStudioView::OnMenuViewLabelEdit()
 	{
 		DWORD dwStyle = ES_CENTER | WS_BORDER | WS_CHILD | WS_VISIBLE /*| ES_AUTOHSCROLL */ | ES_AUTOVSCROLL | ES_MULTILINE;
 		m_edit.Create(dwStyle, CRect(0, 0, 1, 1), this, 0);
-		//m_edit.set_line_align()
+		m_edit.set_draw_border();
 	}
 
 	CRect r = gpRectF_to_CRect(m_item_selected->m_r);
 	CPoint cp = r.CenterPoint();
-	r, make_center_rect(cp.x, cp.y, 60, 20);
+	r = make_center_rect(cp.x, cp.y, r.Width() - 10, 20);
 	m_edit.MoveWindow(r);
 
 	m_edit.set_text(m_item_selected->m_label);
 	m_edit.ShowWindow(SW_SHOW);
+	m_edit.SetFocus();
+}
+
+LRESULT CUXStudioView::on_message_CSCEdit(WPARAM wParam, LPARAM lParam)
+{
+	m_edit.ShowWindow(SW_HIDE);
+
+	return 0;
+}
+
+void CUXStudioView::edit_end(bool valid)
+{
+	m_edit.ShowWindow(SW_HIDE);
+
+	if (!valid)
+		return;
+
+	m_item_selected->m_label = m_edit.get_text();
 }
