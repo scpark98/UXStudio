@@ -239,15 +239,17 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 
 	//도형을 그리는 중에는 스크롤 보정된 실제 좌표이므로 보정을 하지 않은 좌표를 스크린에 그려줘야 한다.
-	if (m_lbutton_down && !m_spacebar_down)
+	if (m_lbutton_down && !m_spacebar_down && m_pt_lbutton_down.x >= 0 && m_pt_lbutton_down.y >= 0)
 	{
 		CPoint pt_lbutton_down = m_pt_lbutton_down;
 		CPoint pt_cur = m_pt_cur;
-		TRACE(_T("old = %d, %d\n"), pt_cur.x, pt_cur.y);
-		adjust_scroll_offset(pt_lbutton_down, true);
+		TRACE(_T("old : pt_lbutton_down = %d, %d, pt_cur = %d, %d\n"), pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y);
+		//adjust_scroll_offset(pt_lbutton_down, true);
 		adjust_scroll_offset(pt_cur, true);
-		TRACE(_T("new = %d, %d\n"), pt_cur.x, pt_cur.y);
-		d2dc->DrawRectangle(D2D1::RectF(pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y), m_br_draw.Get());
+		TRACE(_T("new : pt_lbutton_down = %d, %d, pt_cur = %d, %d\n"), pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y);
+
+		if (pt_lbutton_down != pt_cur)
+			d2dc->DrawRectangle(D2D1::RectF(pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y), m_br_draw.Get());
 	}
 
 	for (int i = 0; i < pDoc->m_data.size(); i++)
@@ -259,7 +261,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
-		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, (el == m_item_hover && !el->m_selected) ? 2.0f : 1.0f, el->m_round);
+		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, (el == m_item_hover && !el->m_selected) ? 2.0f : 1.0f, el->m_round[0]);
 
 		m_br_label->SetColor(get_d2color(pDoc->m_data[i]->m_cr_label));
 
@@ -293,7 +295,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		Gdiplus::RectF r_selected = m_item_selected->m_r;
 		r_selected.Offset(-hs, -vs);
 		D2D1_RECT_F rf_selected = { r_selected.X, r_selected.Y, r_selected.GetRight(), r_selected.GetBottom() };
-		d2dc->DrawRectangle(rf_selected, m_br_multi_selected.Get(), 2.0f);
+		d2dc->DrawRectangle(rf_selected, m_br_multi_selected.Get(), 1.0f);
 		get_resizable_handle(r_selected, m_resize_handle);
 		draw_resize_handle(d2dc);
 	}
@@ -369,6 +371,9 @@ CPoint CUXStudioView::get_near_grid(CPoint pt)
 */
 void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (m_edit.m_hWnd && m_edit.IsWindowVisible())
+		edit_end();
+
 	SetCapture();
 
 	//hover인 항목을 클릭하면 편집모드로 전환된다.
@@ -377,6 +382,8 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	//선택된 항목들을 이동, 크기를 변경 모드 시작
 	//if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
+	trace(m_item_selected);
+	trace(m_handle_index);
 	if (m_item_selected && m_handle_index >= corner_inside)
 	{
 		m_is_resizing = true;
@@ -406,21 +413,27 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		else
 		{
+			m_item_hover->m_selected = false;
 			m_item_selected = NULL;
 			m_r_selected.Width = 0;
 		}
 
 		Invalidate();
+
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_property(m_item_selected);
+
 		return;
 	}
 	else
 	{
+		select_all(false);
 		m_item_selected = NULL;
 		m_r_selected.Width = 0;
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_property(m_item_selected);
 	}
 
 	m_lbutton_down = true;
-	m_pt_lbutton_down = get_near_grid(pt);
+	m_pt_cur = m_pt_lbutton_down = get_near_grid(pt);
 
 	CFormView::OnLButtonDown(nFlags, point);
 }
@@ -438,6 +451,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	if (m_is_resizing)
 	{
 		move_resize_items(pt);
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_property(m_item_selected);
 	}
 	else if (m_lbutton_down)
 	{
@@ -494,6 +508,8 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 			m_pt_cur = get_near_grid(m_pt_cur);
 			Gdiplus::RectF r(m_pt_lbutton_down.x, m_pt_lbutton_down.y, m_pt_cur.x - m_pt_lbutton_down.x, m_pt_cur.y - m_pt_lbutton_down.y);
 			normalize_rect(r);
+
+			m_pt_lbutton_down = CPoint(-1, -1);
 
 			if (r.Width < 20 && r.Height < 20)
 				return;
@@ -617,11 +633,11 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 		switch (pMsg->wParam)
 		{
 			case VK_RETURN:
-				if (GetFocus() == &m_edit)
-				{
-					edit_end();
-					return TRUE;
-				}
+				//if (GetFocus() == &m_edit)
+				//{
+				//	edit_end();
+				//	return TRUE;
+				//}
 				break;
 			case VK_ESCAPE:
 				if (GetFocus() == &m_edit)
@@ -884,27 +900,30 @@ void CUXStudioView::OnMenuViewLabelEdit()
 
 	if (m_edit.m_hWnd == NULL)
 	{
-		DWORD dwStyle = ES_CENTER | WS_BORDER | WS_CHILD | WS_VISIBLE /*| ES_AUTOHSCROLL */ | ES_AUTOVSCROLL | ES_MULTILINE;
+		DWORD dwStyle = ES_CENTER | /*WS_BORDER |*/ WS_CHILD | /*| ES_AUTOHSCROLL |*/  ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN;
 		m_edit.create(dwStyle, CRect(0, 0, 1, 1), this, 0);
-		m_edit.set_draw_border();
 	}
 
 	CRect r = gpRectF_to_CRect(m_item_selected->m_r);
 	CPoint cp = r.CenterPoint();
-	r = make_center_rect(cp.x, cp.y, r.Width() - 10, 20);
+	//r = make_center_rect(cp.x, cp.y, r.Width(), 20);
+	r.DeflateRect(RECT_RESIZE_HANDLE_SIZE, RECT_RESIZE_HANDLE_SIZE);
 	m_edit.MoveWindow(r);
 
+	m_edit.set_back_color(m_item_selected->m_cr_fill);
 	m_edit.set_font_name(m_item_selected->m_font_name);
 	m_edit.set_font_size(m_item_selected->m_font_size);
 	m_edit.set_font_bold(m_item_selected->m_font_weight);
 
 	m_edit.set_text(m_item_selected->m_label);
 	m_edit.ShowWindow(SW_SHOW);
+	m_edit.SetSel(0, -1);
 	m_edit.SetFocus();
 }
 
 LRESULT CUXStudioView::on_message_CSCEdit(WPARAM wParam, LPARAM lParam)
 {
+	CSCEdit* pEdit = (CSCEdit*)wParam;
 	m_edit.ShowWindow(SW_HIDE);
 
 	return 0;
@@ -918,4 +937,10 @@ void CUXStudioView::edit_end(bool valid)
 		return;
 
 	m_item_selected->m_label = m_edit.get_text();
+}
+
+void CUXStudioView::apply_changed_property(CSCUIElement* item)
+{
+	m_item_selected->m_label = item->m_label;
+	Invalidate();
 }

@@ -96,6 +96,15 @@
     <ClInclude Include="..\Common\CEdit\SCEdit\SCEdit.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="PropertyDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ResizeCtrl.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\CStatic\SCStatic\SCStatic.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UXStudio.cpp">
@@ -153,6 +162,15 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\CEdit\SCEdit\SCEdit.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\ResizeCtrl.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\CStatic\SCStatic\SCStatic.cpp">
       <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>

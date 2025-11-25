@@ -13,6 +13,12 @@
 
 - OnMouseMove()에서는 m_r_selected안에 있으면 반응하지 않는다.
 
+[속성창]
+- label
+- x y w h
+- round (indivisual 클릭 시 각각 조절 가능)
+- stroke color, alpha, width, style
+- fill color, alpha, pattern
 
 [스크롤 보정]
 - 도형을 그릴때도 스크롤 보정을 하고 그려야 한다. 그래야만 grid를 따라 그릴 수 있다.

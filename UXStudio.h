@@ -9,6 +9,7 @@
 
 #include "resource.h"       // 주 기호입니다.
 
+#include "Common/data_types/CSCUIElement/SCUIElement.h"
 
 // CUXStudioApp:
 // 이 클래스의 구현에 대해서는 UXStudio.cpp을(를) 참조하세요.
@@ -19,6 +20,7 @@ class CUXStudioApp : public CWinAppEx
 public:
 	CUXStudioApp() noexcept;
 
+	void				apply_changed_property(CSCUIElement* item);
 
 // 재정의입니다.
 public:

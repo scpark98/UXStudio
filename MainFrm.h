@@ -6,7 +6,8 @@
 #include "FileView.h"
 #include "ClassView.h"
 #include "OutputWnd.h"
-#include "PropertiesWnd.h"
+//#include "PropertiesWnd.h"
+#include "PropertyDlg.h"
 
 class CMainFrame : public CMDIFrameWndEx
 {
@@ -19,7 +20,9 @@ public:
 
 // 작업입니다.
 public:
-	void			set_cursor_info(CPoint pt);
+	void				set_cursor_info(CPoint pt);
+	CPropertyDlg		m_propertyDlg;
+
 
 // 재정의입니다.
 public:
@@ -42,7 +45,7 @@ protected:  // 컨트롤 모음이 포함된 멤버입니다.
 	CFileView         m_wndFileView;
 	CClassView        m_wndClassView;
 	COutputWnd        m_wndOutput;
-	CPropertiesWnd    m_wndProperties;
+	//CPropertiesWnd    m_wndProperties;
 
 // 생성된 메시지 맵 함수
 protected:

@@ -34,8 +34,8 @@ protected: // serialization에서만 만들어집니다.
 	CSize							m_sz_grid;
 
 	bool							m_lbutton_down = false;
-	CPoint							m_pt_lbutton_down;
-	CPoint							m_pt_cur;
+	CPoint							m_pt_lbutton_down = CPoint(-1, -1);
+	CPoint							m_pt_cur = CPoint(-1, -1);
 
 	int								m_handle_index = -1;
 	CRect							m_resize_handle[9];
@@ -57,6 +57,8 @@ protected: // serialization에서만 만들어집니다.
 	CSCEdit							m_edit;
 	LRESULT							on_message_CSCEdit(WPARAM wParam, LPARAM lParam);
 	void							edit_end(bool valid = true);
+
+	void							apply_changed_property(CSCUIElement* item);
 
 	CSCUIElement*					m_item_hover = NULL;
 	CSCUIElement*					m_item_selected = NULL;

@@ -86,7 +86,17 @@
 #define IDS_EXPLORER                    305
 #define IDS_EDIT_MENU                   306
 #define IDR_MENU_VIEW_CONTEXT           311
+#define IDD_PROPERTY                    312
 #define IDC_BUTTON1                     1000
+#define IDC_STATIC_X                    1006
+#define IDC_STATIC_Y                    1007
+#define IDC_STATIC_W                    1008
+#define IDC_STATIC_H                    1009
+#define IDC_STATIC_LABEL                1010
+#define IDC_STATIC_FILL                 1011
+#define IDC_STATIC_FILL_COLOR           1012
+#define IDC_STATIC_X3                   1013
+#define IDC_STATIC_FILL_OPACITY         1013
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
@@ -103,9 +113,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        312
+#define _APS_NEXT_RESOURCE_VALUE        314
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

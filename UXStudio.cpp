@@ -248,5 +248,22 @@ void CUXStudioApp::SaveCustomState()
 
 // CUXStudioApp 메시지 처리기
 
+void CUXStudioApp::apply_changed_property(CSCUIElement* item)
+{
+	CMDIFrameWnd* pMainFrame = (CMDIFrameWnd*)AfxGetMainWnd();
+	if (pMainFrame)
+	{
+		CMDIChildWnd* pChild = pMainFrame->MDIGetActive();  // 활성 MDI Child
+		if (pChild)
+		{
+			CUXStudioView* pView = (CUXStudioView*)pChild->GetActiveView();                // Child 내부의 View
+			pView->apply_changed_property(item);
+		}
+	}
+	//CView* pView = ((CFrameWnd*)AfxGetMainWnd())->GetActiveView();
 
-
+	//auto pFrame = (CFrameWnd*)AfxGetMainWnd();
+	//auto pDoc = (CUXStudioDoc*)(pFrame->GetActiveDocument());
+	//auto pFirstView = (CUXStudioView*)(pDoc->GetFirstViewPosition());
+	//pFirstView->apply_changed_property(item);
+}

@@ -138,8 +138,24 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
 	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndOutput);
-	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndProperties);
+	//m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
+	//DockPane(&m_wndProperties);
+
+	if (!m_propertyDlg.Create(_T("속성"), this, TRUE,
+		MAKEINTRESOURCE(IDD_PROPERTY),
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI,
+		32771))
+	{
+		TRACE0("Failed to create Dialog Bar\n");
+		return FALSE;      // fail to create
+	}
+
+	m_propertyDlg.init_controls();
+	EnableDocking(CBRS_ALIGN_LEFT);
+	EnableAutoHidePanes(CBRS_ALIGN_RIGHT);
+	m_propertyDlg.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_propertyDlg);
+
 
 	// 보관된 값에 따라 비주얼 관리자 및 스타일을 설정합니다.
 	OnApplicationLook(theApp.m_nAppLook);
@@ -243,14 +259,15 @@ BOOL CMainFrame::CreateDockingWindows()
 	}
 
 	// 속성 창을 만듭니다.
-	CString strPropertiesWnd;
-	bNameValid = strPropertiesWnd.LoadString(IDS_PROPERTIES_WND);
-	ASSERT(bNameValid);
-	if (!m_wndProperties.Create(strPropertiesWnd, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_PROPERTIESWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("속성 창을 만들지 못했습니다.\n");
-		return FALSE; // 만들지 못했습니다.
-	}
+	//CString strPropertiesWnd;
+	//bNameValid = strPropertiesWnd.LoadString(IDS_PROPERTIES_WND);
+	//ASSERT(bNameValid);
+	//if (!m_wndProperties.Create(strPropertiesWnd, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_PROPERTIESWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
+	//{
+	//	TRACE0("속성 창을 만들지 못했습니다.\n");
+	//	return FALSE; // 만들지 못했습니다.
+	//}
+
 
 	SetDockingWindowIcons(theApp.m_bHiColorIcons);
 	return TRUE;
@@ -267,8 +284,10 @@ void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
 	HICON hOutputBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_OUTPUT_WND_HC : IDI_OUTPUT_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
 	m_wndOutput.SetIcon(hOutputBarIcon, FALSE);
 
-	HICON hPropertiesBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_PROPERTIES_WND_HC : IDI_PROPERTIES_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
-	m_wndProperties.SetIcon(hPropertiesBarIcon, FALSE);
+	//HICON hPropertiesBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_PROPERTIES_WND_HC : IDI_PROPERTIES_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
+	//m_wndProperties.SetIcon(hPropertiesBarIcon, FALSE);
+
+	//m_propertyDlg.SetIcon(hPropertiesBarIcon, FALSE);
 
 	UpdateMDITabbedBarsIcons();
 }

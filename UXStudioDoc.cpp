@@ -184,8 +184,11 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_r.Width = r[2].GetFloat();
 		el->m_r.Height = r[3].GetFloat();
 
-		el->m_round = json.get_array_member("items", i, "round", 0);
-
+		rapidjson::Value& round = items[i]["round"];
+		el->m_round[0] = round[0].GetFloat();
+		el->m_round[1] = round[1].GetFloat();
+		el->m_round[2] = round[2].GetFloat();
+		el->m_round[3] = round[3].GetFloat();
 
 		el->m_label = json.get_array_member("items", i, "label", CString());
 		//TRACE(_T("%s\n"), CString(json.get_array_member("items", i, "label", std::string("")).c_str()));
@@ -233,7 +236,14 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		r.PushBack(m_data[i]->m_r.Height, allocator);
 		item.AddMember("r", r, allocator);
 
-		item.AddMember(rapidjson::Value("round", allocator).Move(), m_data[i]->m_round, allocator);
+		//item.AddMember(rapidjson::Value("round", allocator).Move(), m_data[i]->m_round, allocator);
+		rapidjson::Value round(rapidjson::kArrayType);
+		round.PushBack(m_data[i]->m_round[0], allocator);
+		round.PushBack(m_data[i]->m_round[1], allocator);
+		round.PushBack(m_data[i]->m_round[2], allocator);
+		round.PushBack(m_data[i]->m_round[3], allocator);
+		item.AddMember("round", round, allocator);
+
 
 		//CT2CA(m_data[i]->m_label)을 직접 파라미터로 넘기면 컴파일 에러가 발생한다.
 		std::string sstr = CT2CA(m_data[i]->m_label);
