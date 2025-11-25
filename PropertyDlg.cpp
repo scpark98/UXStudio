@@ -32,6 +32,9 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_Y, m_static_y);
 	DDX_Control(pDX, IDC_STATIC_W, m_static_w);
 	DDX_Control(pDX, IDC_STATIC_H, m_static_h);
+	DDX_Control(pDX, IDC_STATIC_FILL, m_static_fill);
+	DDX_Control(pDX, IDC_STATIC_FILL_COLOR, m_static_fill_color);
+	DDX_Control(pDX, IDC_STATIC_FILL_OPACITY, m_static_fill_opacity);
 }
 
 
@@ -74,6 +77,8 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_Y, 25, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_W, 50, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_H, 75, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_FILL_COLOR, 0, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_FILL_OPACITY, 50, 0, 50, 0);
 
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
 	m_theme.cr_back = gGRAY(44);
@@ -84,12 +89,17 @@ void CPropertyDlg::init_controls()
 	m_static_label.set_round(4, m_theme.cr_back, m_theme.cr_back);
 	m_static_label.set_use_edit();
 	m_static_label.set_edit_text_color(Gdiplus::Color::White);
-	//m_static_label.set_edit_back_color(get_color(gGRAY(96), -16));
 
 	m_static_label.copy_properties(m_static_x);
 	m_static_label.copy_properties(m_static_y);
 	m_static_label.copy_properties(m_static_w);
 	m_static_label.copy_properties(m_static_h);
+
+
+	m_static_fill.set_text_color(m_theme.cr_text);
+	m_static_fill.set_back_color(m_theme.cr_back);
+	m_static_label.copy_properties(m_static_fill_color);
+	m_static_label.copy_properties(m_static_fill_opacity);
 }
 
 void CPropertyDlg::OnBnClickedOk()
@@ -180,6 +190,13 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_static_y.set_text_value(d2S(item->m_r.Y, false, 1));
 		m_static_w.set_text_value(d2S(item->m_r.Width, false, 1));
 		m_static_h.set_text_value(d2S(item->m_r.Height, false, 1));
+		m_static_fill_color.set_text_color(item->m_cr_fill);
+
+		CString str;
+		str.Format(_T("%d, %d, %d"), item->m_cr_fill.GetR(), item->m_cr_fill.GetG(), item->m_cr_fill.GetB());
+		m_static_fill_color.set_text_value(str);
+		m_static_fill_opacity.set_text_value(i2S(item->m_cr_fill.GetA()));
+
 		EnableWindow(TRUE);
 	}
 	else
@@ -189,6 +206,9 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_static_y.set_text_value(_T(""));
 		m_static_w.set_text_value(_T(""));
 		m_static_h.set_text_value(_T(""));
+		m_static_fill_color.set_text_color(Gdiplus::Color::Transparent);
+		m_static_fill_color.set_text_value(_T(""));
+		m_static_fill_opacity.set_text_value(_T(""));
 
 		EnableWindow(FALSE);
 	}
