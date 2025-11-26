@@ -298,8 +298,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	{
 		Gdiplus::RectF r_selected = m_item_selected->m_r;
 		r_selected.Offset(-hs, -vs);
-		D2D1_RECT_F rf_selected = { r_selected.X, r_selected.Y, r_selected.GetRight(), r_selected.GetBottom() };
-		d2dc->DrawRectangle(rf_selected, m_br_multi_selected.Get(), 1.0f);
+		draw_rect(d2dc, r_selected, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 1.0f, m_item_selected->m_round[0]);
 		get_resizable_handle(r_selected, m_resize_handle);
 		draw_resize_handle(d2dc);
 	}

@@ -228,7 +228,7 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		}
 		else if (msg->pThis == &m_static_fill_opacity)
 		{
-			set_color(m_item_cur->m_cr_stroke, 0, _ttof(msg->sValue));
+			set_color(m_item_cur->m_cr_fill, 0, _ttoi(msg->sValue));
 		}
 
 		else if (msg->pThis == &m_static_stroke_color)
@@ -241,7 +241,7 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		}
 		else if (msg->pThis == &m_static_stroke_opacity)
 		{
-			set_color(m_item_cur->m_cr_stroke, 0, _ttof(msg->sValue));
+			set_color(m_item_cur->m_cr_stroke, 0, _ttoi(msg->sValue));
 		}
 		else if (msg->pThis == &m_static_stroke_thickness)
 		{
@@ -274,12 +274,20 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_static_round2.set_text_value(d2S(item->m_round[2], false, 1));
 		m_static_round3.set_text_value(d2S(item->m_round[3], false, 1));
 
-		m_static_fill_color.set_text_color(item->m_cr_fill);
+		//"color picker"일 때 현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
+		//그런데 만약 red 컬러인데 alpha값이 0일 경우, 투명하게 그려지게 되므로 문제가 된다.
+		//a를 255로 강제 세팅해서 그려줘야 한다.
+		Gdiplus::Color cr = item->m_cr_fill;
+		set_color(cr, 0, 255);
+		m_static_fill_color.set_text_color(cr);
 		str.Format(_T("%d, %d, %d"), item->m_cr_fill.GetR(), item->m_cr_fill.GetG(), item->m_cr_fill.GetB());
 		m_static_fill_color.set_text_value(str);
 		m_static_fill_opacity.set_text_value(i2S(item->m_cr_fill.GetA()));
 
-		m_static_stroke_color.set_text_color(item->m_cr_stroke);
+		//현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
+		cr = item->m_cr_stroke;
+		set_color(cr, 0, 255);
+		m_static_stroke_color.set_text_color(cr);
 		str.Format(_T("%d, %d, %d"), item->m_cr_stroke.GetR(), item->m_cr_stroke.GetG(), item->m_cr_stroke.GetB());
 		m_static_stroke_color.set_text_value(str);
 		m_static_stroke_opacity.set_text_value(i2S(item->m_cr_stroke.GetA()));
