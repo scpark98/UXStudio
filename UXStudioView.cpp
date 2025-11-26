@@ -261,7 +261,11 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
-		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, (el == m_item_hover && !el->m_selected) ? 2.0f : 1.0f, el->m_round[0]);
+		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0]);
+
+		//hover된 항목 highlight
+		if (el == m_item_hover && !el->m_selected)
+			draw_rect(d2dc, rf, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 2.0f, el->m_round[0]);
 
 		m_br_label->SetColor(get_d2color(pDoc->m_data[i]->m_cr_label));
 
@@ -941,6 +945,6 @@ void CUXStudioView::edit_end(bool valid)
 
 void CUXStudioView::apply_changed_property(CSCUIElement* item)
 {
-	m_item_selected->m_label = item->m_label;
+	//m_item_selected->m_label = item->m_label;
 	Invalidate();
 }

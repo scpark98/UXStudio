@@ -35,6 +35,16 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_FILL, m_static_fill);
 	DDX_Control(pDX, IDC_STATIC_FILL_COLOR, m_static_fill_color);
 	DDX_Control(pDX, IDC_STATIC_FILL_OPACITY, m_static_fill_opacity);
+	DDX_Control(pDX, IDC_STATIC_FILL, m_static_fill);
+	DDX_Control(pDX, IDC_STATIC_STROKE, m_static_stroke);
+	DDX_Control(pDX, IDC_STATIC_STROKE_COLOR, m_static_stroke_color);
+	DDX_Control(pDX, IDC_STATIC_STROKE_OPACITY, m_static_stroke_opacity);
+	DDX_Control(pDX, IDC_STATIC_STROKE_THICKNESS, m_static_stroke_thickness);
+	DDX_Control(pDX, IDC_STATIC_ROUND0, m_static_round0);
+	DDX_Control(pDX, IDC_STATIC_ROUND1, m_static_round1);
+	DDX_Control(pDX, IDC_STATIC_ROUND2, m_static_round2);
+	DDX_Control(pDX, IDC_STATIC_ROUND3, m_static_round3);
+	DDX_Control(pDX, IDC_STATIC_ROUND, m_static_round);
 }
 
 
@@ -77,8 +87,18 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_Y, 25, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_W, 50, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_H, 75, 0, 25, 0);
+
+	m_resize.Add(IDC_STATIC_ROUND0, 0, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_ROUND1, 25, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_ROUND2, 50, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_ROUND3, 75, 0, 25, 0);
+
 	m_resize.Add(IDC_STATIC_FILL_COLOR, 0, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_FILL_OPACITY, 50, 0, 50, 0);
+
+	m_resize.Add(IDC_STATIC_STROKE_COLOR, 0, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_STROKE_OPACITY, 50, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_STROKE_THICKNESS, 50, 0, 50, 0);
 
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
 	m_theme.cr_back = gGRAY(44);
@@ -100,6 +120,21 @@ void CPropertyDlg::init_controls()
 	m_static_fill.set_back_color(m_theme.cr_back);
 	m_static_label.copy_properties(m_static_fill_color);
 	m_static_label.copy_properties(m_static_fill_opacity);
+
+	m_static_stroke.set_text_color(m_theme.cr_text);
+	m_static_stroke.set_back_color(m_theme.cr_back);
+
+	m_static_label.copy_properties(m_static_stroke_color);
+	m_static_label.copy_properties(m_static_stroke_opacity);
+	m_static_label.copy_properties(m_static_stroke_thickness);
+
+	m_static_round.set_text_color(m_theme.cr_text);
+	m_static_round.set_back_color(m_theme.cr_back);
+
+	m_static_label.copy_properties(m_static_round0);
+	m_static_label.copy_properties(m_static_round1);
+	m_static_label.copy_properties(m_static_round2);
+	m_static_label.copy_properties(m_static_round3);
 }
 
 void CPropertyDlg::OnBnClickedOk()
@@ -163,15 +198,55 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 	if (msg->msg == CSCStaticMsg::msg_text_value_changed)
 	{
 		if (msg->pThis == &m_static_label)
-			m_item_cur->m_label = msg->value;
+			m_item_cur->m_label = msg->sValue;
+
 		else if (msg->pThis == &m_static_x)
-			m_item_cur->m_r.X = _ttof(msg->value);
+			m_item_cur->m_r.X = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_y)
-			m_item_cur->m_r.Y = _ttof(msg->value);
+			m_item_cur->m_r.Y = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_w)
-			m_item_cur->m_r.Width = _ttof(msg->value);
+			m_item_cur->m_r.Width = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_h)
-			m_item_cur->m_r.Height = _ttof(msg->value);
+			m_item_cur->m_r.Height = _ttof(msg->sValue);
+
+		else if (msg->pThis == &m_static_round0)
+			m_item_cur->m_round[0] = _ttof(msg->sValue);
+		else if (msg->pThis == &m_static_round1)
+			m_item_cur->m_round[1] = _ttof(msg->sValue);
+		else if (msg->pThis == &m_static_round2)
+			m_item_cur->m_round[2] = _ttof(msg->sValue);
+		else if (msg->pThis == &m_static_round3)
+			m_item_cur->m_round[3] = _ttof(msg->sValue);
+
+		else if (msg->pThis == &m_static_fill_color)
+		{
+			std::deque<CString> token;
+			msg->sValue.Remove(' ');	//공백제거 필수
+			get_token_string(msg->sValue, token, _T(","), false);
+			ASSERT(token.size() == 3);
+			m_item_cur->m_cr_fill = Gdiplus::Color(m_item_cur->m_cr_fill.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
+		}
+		else if (msg->pThis == &m_static_fill_opacity)
+		{
+			set_color(m_item_cur->m_cr_stroke, 0, _ttof(msg->sValue));
+		}
+
+		else if (msg->pThis == &m_static_stroke_color)
+		{
+			std::deque<CString> token;
+			msg->sValue.Remove(' ');	//공백제거 필수
+			get_token_string(msg->sValue, token, _T(","), false);
+			ASSERT(token.size() == 3);
+			m_item_cur->m_cr_stroke = Gdiplus::Color(m_item_cur->m_cr_stroke.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
+		}
+		else if (msg->pThis == &m_static_stroke_opacity)
+		{
+			set_color(m_item_cur->m_cr_stroke, 0, _ttof(msg->sValue));
+		}
+		else if (msg->pThis == &m_static_stroke_thickness)
+		{
+			m_item_cur->m_stroke_thickness = _ttof(msg->sValue);
+		}
 	}
 
 	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
@@ -185,30 +260,55 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 
 	if (item)
 	{
+		CString str;
+
 		m_static_label.set_text_value(item->m_label);
+
 		m_static_x.set_text_value(d2S(item->m_r.X, false, 1));
 		m_static_y.set_text_value(d2S(item->m_r.Y, false, 1));
 		m_static_w.set_text_value(d2S(item->m_r.Width, false, 1));
 		m_static_h.set_text_value(d2S(item->m_r.Height, false, 1));
-		m_static_fill_color.set_text_color(item->m_cr_fill);
 
-		CString str;
+		m_static_round0.set_text_value(d2S(item->m_round[0], false, 1));
+		m_static_round1.set_text_value(d2S(item->m_round[1], false, 1));
+		m_static_round2.set_text_value(d2S(item->m_round[2], false, 1));
+		m_static_round3.set_text_value(d2S(item->m_round[3], false, 1));
+
+		m_static_fill_color.set_text_color(item->m_cr_fill);
 		str.Format(_T("%d, %d, %d"), item->m_cr_fill.GetR(), item->m_cr_fill.GetG(), item->m_cr_fill.GetB());
 		m_static_fill_color.set_text_value(str);
 		m_static_fill_opacity.set_text_value(i2S(item->m_cr_fill.GetA()));
+
+		m_static_stroke_color.set_text_color(item->m_cr_stroke);
+		str.Format(_T("%d, %d, %d"), item->m_cr_stroke.GetR(), item->m_cr_stroke.GetG(), item->m_cr_stroke.GetB());
+		m_static_stroke_color.set_text_value(str);
+		m_static_stroke_opacity.set_text_value(i2S(item->m_cr_stroke.GetA()));
+		m_static_stroke_thickness.set_text_value(i2S(item->m_stroke_thickness));
 
 		EnableWindow(TRUE);
 	}
 	else
 	{
-		m_static_label.set_text_value(_T(""));
-		m_static_x.set_text_value(_T(""));
-		m_static_y.set_text_value(_T(""));
-		m_static_w.set_text_value(_T(""));
-		m_static_h.set_text_value(_T(""));
-		m_static_fill_color.set_text_color(Gdiplus::Color::Transparent);
-		m_static_fill_color.set_text_value(_T(""));
-		m_static_fill_opacity.set_text_value(_T(""));
+		m_static_label.set_text_value();
+
+		m_static_x.set_text_value();
+		m_static_y.set_text_value();
+		m_static_w.set_text_value();
+		m_static_h.set_text_value();
+
+		m_static_round0.set_text_value();
+		m_static_round1.set_text_value();
+		m_static_round2.set_text_value();
+		m_static_round3.set_text_value();
+
+		m_static_fill_color.set_text_color(Gdiplus::Color::Gray);
+		m_static_fill_color.set_text_value();
+		m_static_fill_opacity.set_text_value();
+
+		m_static_stroke_color.set_text_color(Gdiplus::Color::Gray);
+		m_static_stroke_color.set_text_value();
+		m_static_stroke_opacity.set_text_value();
+		m_static_stroke_thickness.set_text_value();
 
 		EnableWindow(FALSE);
 	}

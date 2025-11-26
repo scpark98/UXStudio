@@ -54,4 +54,13 @@ public:
 	CSCStatic m_static_fill;
 	CSCStatic m_static_fill_color;
 	CSCStatic m_static_fill_opacity;
+	CSCStatic m_static_stroke;
+	CSCStatic m_static_stroke_color;
+	CSCStatic m_static_stroke_opacity;
+	CSCStatic m_static_stroke_thickness;
+	CSCStatic m_static_round;
+	CSCStatic m_static_round0;
+	CSCStatic m_static_round1;
+	CSCStatic m_static_round2;
+	CSCStatic m_static_round3;
 };

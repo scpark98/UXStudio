@@ -97,6 +97,16 @@
 #define IDC_STATIC_FILL_COLOR           1012
 #define IDC_STATIC_X3                   1013
 #define IDC_STATIC_FILL_OPACITY         1013
+#define IDC_STATIC_STROKE               1014
+#define IDC_STATIC_STROKE_COLOR         1015
+#define IDC_STATIC_STROKE_OPACITY       1016
+#define IDC_STATIC_STROKE_THICKNESS     1017
+#define IDC_STATIC_ROUND                1018
+#define IDC_STATIC_ROUND0               1023
+#define IDC_STATIC_ROUND1               1024
+#define IDC_STATIC_ROUND2               1025
+#define IDC_STATIC_H2                   1026
+#define IDC_STATIC_ROUND3               1026
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
