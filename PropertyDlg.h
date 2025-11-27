@@ -18,6 +18,8 @@ public:
 	CResizeCtrl			m_resize;
 	CSCColorTheme		m_theme = CSCColorTheme(this);
 
+	void				set_canvas_property(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy);
+
 	CSCUIElement*		m_item_cur = NULL;
 	void				set_property(CSCUIElement* item);
 
@@ -42,8 +44,10 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
 	CSCStatic m_static_label;
-	CSCStatic m_static_x;
-	CSCStatic m_static_y;
+	CSCStatic m_static_x1;
+	CSCStatic m_static_y1;
+	CSCStatic m_static_x2;
+	CSCStatic m_static_y2;
 	CSCStatic m_static_w;
 	CSCStatic m_static_h;
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
@@ -63,4 +67,10 @@ public:
 	CSCStatic m_static_round1;
 	CSCStatic m_static_round2;
 	CSCStatic m_static_round3;
+	CSCStatic m_static_canvas_size;
+	CSCStatic m_static_canvas_size_cx;
+	CSCStatic m_static_canvas_size_cy;
+	CSCStatic m_static_grid_size;
+	CSCStatic m_static_grid_size_cx;
+	CSCStatic m_static_grid_size_cy;
 };

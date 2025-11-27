@@ -89,7 +89,9 @@
 #define IDD_PROPERTY                    312
 #define IDC_BUTTON1                     1000
 #define IDC_STATIC_X                    1006
+#define IDC_STATIC_X1                   1006
 #define IDC_STATIC_Y                    1007
+#define IDC_STATIC_Y1                   1007
 #define IDC_STATIC_W                    1008
 #define IDC_STATIC_H                    1009
 #define IDC_STATIC_LABEL                1010
@@ -102,11 +104,19 @@
 #define IDC_STATIC_STROKE_OPACITY       1016
 #define IDC_STATIC_STROKE_THICKNESS     1017
 #define IDC_STATIC_ROUND                1018
+#define IDC_STATIC_X2                   1019
+#define IDC_STATIC_Y2                   1020
+#define IDC_STATIC_CANVAS_SIZE          1021
+#define IDC_STATIC_GRID_SIZE            1022
 #define IDC_STATIC_ROUND0               1023
 #define IDC_STATIC_ROUND1               1024
 #define IDC_STATIC_ROUND2               1025
-#define IDC_STATIC_H2                   1026
 #define IDC_STATIC_ROUND3               1026
+#define IDC_STATIC_CANVAS_SIZE_CX       1027
+#define IDC_STATIC_CANVAS_SIZE_CY       1028
+#define IDC_STATIC_GRID_SIZE_CX         1029
+#define IDC_STATIC_ROUND7               1030
+#define IDC_STATIC_GRID_SIZE_CY         1030
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
@@ -118,13 +128,15 @@
 #define ID_MENU_VIEW_SEND_TO_BOTTOM     32779
 #define ID_VIEW_32780                   32780
 #define ID_MENU_VIEW_LABEL_EDIT         32781
+#define ID_VIEW_32782                   32782
+#define ID_MENU_VIEW_DELETE             32783
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        314
-#define _APS_NEXT_COMMAND_VALUE         32782
+#define _APS_NEXT_COMMAND_VALUE         32784
 #define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

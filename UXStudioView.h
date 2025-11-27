@@ -41,7 +41,8 @@ protected: // serialization에서만 만들어집니다.
 	CRect							m_resize_handle[9];
 	void							draw_resize_handle(ID2D1DeviceContext* d2dc);
 	bool							m_is_resizing = false;
-	void							move_resize_items(CPoint pt);	//pt = current point
+	void							move_resize_item(CPoint pt);	//마우스를 이용한 이동, 크기조정
+	void							move_resize_item(int key);		//방향키를 이용한 이동, 크기조정
 
 	//max rect of all selected items
 	Gdiplus::RectF					m_r_selected;
@@ -185,6 +186,7 @@ public:
 	afx_msg void OnMenuViewCopy();
 	afx_msg void OnMenuViewPaste();
 	afx_msg void OnMenuViewLabelEdit();
+	afx_msg void OnMenuViewDelete();
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

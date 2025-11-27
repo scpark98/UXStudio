@@ -28,8 +28,10 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CPaneDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_STATIC_LABEL, m_static_label);
-	DDX_Control(pDX, IDC_STATIC_X, m_static_x);
-	DDX_Control(pDX, IDC_STATIC_Y, m_static_y);
+	DDX_Control(pDX, IDC_STATIC_X1, m_static_x1);
+	DDX_Control(pDX, IDC_STATIC_Y1, m_static_y1);
+	DDX_Control(pDX, IDC_STATIC_X2, m_static_x2);
+	DDX_Control(pDX, IDC_STATIC_Y2, m_static_y2);
 	DDX_Control(pDX, IDC_STATIC_W, m_static_w);
 	DDX_Control(pDX, IDC_STATIC_H, m_static_h);
 	DDX_Control(pDX, IDC_STATIC_FILL, m_static_fill);
@@ -45,6 +47,12 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_ROUND2, m_static_round2);
 	DDX_Control(pDX, IDC_STATIC_ROUND3, m_static_round3);
 	DDX_Control(pDX, IDC_STATIC_ROUND, m_static_round);
+	DDX_Control(pDX, IDC_STATIC_CANVAS_SIZE, m_static_canvas_size);
+	DDX_Control(pDX, IDC_STATIC_CANVAS_SIZE_CX, m_static_canvas_size_cx);
+	DDX_Control(pDX, IDC_STATIC_CANVAS_SIZE_CY, m_static_canvas_size_cy);
+	DDX_Control(pDX, IDC_STATIC_GRID_SIZE, m_static_grid_size);
+	DDX_Control(pDX, IDC_STATIC_GRID_SIZE_CX, m_static_grid_size_cx);
+	DDX_Control(pDX, IDC_STATIC_GRID_SIZE_CY, m_static_grid_size_cy);
 }
 
 
@@ -82,11 +90,20 @@ LRESULT CPropertyDlg::OnInitDialog(WPARAM wParam, LPARAM lParam)
 void CPropertyDlg::init_controls()
 {
 	m_resize.Create(this);
+
+	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CX, 0, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CY, 50, 0, 50, 0);
+
+	m_resize.Add(IDC_STATIC_GRID_SIZE_CX, 0, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_GRID_SIZE_CY, 50, 0, 50, 0);
+
 	m_resize.Add(IDC_STATIC_LABEL, 0, 0, 100, 0);
-	m_resize.Add(IDC_STATIC_X, 0, 0, 25, 0);
-	m_resize.Add(IDC_STATIC_Y, 25, 0, 25, 0);
-	m_resize.Add(IDC_STATIC_W, 50, 0, 25, 0);
-	m_resize.Add(IDC_STATIC_H, 75, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_X1, 0, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_Y1, 25, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_X2, 50, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_Y2, 75, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_W, 0, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_H, 50, 0, 50, 0);
 
 	m_resize.Add(IDC_STATIC_ROUND0, 0, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_ROUND1, 25, 0, 25, 0);
@@ -103,38 +120,49 @@ void CPropertyDlg::init_controls()
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
 	m_theme.cr_back = gGRAY(44);
 
-	m_static_label.set_text_color(m_theme.cr_text);
-	m_static_label.set_back_color(gGRAY(96));
-	m_static_label.set_prefix_space(2);
-	m_static_label.set_round(4, m_theme.cr_back, m_theme.cr_back);
-	m_static_label.set_use_edit();
-	m_static_label.set_edit_text_color(Gdiplus::Color::White);
+	m_static_canvas_size.set_text_color(m_theme.cr_text);
+	m_static_canvas_size.set_back_color(m_theme.cr_back);
+	m_static_canvas_size.copy_properties(m_static_grid_size);
 
-	m_static_label.copy_properties(m_static_x);
-	m_static_label.copy_properties(m_static_y);
-	m_static_label.copy_properties(m_static_w);
-	m_static_label.copy_properties(m_static_h);
+	m_static_canvas_size_cx.set_text_color(m_theme.cr_text);
+	m_static_canvas_size_cx.set_back_color(gGRAY(96));
+	m_static_canvas_size_cx.set_prefix_space(2);
+	m_static_canvas_size_cx.set_round(4, m_theme.cr_back, m_theme.cr_back);
+	m_static_canvas_size_cx.set_use_edit();
+	m_static_canvas_size_cx.set_edit_text_color(Gdiplus::Color::White);
+	m_static_canvas_size_cx.copy_properties(m_static_canvas_size_cy);
 
+	m_static_canvas_size_cx.copy_properties(m_static_grid_size_cx);
+	m_static_canvas_size_cx.copy_properties(m_static_grid_size_cy);
+
+	m_static_canvas_size_cx.copy_properties(m_static_label);
+
+	m_static_canvas_size_cx.copy_properties(m_static_x1);
+	m_static_canvas_size_cx.copy_properties(m_static_y1);
+	m_static_canvas_size_cx.copy_properties(m_static_x2);
+	m_static_canvas_size_cx.copy_properties(m_static_y2);
+	m_static_canvas_size_cx.copy_properties(m_static_w);
+	m_static_canvas_size_cx.copy_properties(m_static_h);
 
 	m_static_fill.set_text_color(m_theme.cr_text);
 	m_static_fill.set_back_color(m_theme.cr_back);
-	m_static_label.copy_properties(m_static_fill_color);
-	m_static_label.copy_properties(m_static_fill_opacity);
+	m_static_canvas_size_cx.copy_properties(m_static_fill_color);
+	m_static_canvas_size_cx.copy_properties(m_static_fill_opacity);
 
 	m_static_stroke.set_text_color(m_theme.cr_text);
 	m_static_stroke.set_back_color(m_theme.cr_back);
 
-	m_static_label.copy_properties(m_static_stroke_color);
-	m_static_label.copy_properties(m_static_stroke_opacity);
-	m_static_label.copy_properties(m_static_stroke_thickness);
+	m_static_canvas_size_cx.copy_properties(m_static_stroke_color);
+	m_static_canvas_size_cx.copy_properties(m_static_stroke_opacity);
+	m_static_canvas_size_cx.copy_properties(m_static_stroke_thickness);
 
 	m_static_round.set_text_color(m_theme.cr_text);
 	m_static_round.set_back_color(m_theme.cr_back);
 
-	m_static_label.copy_properties(m_static_round0);
-	m_static_label.copy_properties(m_static_round1);
-	m_static_label.copy_properties(m_static_round2);
-	m_static_label.copy_properties(m_static_round3);
+	m_static_canvas_size_cx.copy_properties(m_static_round0);
+	m_static_canvas_size_cx.copy_properties(m_static_round1);
+	m_static_canvas_size_cx.copy_properties(m_static_round2);
+	m_static_canvas_size_cx.copy_properties(m_static_round3);
 }
 
 void CPropertyDlg::OnBnClickedOk()
@@ -188,6 +216,11 @@ void CPropertyDlg::OnSize(UINT nType, int cx, int cy)
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 }
 
+void CPropertyDlg::set_canvas_property(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy)
+{
+
+}
+
 LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 {
 	//if (!m_item_cur)
@@ -200,14 +233,46 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		if (msg->pThis == &m_static_label)
 			m_item_cur->m_label = msg->sValue;
 
-		else if (msg->pThis == &m_static_x)
+		//좌표값 또는 w, h를 변경하면 서로 영향을 주는데 이 때 기준은 좌표값을 유지시키도록 한다.
+		//즉, x2를 변경하면 x1을 변경시키는 것이 아니라 width를 변경시켜준다.
+		else if (msg->pThis == &m_static_x1)
+		{
+			//x1를 변경하면 x2을 변경하는 것이 아니라 width를 조정해준다.
 			m_item_cur->m_r.X = _ttof(msg->sValue);
-		else if (msg->pThis == &m_static_y)
+			m_item_cur->m_r.Width = _ttof(msg->sValue) - m_item_cur->m_r.X;
+			m_static_w.set_textf(_T("%.1f"), m_item_cur->m_r.Width);
+		}
+		else if (msg->pThis == &m_static_y1)
+		{
+			//y1를 변경하면 y2을 변경하는 것이 아니라 height를 조정해준다.
 			m_item_cur->m_r.Y = _ttof(msg->sValue);
+			m_item_cur->m_r.Height = _ttof(msg->sValue) - m_item_cur->m_r.Y;
+			m_static_h.set_textf(_T("%.1f"), m_item_cur->m_r.Height);
+		}
+		else if (msg->pThis == &m_static_x2)
+		{
+			//x2를 변경하면 x1을 변경하는 것이 아니라 width를 조정해준다.
+			m_item_cur->m_r.Width = _ttof(msg->sValue) - m_item_cur->m_r.X;
+			m_static_w.set_textf(_T("%.1f"), m_item_cur->m_r.Width);
+		}
+		else if (msg->pThis == &m_static_y2)
+		{
+			//y2를 변경하면 y1을 변경하는 것이 아니라 height를 조정해준다.
+			m_item_cur->m_r.Height = _ttof(msg->sValue) - m_item_cur->m_r.Y;
+			m_static_h.set_textf(_T("%.1f"), m_item_cur->m_r.Height);
+		}
 		else if (msg->pThis == &m_static_w)
+		{
+			//width를 변경하면 x2를 조정해준다.
 			m_item_cur->m_r.Width = _ttof(msg->sValue);
+			m_static_x2.set_text_value(d2S(m_item_cur->m_r.GetRight(), false, 1));
+		}
 		else if (msg->pThis == &m_static_h)
+		{
+			//height를 변경하면 y2를 조정해준다.
 			m_item_cur->m_r.Height = _ttof(msg->sValue);
+			m_static_y2.set_text_value(d2S(m_item_cur->m_r.GetBottom(), false, 1));
+		}
 
 		else if (msg->pThis == &m_static_round0)
 			m_item_cur->m_round[0] = _ttof(msg->sValue);
@@ -264,8 +329,10 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 
 		m_static_label.set_text_value(item->m_label);
 
-		m_static_x.set_text_value(d2S(item->m_r.X, false, 1));
-		m_static_y.set_text_value(d2S(item->m_r.Y, false, 1));
+		m_static_x1.set_text_value(d2S(item->m_r.X, false, 1));
+		m_static_y1.set_text_value(d2S(item->m_r.Y, false, 1));
+		m_static_x2.set_text_value(d2S(item->m_r.GetRight(), false, 1));
+		m_static_y2.set_text_value(d2S(item->m_r.GetBottom(), false, 1));
 		m_static_w.set_text_value(d2S(item->m_r.Width, false, 1));
 		m_static_h.set_text_value(d2S(item->m_r.Height, false, 1));
 
@@ -299,8 +366,10 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 	{
 		m_static_label.set_text_value();
 
-		m_static_x.set_text_value();
-		m_static_y.set_text_value();
+		m_static_x1.set_text_value();
+		m_static_y1.set_text_value();
+		m_static_x2.set_text_value();
+		m_static_y2.set_text_value();
 		m_static_w.set_text_value();
 		m_static_h.set_text_value();
 

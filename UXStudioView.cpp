@@ -51,6 +51,7 @@ ON_COMMAND(ID_MENU_VIEW_COPY, &CUXStudioView::OnMenuViewCopy)
 ON_COMMAND(ID_MENU_VIEW_PASTE, &CUXStudioView::OnMenuViewPaste)
 ON_COMMAND(ID_MENU_VIEW_LABEL_EDIT, &CUXStudioView::OnMenuViewLabelEdit)
 ON_REGISTERED_MESSAGE(Message_CSCEdit, &CUXStudioView::on_message_CSCEdit)
+ON_COMMAND(ID_MENU_VIEW_DELETE, &CUXStudioView::OnMenuViewDelete)
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -115,6 +116,8 @@ void CUXStudioView::OnInitialUpdate()
 	m_sz_grid.cy = AfxGetApp()->GetProfileInt(_T("setting"), _T("grid cy"), 8);
 
 	SetScrollSizes(MM_TEXT, CSize(1920, 1080));
+
+	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_canvas_property(1920, 1080, m_sz_grid.cx, m_sz_grid.cy);
 }
 
 // CUXStudioView 인쇄
@@ -238,21 +241,21 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	}
 
 
-	//도형을 그리는 중에는 스크롤 보정된 실제 좌표이므로 보정을 하지 않은 좌표를 스크린에 그려줘야 한다.
+	//도형을 그리는 중에는 스크롤 보정된 실제 좌표이므로 그릴때는 역보정하여 화면에 그려줘야 한다.
 	if (m_lbutton_down && !m_spacebar_down && m_pt_lbutton_down.x >= 0 && m_pt_lbutton_down.y >= 0)
 	{
 		CPoint pt_lbutton_down = m_pt_lbutton_down;
+		adjust_scroll_offset(pt_lbutton_down, true);
+
 		CPoint pt_cur = m_pt_cur;
-		TRACE(_T("old : pt_lbutton_down = %d, %d, pt_cur = %d, %d\n"), pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y);
-		//adjust_scroll_offset(pt_lbutton_down, true);
 		adjust_scroll_offset(pt_cur, true);
-		TRACE(_T("new : pt_lbutton_down = %d, %d, pt_cur = %d, %d\n"), pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y);
 
 		if (pt_lbutton_down != pt_cur)
 			d2dc->DrawRectangle(D2D1::RectF(pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y), m_br_draw.Get());
 	}
 
-	for (int i = 0; i < pDoc->m_data.size(); i++)
+	//역순으로 그려줘야 z-order가 유효하다.
+	for (int i = pDoc->m_data.size() - 1; i >= 0; i--)
 	{
 		CSCUIElement* el = pDoc->m_data[i];
 		Gdiplus::RectF r = el->m_r;
@@ -445,15 +448,16 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	CPoint pt = point;
-	pt.Offset(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
+	adjust_scroll_offset(pt);
+	pt = get_near_grid(pt);
 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_cursor_info(pt);
 
 	//trace(m_lbutton_down);
-	//trace(m_spacebar_down);
+	trace(m_is_resizing);
 
 	if (m_is_resizing)
 	{
-		move_resize_items(pt);
+		move_resize_item(pt);
 		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_property(m_item_selected);
 	}
 	else if (m_lbutton_down)
@@ -465,7 +469,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		else
 		{
-			m_pt_cur = get_near_grid(pt);
+			m_pt_cur = pt;
 		}
 		Invalidate();
 	}
@@ -488,6 +492,10 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	ReleaseCapture();
 
+	CPoint pt = point;
+	adjust_scroll_offset(pt);
+	pt = get_near_grid(pt);
+
 	if (m_is_resizing)
 	{
 		m_is_resizing = false;
@@ -506,9 +514,9 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		else
 		{
-			m_pt_cur = point;
-			adjust_scroll_offset(m_pt_cur);
-			m_pt_cur = get_near_grid(m_pt_cur);
+			m_pt_cur = pt;
+			//adjust_scroll_offset(m_pt_cur);
+			//m_pt_cur = get_near_grid(m_pt_cur);
 			Gdiplus::RectF r(m_pt_lbutton_down.x, m_pt_lbutton_down.y, m_pt_cur.x - m_pt_lbutton_down.x, m_pt_cur.y - m_pt_lbutton_down.y);
 			normalize_rect(r);
 
@@ -517,7 +525,8 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 			if (r.Width < 20 && r.Height < 20)
 				return;
 
-			pDoc->m_data.push_back(new CSCUIElement(r));
+			//가장 최종으로 그려진 항목이 가장 첫번째가 되어야 한다.
+			pDoc->m_data.push_front(new CSCUIElement(r));
 		}
 		Invalidate();
 	}
@@ -525,7 +534,7 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	CFormView::OnLButtonUp(nFlags, point);
 }
 
-void CUXStudioView::move_resize_items(CPoint pt)
+void CUXStudioView::move_resize_item(CPoint pt)
 {
 	if (!m_item_selected)
 		return;
@@ -584,6 +593,28 @@ void CUXStudioView::move_resize_items(CPoint pt)
 		case corner_bottomright:
 			item->m_r.Height = pt.y - item->m_r.Y;
 			item->m_r.Width = pt.x - item->m_r.X;
+			break;
+	}
+
+	Invalidate();
+}
+
+//방향키를 이용한 이동, 크기조정
+void CUXStudioView::move_resize_item(int key)
+{
+	switch (key)
+	{
+		case VK_LEFT:
+			m_item_selected->m_r.X -= m_sz_grid.cx;
+			break;
+		case VK_RIGHT:
+			m_item_selected->m_r.X += m_sz_grid.cx;
+			break;
+		case VK_UP:
+			m_item_selected->m_r.Y -= m_sz_grid.cy;
+			break;
+		case VK_DOWN:
+			m_item_selected->m_r.Y += m_sz_grid.cy;
 			break;
 	}
 
@@ -656,7 +687,7 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 				m_spacebar_down = true;
 				break;
 			case VK_DELETE:
-				delete_selected_items();
+				OnMenuViewDelete();
 				return true;
 			case VK_F2:
 				OnMenuViewLabelEdit();
@@ -674,6 +705,12 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 					OnMenuViewPaste();
 					return true;
 				}
+				break;
+			case VK_LEFT:
+			case VK_RIGHT:
+			case VK_UP:
+			case VK_DOWN:
+				move_resize_item(pMsg->wParam);
 				break;
 		}
 	}
@@ -890,7 +927,13 @@ void CUXStudioView::OnMenuViewPaste()
 
 	new_item->m_r.Offset(20, 20);
 
-	pDoc->m_data.push_back(new_item);
+	//맨 끝에 넣지 않고 현재 선택된 항목의 바로 다음 차례로 넣어준다.
+	auto it = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_item_selected);
+	if (it == pDoc->m_data.end())
+		pDoc->m_data.push_front(new_item);
+	else
+		pDoc->m_data.insert(it, new_item);
+
 	m_item_selected = new_item;
 
 	Invalidate();
@@ -946,4 +989,9 @@ void CUXStudioView::apply_changed_property(CSCUIElement* item)
 {
 	//m_item_selected->m_label = item->m_label;
 	Invalidate();
+}
+void CUXStudioView::OnMenuViewDelete()
+{
+	delete_selected_items();
+	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_property(m_item_selected);
 }
