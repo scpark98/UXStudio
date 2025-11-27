@@ -21,6 +21,7 @@ public:
 	CUXStudioApp() noexcept;
 
 	void				apply_changed_property(CSCUIElement* item);
+	void				apply_canvas_property_changed(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy);
 
 // 재정의입니다.
 public:

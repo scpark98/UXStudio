@@ -87,6 +87,33 @@ LRESULT CPropertyDlg::OnInitDialog(WPARAM wParam, LPARAM lParam)
 }
 */
 
+void CPropertyDlg::enable_window(bool enable)
+{
+	//EnableWindow(enable);
+
+	/*
+	if (!enable)
+	{
+		m_static_canvas_size.EnableWindow(TRUE);
+		m_static_canvas_size_cx.EnableWindow(TRUE);
+		m_static_canvas_size_cy.EnableWindow(TRUE);
+
+		m_static_grid_size.EnableWindow(TRUE);
+		m_static_grid_size_cx.EnableWindow(TRUE);
+		m_static_grid_size_cy.EnableWindow(TRUE);
+	}
+	*/
+	CWnd* pWnd = &m_static_label;
+
+	while (pWnd)
+	{
+		pWnd->EnableWindow(enable);
+		pWnd = GetNextDlgTabItem(pWnd);
+		if (pWnd == &m_static_canvas_size)
+			break;
+	}
+}
+
 void CPropertyDlg::init_controls()
 {
 	m_resize.Create(this);
@@ -163,6 +190,8 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size_cx.copy_properties(m_static_round1);
 	m_static_canvas_size_cx.copy_properties(m_static_round2);
 	m_static_canvas_size_cx.copy_properties(m_static_round3);
+
+	enable_window(false);
 }
 
 void CPropertyDlg::OnBnClickedOk()
@@ -218,7 +247,10 @@ void CPropertyDlg::OnSize(UINT nType, int cx, int cy)
 
 void CPropertyDlg::set_canvas_property(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy)
 {
-
+	m_static_canvas_size_cx.set_text_value(i2S(canvas_cx));
+	m_static_canvas_size_cy.set_text_value(i2S(canvas_cy));
+	m_static_grid_size_cx.set_text_value(i2S(grid_cx));
+	m_static_grid_size_cy.set_text_value(i2S(grid_cy));
 }
 
 LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
@@ -230,6 +262,19 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 
 	if (msg->msg == CSCStaticMsg::msg_text_value_changed)
 	{
+		if (msg->pThis == &m_static_canvas_size_cx ||
+			msg->pThis == &m_static_canvas_size_cy ||
+			msg->pThis == &m_static_grid_size_cx ||
+			msg->pThis == &m_static_grid_size_cy)
+		{
+			int canvas_cx = _ttoi(m_static_canvas_size_cx.get_text_value());
+			int canvas_cy = _ttoi(m_static_canvas_size_cy.get_text_value());
+			int grid_cx = _ttoi(m_static_grid_size_cx.get_text_value());
+			int grid_cy = _ttoi(m_static_grid_size_cy.get_text_value());
+			((CUXStudioApp*)(AfxGetApp()))->apply_canvas_property_changed(canvas_cx, canvas_cy, grid_cx, grid_cy);
+			return 0;
+		}
+
 		if (msg->pThis == &m_static_label)
 			m_item_cur->m_label = msg->sValue;
 
@@ -312,9 +357,10 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		{
 			m_item_cur->m_stroke_thickness = _ttof(msg->sValue);
 		}
+		
+		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 	}
 
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 
 	return 0;
 }
@@ -360,7 +406,7 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_static_stroke_opacity.set_text_value(i2S(item->m_cr_stroke.GetA()));
 		m_static_stroke_thickness.set_text_value(i2S(item->m_stroke_thickness));
 
-		EnableWindow(TRUE);
+		enable_window(true);
 	}
 	else
 	{
@@ -387,6 +433,6 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_static_stroke_opacity.set_text_value();
 		m_static_stroke_thickness.set_text_value();
 
-		EnableWindow(FALSE);
+		enable_window(false);
 	}
 }

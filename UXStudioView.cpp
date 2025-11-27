@@ -987,9 +987,16 @@ void CUXStudioView::edit_end(bool valid)
 
 void CUXStudioView::apply_changed_property(CSCUIElement* item)
 {
-	//m_item_selected->m_label = item->m_label;
 	Invalidate();
 }
+
+void CUXStudioView::apply_canvas_property_changed(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy)
+{
+	SetScrollSizes(MM_TEXT, CSize(canvas_cx, canvas_cy));
+	m_sz_grid = CSize(grid_cx, grid_cy);
+	Invalidate();
+}
+
 void CUXStudioView::OnMenuViewDelete()
 {
 	delete_selected_items();

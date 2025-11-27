@@ -60,6 +60,7 @@ protected: // serialization에서만 만들어집니다.
 	void							edit_end(bool valid = true);
 
 	void							apply_changed_property(CSCUIElement* item);
+	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy);
 
 	CSCUIElement*					m_item_hover = NULL;
 	CSCUIElement*					m_item_selected = NULL;

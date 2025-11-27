@@ -14,6 +14,9 @@ public:
 	CPropertyDlg(CWnd* pParent = nullptr);   // 표준 생성자입니다.
 	virtual ~CPropertyDlg();
 
+	//item을 선택해야 enable되지만 canvas_size, grid_size는 항상 enable이어야한다.
+	void				enable_window(bool enable);
+
 	void				init_controls();
 	CResizeCtrl			m_resize;
 	CSCColorTheme		m_theme = CSCColorTheme(this);
