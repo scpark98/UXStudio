@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CPropertyDlg, CPaneDialog)
 	ON_REGISTERED_MESSAGE(Message_CSCStatic, &CPropertyDlg::on_message_CSCStatic)
 	ON_BN_CLICKED(IDC_CHECK_FONT_BOLD, &CPropertyDlg::OnBnClickedCheckFontBold)
 	ON_BN_CLICKED(IDC_CHECK_FONT_ITALIC, &CPropertyDlg::OnBnClickedCheckFontItalic)
+	ON_CBN_SELCHANGE(IDC_COMBO_FONT, &CPropertyDlg::OnCbnSelchangeComboFont)
 END_MESSAGE_MAP()
 
 
@@ -495,5 +496,11 @@ void CPropertyDlg::OnBnClickedCheckFontBold()
 void CPropertyDlg::OnBnClickedCheckFontItalic()
 {
 	m_item_cur->m_font_italic = (m_check_font_italic.GetCheck() == BST_CHECKED);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnCbnSelchangeComboFont()
+{
+	m_item_cur->m_font_name = m_combo_font.get_text();
 	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 }

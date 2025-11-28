@@ -87,4 +87,5 @@ public:
 	afx_msg void OnBnClickedCheckFontBold();
 	afx_msg void OnBnClickedCheckFontItalic();
 	CSCStatic m_static_text_opacity;
+	afx_msg void OnCbnSelchangeComboFont();
 };

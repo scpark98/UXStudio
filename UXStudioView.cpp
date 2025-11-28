@@ -514,7 +514,8 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		m_is_resizing = false;
 		m_pt_lbutton_down = CPoint(-1, -1);
-		//normalize_rect(m_item_selected->m_r);
+		normalize_rect(m_item_selected->m_r);
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_property(m_item_selected);
 	}
 
 	if (m_lbutton_down)
