@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include <deque>
 #include "Common/data_types/CSCUIElement/SCUIElement.h"
 
@@ -18,6 +19,11 @@ protected: // serialization에서만 만들어집니다.
 // 특성입니다.
 public:
 	CString							m_filepath;
+
+	CSize							m_sz_canvas = CSize(1920, 1080);
+	CSize							m_sz_grid = CSize(8, 8);
+
+
 	std::deque<CSCUIElement*>		m_data;
 
 // 작업입니다.

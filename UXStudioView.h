@@ -31,7 +31,7 @@ protected: // serialization에서만 만들어집니다.
 	IDWriteFactory*					m_WriteFactory = NULL;
 	IDWriteTextFormat*				m_WriteFormat = NULL;
 
-	CSize							m_sz_grid;
+	//CSize							m_sz_grid;
 
 	bool							m_lbutton_down = false;
 	CPoint							m_pt_lbutton_down = CPoint(-1, -1);
@@ -55,6 +55,7 @@ protected: // serialization에서만 만들어집니다.
 	void							select_all(bool select);
 	void							delete_selected_items();
 
+	bool							m_in_editing = false;
 	CSCEdit							m_edit;
 	LRESULT							on_message_CSCEdit(WPARAM wParam, LPARAM lParam);
 	void							edit_end(bool valid = true);
@@ -71,24 +72,40 @@ protected: // serialization에서만 만들어집니다.
 
 	//가장 가까운 grid 좌표를 리턴한다.
 	//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
-	template <class T> T			get_near_grid(T pt_src)
+	template <class T> T get_near_grid(T src)
 	{
 		if constexpr (std::is_same_v<T, CPoint>)
+		//if (typeid(T) == typeid(CPoint))	//compile error
 		{
-			CPoint pt = pt_src;
-			pt.x = (pt.x / m_sz_grid.cx) * m_sz_grid.cx;
-			pt.y = (pt.y / m_sz_grid.cy) * m_sz_grid.cy;
+			CPoint* pt = reinterpret_cast<CPoint*>(&src);
+			pt->x = (pt->x / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			pt->y = (pt->y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
 
-			return pt;
+			return *pt;
 		}
 		else if constexpr (std::is_same_v<T, Gdiplus::PointF>)
+		//else if (typeid(T) == typeid(Gdiplus::PointF))
 		{
-			Gdiplus::PointF pt = pt_src;
-			pt.X = (int)(pt.X / m_sz_grid.cx) * m_sz_grid.cx;
-			pt.Y = (int)(pt.Y / m_sz_grid.cy) * m_sz_grid.cy;
+			//Gdiplus::PointF* pt = reinterpret_cast<Gdiplus::PointF*>&src;
+			//pt->X = (int)(pt->X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			//pt->Y = (int)(pt->Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
+			Gdiplus::PointF* pt = reinterpret_cast<Gdiplus::PointF*>(&src);
+			pt->X = (int)(pt->X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			pt->Y = (int)(pt->Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
 
-			return pt;
+			return *pt;
 		}
+		else if constexpr (std::is_same_v<T, Gdiplus::RectF>)
+		//else if (typeid(T) == typeid(Gdiplus::RectF))
+		{
+			Gdiplus::RectF r = (Gdiplus::RectF)src;
+			r.X = (int)(r.X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			r.Y = (int)(r.Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
+
+			return r;
+		}
+
+		return src;
 	}
 	//Gdiplus::PointF					get_near_grid(Gdiplus::PointF pt);
 
@@ -101,7 +118,7 @@ protected: // serialization에서만 만들어집니다.
 
 	//point, rect 등을 현재 스크롤바 위치만큼 보정한다.
 	//invert = false이면 스크롤 오프셋만큼 더하는 것이고 true이면 적용했던 오프셋을 다시 빼준다.
-	template <class T> void	adjust_scroll_offset(T& value, bool invert = false)
+	template <class T> void	adjust_scroll_offset(T& value, bool near_grid = true, bool invert = false)
 	{
 		CPoint sp((invert ? -1 : 1) * GetScrollPos(SB_HORZ), (invert ? -1 : 1) * GetScrollPos(SB_VERT));
 
@@ -110,18 +127,25 @@ protected: // serialization에서만 만들어집니다.
 		{
 			CPoint pt = value;
 			pt.Offset(sp);
+			if (near_grid)
+				pt = get_near_grid(pt);
 			value = pt;
 		}
 		else if constexpr (std::is_same_v<T, Gdiplus::Rect>)
 		{
 			Gdiplus::Rect r = value;
 			r.Offset(sp.x, sp.y);
+			if (near_grid)
+				r = get_near_grid(r);
 			value = r;
 		}
 		else if constexpr (std::is_same_v<T, Gdiplus::RectF>)
 		{
 			Gdiplus::RectF r = value;
 			r.Offset(sp.x, sp.y);
+			if (near_grid)
+				r = get_near_grid(r);
+
 			value = r;
 		}
 	}
@@ -158,7 +182,12 @@ public:
 #endif
 
 protected:
-	CUXStudioDoc* pDoc = NULL;
+	CUXStudioDoc*	pDoc = NULL;
+
+	std::vector<std::deque<CSCUIElement*>*> m_undo;
+	std::vector<std::deque<CSCUIElement*>*>::iterator m_undo_iter;
+	void			push_undo();
+	void			undo();
 
 // 생성된 메시지 맵 함수
 protected:
@@ -188,6 +217,8 @@ public:
 	afx_msg void OnMenuViewPaste();
 	afx_msg void OnMenuViewLabelEdit();
 	afx_msg void OnMenuViewDelete();
+	afx_msg void OnEditUndo();
+	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

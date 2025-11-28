@@ -105,6 +105,12 @@
     <ClInclude Include="..\Common\CStatic\SCStatic\SCStatic.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\CComboBox\SCComboBox\SCComboBox.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\CButton\GdiButton\GdiButton.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UXStudio.cpp">
@@ -172,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="..\Common\CStatic\SCStatic\SCStatic.cpp">
       <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\CComboBox\SCComboBox\SCComboBox.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\CButton\GdiButton\GdiButton.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

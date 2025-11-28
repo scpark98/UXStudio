@@ -17,6 +17,9 @@
 
 - OnMouseMove()에서는 m_r_selected안에 있으면 반응하지 않는다.
 
+[undo/redo]
+- m_data의 복사본을 vector에 저장해서 불러오는 방식으로 구현
+
 [속성창]
 - label
 - x y w h

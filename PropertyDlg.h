@@ -3,6 +3,8 @@
 
 #include "Common/ResizeCtrl.h"
 #include "Common/CStatic/SCStatic/SCStatic.h"
+#include "Common/CButton/GdiButton/GdiButton.h"
+#include "Common/CComboBox/SCComboBox/SCComboBox.h"
 #include "Common/data_types/CSCUIElement/SCUIElement.h"
 // CPropertyDlg 대화 상자
 
@@ -76,4 +78,12 @@ public:
 	CSCStatic m_static_grid_size;
 	CSCStatic m_static_grid_size_cx;
 	CSCStatic m_static_grid_size_cy;
+	CSCComboBox m_combo_font;
+	CSCStatic m_static_font;
+	CSCStatic m_static_font_size;
+	CGdiButton m_check_font_bold;
+	CGdiButton m_check_font_italic;
+	CSCStatic m_static_text_color;
+	afx_msg void OnBnClickedCheckFontBold();
+	afx_msg void OnBnClickedCheckFontItalic();
 };

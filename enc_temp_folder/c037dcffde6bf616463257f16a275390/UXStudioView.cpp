@@ -274,10 +274,10 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		m_br_label->SetColor(get_d2color(pDoc->m_data[i]->m_cr_text));
 
-		IDWriteTextFormat* wf = NULL;
-		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&wf));
-		m_WriteFactory->CreateTextFormat(pDoc->m_data[i]->m_font_name, nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, _T("ko-kr"), &wf);
-		d2dc->DrawText(pDoc->m_data[i]->m_text, pDoc->m_data[i]->m_text.GetLength(), wf, rf, m_br_label.Get());
+		m_WriteFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		d2dc->DrawText(pDoc->m_data[i]->m_text, pDoc->m_data[i]->m_text.GetLength(), m_WriteFormat, rf, m_br_label.Get());
 
 		//좌표 확인용 코드
 		if (true)

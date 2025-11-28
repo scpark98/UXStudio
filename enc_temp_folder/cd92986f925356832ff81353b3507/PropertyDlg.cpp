@@ -71,8 +71,6 @@ BEGIN_MESSAGE_MAP(CPropertyDlg, CPaneDialog)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_REGISTERED_MESSAGE(Message_CSCStatic, &CPropertyDlg::on_message_CSCStatic)
-	ON_BN_CLICKED(IDC_CHECK_FONT_BOLD, &CPropertyDlg::OnBnClickedCheckFontBold)
-	ON_BN_CLICKED(IDC_CHECK_FONT_ITALIC, &CPropertyDlg::OnBnClickedCheckFontItalic)
 END_MESSAGE_MAP()
 
 
@@ -379,10 +377,6 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 			ASSERT(token.size() == 3);
 			m_item_cur->m_cr_text = Gdiplus::Color(m_item_cur->m_cr_text.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
 		}
-		else if (msg->pThis == &m_static_font_size)
-		{
-			m_item_cur->m_font_size = _ttoi(msg->sValue);
-		}
 		
 		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 	}
@@ -439,11 +433,6 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		str.Format(_T("%d, %d, %d"), cr.GetR(), cr.GetG(), cr.GetB());
 		m_static_text_color.set_text_value(str);
 
-		//font
-		m_static_font_size.set_text_value(i2S(item->m_font_size));
-		m_check_font_bold.SetCheck(item->m_font_bold ? BST_CHECKED : BST_UNCHECKED);
-		m_check_font_bold.SetCheck(item->m_font_italic ? BST_CHECKED : BST_UNCHECKED);
-
 		enable_window(true);
 	}
 	else
@@ -476,14 +465,4 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 
 		enable_window(false);
 	}
-}
-
-void CPropertyDlg::OnBnClickedCheckFontBold()
-{
-	m_item_cur->m_font_bold = (m_check_font_bold.GetCheck() == BST_CHECKED);
-}
-
-void CPropertyDlg::OnBnClickedCheckFontItalic()
-{
-	m_item_cur->m_font_italic = (m_check_font_italic.GetCheck() == BST_CHECKED);
 }

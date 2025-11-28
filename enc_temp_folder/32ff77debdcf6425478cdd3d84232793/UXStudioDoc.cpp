@@ -208,7 +208,6 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_font_name = json.get_array_member("items", i, "font_name", "Arial");
 		el->m_font_size = json.get_array_member("items", i, "font_size", 10);
 		el->m_font_bold = json.get_array_member("items", i, "font_bold", false);
-		el->m_font_italic = json.get_array_member("items", i, "font_italic", false);
 
 		el->m_stroke_thickness = json.get_array_member("items", i, "stroke_thickness", 1.0f);
 		el->m_cr_stroke = Gdiplus::Color(json.get_array_member("items", i, "cr_stroke", (UINT)(Gdiplus::Color::RoyalBlue)));
@@ -274,7 +273,6 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		item.AddMember(rapidjson::Value("font_name", allocator).Move(), sstr, allocator);
 		item.AddMember(rapidjson::Value("font_size", allocator).Move(), m_data[i]->m_font_size, allocator);
 		item.AddMember(rapidjson::Value("font_bold", allocator).Move(), m_data[i]->m_font_bold, allocator);
-		item.AddMember(rapidjson::Value("font_italic", allocator).Move(), m_data[i]->m_font_italic, allocator);
 
 		item.AddMember(rapidjson::Value("stroke_thickness", allocator).Move(), m_data[i]->m_stroke_thickness, allocator);
 		item.AddMember(rapidjson::Value("cr_stroke", allocator).Move(), (UINT)m_data[i]->m_cr_stroke.GetValue(), allocator);

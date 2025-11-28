@@ -117,6 +117,13 @@
 #define IDC_STATIC_GRID_SIZE_CX         1029
 #define IDC_STATIC_ROUND7               1030
 #define IDC_STATIC_GRID_SIZE_CY         1030
+#define IDC_COMBO_FONT                  1031
+#define IDC_STATIC_FONT_SIZE            1032
+#define IDC_STATIC_FONT                 1033
+#define IDC_CHECK_FONT_BOLD             1034
+#define IDC_CHECK_FONT_ITALIC           1035
+#define IDC_STATIC_FONT_COLOR           1036
+#define IDC_STATIC_TEXT_COLOR           1036
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
@@ -137,7 +144,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        314
 #define _APS_NEXT_COMMAND_VALUE         32784
-#define _APS_NEXT_CONTROL_VALUE         1007
+#define _APS_NEXT_CONTROL_VALUE         1035
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
