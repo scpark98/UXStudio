@@ -276,7 +276,13 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		IDWriteTextFormat* wf = NULL;
 		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&wf));
-		m_WriteFactory->CreateTextFormat(pDoc->m_data[i]->m_font_name, nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, _T("ko-kr"), &wf);
+		m_WriteFactory->CreateTextFormat(pDoc->m_data[i]->m_font_name, nullptr,
+			pDoc->m_data[i]->m_font_bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
+			pDoc->m_data[i]->m_font_italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			pDoc->m_data[i]->m_font_size, _T("ko-kr"), &wf);
+		wf->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		wf->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		d2dc->DrawText(pDoc->m_data[i]->m_text, pDoc->m_data[i]->m_text.GetLength(), wf, rf, m_br_label.Get());
 
 		//좌표 확인용 코드

@@ -59,6 +59,7 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_FONT_BOLD, m_check_font_bold);
 	DDX_Control(pDX, IDC_CHECK_FONT_ITALIC, m_check_font_italic);
 	DDX_Control(pDX, IDC_STATIC_TEXT_COLOR, m_static_text_color);
+	DDX_Control(pDX, IDC_STATIC_TEXT_OPACITY, m_static_text_opacity);
 }
 
 
@@ -204,6 +205,7 @@ void CPropertyDlg::init_controls()
 	m_check_font_bold.set_color(m_theme.cr_text, m_theme.cr_back, false);
 	m_check_font_italic.set_color(m_theme.cr_text, m_theme.cr_back, false);
 	m_static_canvas_size_cx.copy_properties(m_static_text_color);
+	m_static_canvas_size_cx.copy_properties(m_static_text_opacity);
 
 	enable_window(false);
 }
@@ -379,6 +381,10 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 			ASSERT(token.size() == 3);
 			m_item_cur->m_cr_text = Gdiplus::Color(m_item_cur->m_cr_text.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
 		}
+		else if (msg->pThis == &m_static_text_opacity)
+		{
+			set_color(m_item_cur->m_cr_text, 0, _ttoi(msg->sValue));
+		}
 		else if (msg->pThis == &m_static_font_size)
 		{
 			m_item_cur->m_font_size = _ttoi(msg->sValue);
@@ -438,6 +444,7 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_static_text_color.set_text_color(cr);
 		str.Format(_T("%d, %d, %d"), cr.GetR(), cr.GetG(), cr.GetB());
 		m_static_text_color.set_text_value(str);
+		m_static_text_opacity.set_text_value(i2S(item->m_cr_text.GetA()));
 
 		//font
 		m_static_font_size.set_text_value(i2S(item->m_font_size));
@@ -473,6 +480,7 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 
 		m_static_text_color.set_text_color(Gdiplus::Color::Gray);
 		m_static_text_color.set_text_value();
+		m_static_text_opacity.set_text_value();
 
 		enable_window(false);
 	}
@@ -481,9 +489,11 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 void CPropertyDlg::OnBnClickedCheckFontBold()
 {
 	m_item_cur->m_font_bold = (m_check_font_bold.GetCheck() == BST_CHECKED);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 }
 
 void CPropertyDlg::OnBnClickedCheckFontItalic()
 {
 	m_item_cur->m_font_italic = (m_check_font_italic.GetCheck() == BST_CHECKED);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 }

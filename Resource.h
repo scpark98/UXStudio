@@ -124,6 +124,8 @@
 #define IDC_CHECK_FONT_ITALIC           1035
 #define IDC_STATIC_FONT_COLOR           1036
 #define IDC_STATIC_TEXT_COLOR           1036
+#define IDC_STATIC_FILL_OPACITY2        1037
+#define IDC_STATIC_TEXT_OPACITY         1037
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773

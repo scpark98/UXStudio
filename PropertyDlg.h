@@ -86,4 +86,5 @@ public:
 	CSCStatic m_static_text_color;
 	afx_msg void OnBnClickedCheckFontBold();
 	afx_msg void OnBnClickedCheckFontItalic();
+	CSCStatic m_static_text_opacity;
 };
