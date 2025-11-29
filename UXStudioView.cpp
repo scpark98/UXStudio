@@ -982,11 +982,12 @@ void CUXStudioView::OnMenuViewLabelEdit()
 	CRect r = gpRectF_to_CRect(m_item_selected->m_r);
 	CPoint cp = r.CenterPoint();
 	//r = make_center_rect(cp.x, cp.y, r.Width(), 20);
-	r.DeflateRect(RECT_RESIZE_HANDLE_SIZE, RECT_RESIZE_HANDLE_SIZE);
+	r.DeflateRect(RECT_RESIZE_HANDLE_SIZE * 2, RECT_RESIZE_HANDLE_SIZE * 2);
 	m_edit.MoveWindow(r);
 
 	m_edit.set_text_color(m_item_selected->m_cr_text);
-	m_edit.set_back_color(m_item_selected->m_cr_fill);
+	m_edit.set_transparent();
+	//m_edit.set_back_color(m_item_selected->m_cr_fill);
 	m_edit.set_font_name(m_item_selected->m_font_name);
 	m_edit.set_font_size(m_item_selected->m_font_size);
 	m_edit.set_font_weight(m_item_selected->m_font_bold ? FW_BOLD : FW_NORMAL);
