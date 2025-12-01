@@ -156,6 +156,7 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_STROKE_THICKNESS, 50, 0, 50, 0);
 	*/
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
+	m_theme.cr_text = gGRAY(160);
 	m_theme.cr_back = gGRAY(44);
 
 	m_static_canvas_size.set_text_color(m_theme.cr_text);
@@ -167,7 +168,7 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size.copy_properties(m_static_round);
 
 	m_static_canvas_size_cx.set_text_color(m_theme.cr_text);
-	m_static_canvas_size_cx.set_back_color(gGRAY(96));
+	m_static_canvas_size_cx.set_back_color(gGRAY(64));
 	m_static_canvas_size_cx.set_prefix_space(2);
 	m_static_canvas_size_cx.set_round(4, m_theme.cr_back, m_theme.cr_back);
 	m_static_canvas_size_cx.set_use_edit();

@@ -466,7 +466,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_cursor_info(pt);
 
 	//trace(m_lbutton_down);
-	trace(m_is_resizing);
+	//trace(m_is_resizing);
 
 	if (m_is_resizing)
 	{
@@ -489,13 +489,17 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 	else
 	{
-		m_item_hover = get_hover_item(pt);
-		TRACE(_T("hover = %p\n"), m_item_hover);
+		CSCUIElement* hover = get_hover_item(pt);
+		if (hover != m_item_hover)
+		{
+			m_item_hover = get_hover_item(pt);
+			TRACE(_T("hover = %p\n"), m_item_hover);
 
-		CRect rc;
-		GetClientRect(rc);
-		m_d2dc.on_size_changed(rc.Width(), rc.Height());
-		Invalidate();
+			CRect rc;
+			GetClientRect(rc);
+			m_d2dc.on_size_changed(rc.Width(), rc.Height());
+			Invalidate();
+		}
 	}
 
 	CFormView::OnMouseMove(nFlags, point);
@@ -649,8 +653,6 @@ void CUXStudioView::move_resize_item(int key)
 
 CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 {
-	m_item_hover = NULL;
-	
 	//기본적으로 rect안에 커서가 들어오면 hover로 인식하지만
 	//rect안에 또 다른 rect가 있을 경우, 순서가 나중인 rect는 hover로 판정될 수 없다.
 	//따라서 테두리 위에 커서가 위치하는 경우 먼저 hover 판정을 해야 하고
@@ -680,9 +682,9 @@ CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 	}
 
 	if (res != pDoc->m_data.end())
-		m_item_hover = *res;
+		return *res;
 
-	return m_item_hover;
+	return NULL;
 }
 
 BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
