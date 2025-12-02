@@ -22,6 +22,7 @@ public:
 public:
 	void				set_cursor_info(CPoint pt);
 	CPropertyDlg		m_propertyDlg;
+	void				set_property(CSCUIElement* item, int item_index);
 
 
 // 재정의입니다.

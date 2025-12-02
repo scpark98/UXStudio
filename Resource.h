@@ -126,6 +126,14 @@
 #define IDC_STATIC_TEXT_COLOR           1036
 #define IDC_STATIC_FILL_OPACITY2        1037
 #define IDC_STATIC_TEXT_OPACITY         1037
+#define IDC_STATIC_TEXT_ALIGN           1038
+#define IDC_RADIO_ALIGN_LEFT            1039
+#define IDC_RADIO_ALIGN_CENTER          1040
+#define IDC_RADIO_ALIGN_RIGHT           1041
+#define IDC_RADIO_VALIGN_TOP            1042
+#define IDC_RADIO_VALIGN_CENTER         1043
+#define IDC_RADIO_ALIGN_BOTTOM          1044
+#define IDC_RADIO_VALIGN_BOTTOM         1044
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
@@ -139,14 +147,16 @@
 #define ID_MENU_VIEW_LABEL_EDIT         32781
 #define ID_VIEW_32782                   32782
 #define ID_MENU_VIEW_DELETE             32783
+#define ID_32784                        32784
+#define ID_MENU_VIEW_SHOW_COORD         32785
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        314
-#define _APS_NEXT_COMMAND_VALUE         32784
-#define _APS_NEXT_CONTROL_VALUE         1035
+#define _APS_NEXT_COMMAND_VALUE         32786
+#define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

@@ -88,4 +88,16 @@ public:
 	afx_msg void OnBnClickedCheckFontItalic();
 	CSCStatic m_static_text_opacity;
 	afx_msg void OnCbnSelchangeComboFont();
+	afx_msg void OnBnClickedRadioAlignLeft();
+	afx_msg void OnBnClickedRadioAlignCenter();
+	afx_msg void OnBnClickedRadioAlignRight();
+	afx_msg void OnBnClickedRadioVAlignTop();
+	afx_msg void OnBnClickedRadioVAlignCenter();
+	afx_msg void OnBnClickedRadioVAlignBottom();
+	CGdiButton m_radio_align_left;
+	CGdiButton m_radio_align_center;
+	CGdiButton m_radio_align_right;
+	CGdiButton m_radio_valign_top;
+	CGdiButton m_radio_valign_center;
+	CGdiButton m_radio_valign_bottom;
 };

@@ -22,6 +22,7 @@ protected: // serialization에서만 만들어집니다.
 
 	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
 	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
+	ComPtr<ID2D1SolidColorBrush>	m_br_order;
 	ComPtr<ID2D1SolidColorBrush>	m_br_item;
 	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
 	ComPtr<ID2D1SolidColorBrush>	m_br_selected;
@@ -37,12 +38,16 @@ protected: // serialization에서만 만들어집니다.
 	CPoint							m_pt_lbutton_down = CPoint(-1, -1);
 	CPoint							m_pt_cur = CPoint(-1, -1);
 
+	//개발 단계에서 확인용으로 각 항목의 좌표값 표시 여부
+	bool							m_show_element_coord = true;
+
 	int								m_handle_index = -1;
 	CRect							m_resize_handle[9];
 	void							draw_resize_handle(ID2D1DeviceContext* d2dc);
+	//이동 또는 크기이동 중...
 	bool							m_is_resizing = false;
-	void							move_resize_item(CPoint pt);	//마우스를 이용한 이동, 크기조정
-	void							move_resize_item(int key);		//방향키를 이용한 이동, 크기조정
+	void							move_or_resize_item(CPoint pt);	//마우스를 이용한 이동, 크기조정
+	void							move_or_resize_item(int key);		//방향키를 이용한 이동, 크기조정
 
 	//max rect of all selected items
 	Gdiplus::RectF					m_r_selected;
@@ -72,6 +77,8 @@ protected: // serialization에서만 만들어집니다.
 
 	//가장 가까운 grid 좌표를 리턴한다.
 	//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
+	//grid로 나누고 다시 grid를 곱하는 과정에서 항상 버림만 발생하므로 문제가 있다.
+	//float으로 나누고 0.5를 넘으면 올림해야 한다.
 	template <class T> T get_near_grid(T src)
 	{
 		if constexpr (std::is_same_v<T, CPoint>)
@@ -98,11 +105,17 @@ protected: // serialization에서만 만들어집니다.
 		else if constexpr (std::is_same_v<T, Gdiplus::RectF>)
 		//else if (typeid(T) == typeid(Gdiplus::RectF))
 		{
-			Gdiplus::RectF r = (Gdiplus::RectF)src;
-			r.X = (int)(r.X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
-			r.Y = (int)(r.Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
+			Gdiplus::RectF* r = reinterpret_cast<Gdiplus::RectF*>(&src);
+			//float div = r->X / pDoc->m_sz_grid.cx;
+			//div = ROUND(div, 0) * pDoc->m_sz_grid.cx;
+			r->X = ROUND(r->X / pDoc->m_sz_grid.cx, 0) * pDoc->m_sz_grid.cx;
+			r->Y = ROUND(r->Y / pDoc->m_sz_grid.cy, 0) * pDoc->m_sz_grid.cy;
+			//r->X = int(r->X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			//r->Y = int(r->Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
 
-			return r;
+			//TRACE(_T("src->X = %.2f, div = %.2f, r->X = %.2f\n"), src.X, div, r->X);
+
+			return *r;
 		}
 
 		return src;
@@ -118,7 +131,7 @@ protected: // serialization에서만 만들어집니다.
 
 	//point, rect 등을 현재 스크롤바 위치만큼 보정한다.
 	//invert = false이면 스크롤 오프셋만큼 더하는 것이고 true이면 적용했던 오프셋을 다시 빼준다.
-	template <class T> void	adjust_scroll_offset(T& value, bool near_grid = true, bool invert = false)
+	template <class T> T adjust_scroll_offset(T& value, bool near_grid = true, bool invert = false)
 	{
 		CPoint sp((invert ? -1 : 1) * GetScrollPos(SB_HORZ), (invert ? -1 : 1) * GetScrollPos(SB_VERT));
 
@@ -130,6 +143,7 @@ protected: // serialization에서만 만들어집니다.
 			if (near_grid)
 				pt = get_near_grid(pt);
 			value = pt;
+			return value;
 		}
 		else if constexpr (std::is_same_v<T, Gdiplus::Rect>)
 		{
@@ -138,6 +152,7 @@ protected: // serialization에서만 만들어집니다.
 			if (near_grid)
 				r = get_near_grid(r);
 			value = r;
+			return value;
 		}
 		else if constexpr (std::is_same_v<T, Gdiplus::RectF>)
 		{
@@ -147,7 +162,10 @@ protected: // serialization에서만 만들어집니다.
 				r = get_near_grid(r);
 
 			value = r;
+			return value;
 		}
+
+		return value;
 	}
 
 public:
@@ -188,6 +206,11 @@ protected:
 	std::vector<std::deque<CSCUIElement*>*>::iterator m_undo_iter;
 	void			push_undo();
 	void			undo();
+	//after = true이면 현재 선택된 항목의 뒤에 추가한다.
+	void			insert(CSCUIElement* new_item, bool after = true);
+
+	//현재 항목의 index 리턴.
+	int				get_index(CSCUIElement* cur);
 
 // 생성된 메시지 맵 함수
 protected:
@@ -219,6 +242,7 @@ public:
 	afx_msg void OnMenuViewDelete();
 	afx_msg void OnEditUndo();
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
+	afx_msg void OnMenuViewShowCoord();
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

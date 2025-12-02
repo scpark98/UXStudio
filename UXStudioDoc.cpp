@@ -200,7 +200,8 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_text = json.get_array_member("items", i, "label", CString());
 		//TRACE(_T("%s\n"), CString(json.get_array_member("items", i, "label", std::string("")).c_str()));
 		//TRACE(_T("%S\n"), json.get_array_member("items", i, "label", ""));
-		el->m_text_align = json.get_array_member("items", i, "label_align", UINT(0));
+		el->m_text_align = json.get_array_member("items", i, "label_align", (int)DWRITE_TEXT_ALIGNMENT_CENTER);
+		el->m_text_valign = json.get_array_member("items", i, "label_valign", (int)DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		el->m_text_visible = json.get_array_member("items", i, "label_visible", true);
 		el->m_cr_text = Gdiplus::Color(json.get_array_member("items", i, "cr_text", (UINT)(Gdiplus::Color::Black)));
 		el->m_cr_back = Gdiplus::Color(json.get_array_member("items", i, "cr_back", (UINT)(Gdiplus::Color::Transparent)));
@@ -266,6 +267,7 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		std::string sstr = CT2CA(m_data[i]->m_text);
 		item.AddMember(rapidjson::Value("label", allocator).Move(), sstr, allocator);
 		item.AddMember(rapidjson::Value("label_align", allocator).Move(), m_data[i]->m_text_align, allocator);
+		item.AddMember(rapidjson::Value("label_valign", allocator).Move(), m_data[i]->m_text_valign, allocator);
 		item.AddMember(rapidjson::Value("label_visible", allocator).Move(), m_data[i]->m_text_visible, allocator);
 		item.AddMember(rapidjson::Value("cr_text", allocator).Move(), (UINT)m_data[i]->m_cr_text.GetValue(), allocator);
 		item.AddMember(rapidjson::Value("cr_back", allocator).Move(), (UINT)m_data[i]->m_cr_back.GetValue(), allocator);

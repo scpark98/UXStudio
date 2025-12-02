@@ -34,7 +34,8 @@ END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
-	ID_SEPARATOR,           // 상태 줄 표시기
+	ID_SEPARATOR,
+	ID_SEPARATOR,
 	ID_SEPARATOR,
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
@@ -105,7 +106,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // 만들지 못했습니다.
 	}
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
-	m_wndStatusBar.SetPaneInfo(1, ID_SEPARATOR, SBPS_NORMAL, 55);
+	m_wndStatusBar.SetPaneInfo(1, ID_SEPARATOR, SBPS_NORMAL, 240);
+	m_wndStatusBar.SetPaneInfo(2, ID_SEPARATOR, SBPS_NORMAL, 55);
 	//m_wndStatusBar.SetPaneTextColor(1, red);
 
 	// TODO: 도구 모음 및 메뉴 모음을 도킹할 수 없게 하려면 이 다섯 줄을 삭제하십시오.
@@ -483,5 +485,24 @@ void CMainFrame::set_cursor_info(CPoint pt)
 	CString str;
 
 	str.Format(_T("%d, %d"), pt.x, pt.y);
+	m_wndStatusBar.SetPaneText(2, str);
+}
+
+void CMainFrame::set_property(CSCUIElement* item, int item_index)
+{
+	CString str;
+
+	if (item)
+		str.Format(_T("%d : %.0f, %.0f ~ %.0f, %.0f (%.0f x %.0f)"),
+			item_index, item->m_r.X, item->m_r.Y, item->m_r.GetRight(), item->m_r.GetBottom(),
+			item->m_r.Width, item->m_r.Height);
+
 	m_wndStatusBar.SetPaneText(1, str);
+	CClientDC dc(this);
+	CFont* font = GetFont();
+	CFont* pOldFont = dc.SelectObject(font);
+	m_wndStatusBar.SetPaneInfo(1, ID_SEPARATOR, SBPS_NORMAL, dc.GetTextExtent(str).cx);
+	dc.SelectObject(pOldFont);
+
+	m_propertyDlg.set_property(item);
 }

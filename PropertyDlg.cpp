@@ -60,6 +60,12 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_FONT_ITALIC, m_check_font_italic);
 	DDX_Control(pDX, IDC_STATIC_TEXT_COLOR, m_static_text_color);
 	DDX_Control(pDX, IDC_STATIC_TEXT_OPACITY, m_static_text_opacity);
+	DDX_Control(pDX, IDC_RADIO_ALIGN_LEFT, m_radio_align_left);
+	DDX_Control(pDX, IDC_RADIO_ALIGN_CENTER, m_radio_align_center);
+	DDX_Control(pDX, IDC_RADIO_ALIGN_RIGHT, m_radio_align_right);
+	DDX_Control(pDX, IDC_RADIO_VALIGN_TOP, m_radio_valign_top);
+	DDX_Control(pDX, IDC_RADIO_VALIGN_CENTER, m_radio_valign_center);
+	DDX_Control(pDX, IDC_RADIO_VALIGN_BOTTOM, m_radio_valign_bottom);
 }
 
 
@@ -75,6 +81,12 @@ BEGIN_MESSAGE_MAP(CPropertyDlg, CPaneDialog)
 	ON_BN_CLICKED(IDC_CHECK_FONT_BOLD, &CPropertyDlg::OnBnClickedCheckFontBold)
 	ON_BN_CLICKED(IDC_CHECK_FONT_ITALIC, &CPropertyDlg::OnBnClickedCheckFontItalic)
 	ON_CBN_SELCHANGE(IDC_COMBO_FONT, &CPropertyDlg::OnCbnSelchangeComboFont)
+	ON_BN_CLICKED(IDC_RADIO_ALIGN_LEFT, &CPropertyDlg::OnBnClickedRadioAlignLeft)
+	ON_BN_CLICKED(IDC_RADIO_ALIGN_CENTER, &CPropertyDlg::OnBnClickedRadioAlignCenter)
+	ON_BN_CLICKED(IDC_RADIO_ALIGN_RIGHT, &CPropertyDlg::OnBnClickedRadioAlignRight)
+	ON_BN_CLICKED(IDC_RADIO_VALIGN_TOP, &CPropertyDlg::OnBnClickedRadioVAlignTop)
+	ON_BN_CLICKED(IDC_RADIO_VALIGN_CENTER, &CPropertyDlg::OnBnClickedRadioVAlignCenter)
+	ON_BN_CLICKED(IDC_RADIO_VALIGN_BOTTOM, &CPropertyDlg::OnBnClickedRadioVAlignBottom)
 END_MESSAGE_MAP()
 
 
@@ -126,7 +138,6 @@ void CPropertyDlg::enable_window(bool enable)
 
 void CPropertyDlg::init_controls()
 {
-	/*
 	m_resize.Create(this);
 
 	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CX, 0, 0, 50, 0);
@@ -135,7 +146,7 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_GRID_SIZE_CX, 0, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_GRID_SIZE_CY, 50, 0, 50, 0);
 
-	m_resize.Add(IDC_STATIC_text, 0, 0, 100, 0);
+	m_resize.Add(IDC_STATIC_LABEL, 0, 0, 100, 0);
 	m_resize.Add(IDC_STATIC_X1, 0, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_Y1, 25, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_X2, 50, 0, 25, 0);
@@ -154,7 +165,7 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_STROKE_COLOR, 0, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_STROKE_OPACITY, 50, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_STROKE_THICKNESS, 50, 0, 50, 0);
-	*/
+
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
 	m_theme.cr_text = gGRAY(160);
 	m_theme.cr_back = gGRAY(44);
@@ -302,27 +313,27 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		{
 			//x1를 변경하면 x2을 변경하는 것이 아니라 width를 조정해준다.
 			m_item_cur->m_r.X = _ttof(msg->sValue);
-			m_item_cur->m_r.Width = _ttof(msg->sValue) - m_item_cur->m_r.X;
-			m_static_w.set_textf(_T("%.1f"), m_item_cur->m_r.Width);
+			m_item_cur->m_r.Width = m_item_cur->m_r.GetRight() - m_item_cur->m_r.X;
+			m_static_w.set_text_value(_T("%.1f"), m_item_cur->m_r.Width);
 		}
 		else if (msg->pThis == &m_static_y1)
 		{
 			//y1를 변경하면 y2을 변경하는 것이 아니라 height를 조정해준다.
 			m_item_cur->m_r.Y = _ttof(msg->sValue);
-			m_item_cur->m_r.Height = _ttof(msg->sValue) - m_item_cur->m_r.Y;
-			m_static_h.set_textf(_T("%.1f"), m_item_cur->m_r.Height);
+			m_item_cur->m_r.Height = m_item_cur->m_r.GetBottom() - m_item_cur->m_r.Y;
+			m_static_h.set_text_value(_T("%.1f"), m_item_cur->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_x2)
 		{
 			//x2를 변경하면 x1을 변경하는 것이 아니라 width를 조정해준다.
 			m_item_cur->m_r.Width = _ttof(msg->sValue) - m_item_cur->m_r.X;
-			m_static_w.set_textf(_T("%.1f"), m_item_cur->m_r.Width);
+			m_static_w.set_text_value(_T("%.1f"), m_item_cur->m_r.Width);
 		}
 		else if (msg->pThis == &m_static_y2)
 		{
 			//y2를 변경하면 y1을 변경하는 것이 아니라 height를 조정해준다.
 			m_item_cur->m_r.Height = _ttof(msg->sValue) - m_item_cur->m_r.Y;
-			m_static_h.set_textf(_T("%.1f"), m_item_cur->m_r.Height);
+			m_static_h.set_text_value(_T("%.1f"), m_item_cur->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_w)
 		{
@@ -451,7 +462,9 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		//font
 		m_static_font_size.set_text_value(i2S(item->m_font_size));
 		m_check_font_bold.SetCheck(item->m_font_bold ? BST_CHECKED : BST_UNCHECKED);
-		m_check_font_bold.SetCheck(item->m_font_italic ? BST_CHECKED : BST_UNCHECKED);
+		m_check_font_italic.SetCheck(item->m_font_italic ? BST_CHECKED : BST_UNCHECKED);
+
+		
 
 		enable_window(true);
 	}
@@ -503,5 +516,41 @@ void CPropertyDlg::OnBnClickedCheckFontItalic()
 void CPropertyDlg::OnCbnSelchangeComboFont()
 {
 	m_item_cur->m_font_name = m_combo_font.get_text();
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnBnClickedRadioAlignLeft()
+{
+	m_item_cur->m_text_align = DWRITE_TEXT_ALIGNMENT_LEADING;
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnBnClickedRadioAlignCenter()
+{
+	m_item_cur->m_text_align = DWRITE_TEXT_ALIGNMENT_CENTER;
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnBnClickedRadioAlignRight()
+{
+	m_item_cur->m_text_align = DWRITE_TEXT_ALIGNMENT_TRAILING;
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnBnClickedRadioVAlignTop()
+{
+	m_item_cur->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnBnClickedRadioVAlignCenter()
+{
+	m_item_cur->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+}
+
+void CPropertyDlg::OnBnClickedRadioVAlignBottom()
+{
+	m_item_cur->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_FAR;
 	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
 }
