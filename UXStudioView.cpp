@@ -117,10 +117,23 @@ void CUXStudioView::OnInitialUpdate()
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_draw.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_order.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_item.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_align_fit.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), m_br_multi_selected.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), m_br_label.GetAddressOf());
+
+	D2D1_STROKE_STYLE_PROPERTIES strokeStyle =
+		D2D1::StrokeStyleProperties(
+			D2D1_CAP_STYLE_FLAT,  // startCap
+			D2D1_CAP_STYLE_FLAT,  // endCap
+			D2D1_CAP_STYLE_ROUND, // dashCap
+			D2D1_LINE_JOIN_ROUND, // lineJoin
+			1.0f,                // miterLimit
+			D2D1_DASH_STYLE_DASH_DOT, // dashStyle 
+			0.f);
+
+	m_d2dc.get_factory()->CreateStrokeStyle(strokeStyle, NULL, 0, m_stroke_style.GetAddressOf());
 
 	SetScrollSizes(MM_TEXT, pDoc->m_sz_canvas);
 
@@ -338,7 +351,8 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		pt[1] = m_pt_align_fit[1];
 		adjust_scroll_offset(pt[0], false, true);
 		adjust_scroll_offset(pt[1], false, true);
-		d2dc->DrawLine(pt[0], pt[1], m_br_draw.Get(), 1.5f);
+
+		d2dc->DrawLine(pt[0], pt[1], m_br_align_fit.Get(), 1.0f, m_stroke_style.Get());
 	}
 
 	HRESULT hr = d2dc->EndDraw();
@@ -550,6 +564,8 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	adjust_scroll_offset(pt, true);
 	//pt = get_near_grid(pt);
 
+	m_pt_align_fit[0].x = -1;
+
 	if (m_is_resizing)
 	{
 		m_is_resizing = false;
@@ -583,8 +599,9 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 			//가장 최종으로 그려진 항목이 가장 첫번째가 되어야 한다.
 			pDoc->m_data.push_front(new CSCUIElement(r));
 		}
-		Invalidate();
 	}
+
+	Invalidate();
 
 	CFormView::OnLButtonUp(nFlags, point);
 }
@@ -710,8 +727,8 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el)
 			if (is_in_range(el->m_r.X, r.X - gravity, r.X + gravity))
 			{
 				set_left(el->m_r, r.X);
-				m_pt_align_fit[0] = D2D1::Point2F(el->m_r.X, r.Y);
-				m_pt_align_fit[1] = D2D1::Point2F(el->m_r.X, el->m_r.GetBottom());
+				m_pt_align_fit[0] = D2D1::Point2F(el->m_r.X, MIN(r.Y, el->m_r.Y));
+				m_pt_align_fit[1] = D2D1::Point2F(el->m_r.X, MAX(r.GetBottom(), el->m_r.GetBottom()));
 				return;
 			}
 			else

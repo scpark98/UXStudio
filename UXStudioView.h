@@ -23,12 +23,16 @@ protected: // serialization에서만 만들어집니다.
 	ComPtr<ID2D1SolidColorBrush>	m_br_canvas;
 	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
 	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
+	ComPtr<ID2D1SolidColorBrush>	m_br_align_fit;
 	ComPtr<ID2D1SolidColorBrush>	m_br_order;
 	ComPtr<ID2D1SolidColorBrush>	m_br_item;
 	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
 	ComPtr<ID2D1SolidColorBrush>	m_br_selected;
 	ComPtr<ID2D1SolidColorBrush>	m_br_multi_selected;
 	ComPtr<ID2D1SolidColorBrush>	m_br_label;
+
+	ComPtr<ID2D1StrokeStyle>		m_stroke_style;
+
 
 	IDWriteFactory*					m_WriteFactory = NULL;
 	IDWriteTextFormat*				m_WriteFormat = NULL;
