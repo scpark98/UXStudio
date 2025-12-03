@@ -66,6 +66,9 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_VALIGN_TOP, m_radio_valign_top);
 	DDX_Control(pDX, IDC_RADIO_VALIGN_CENTER, m_radio_valign_center);
 	DDX_Control(pDX, IDC_RADIO_VALIGN_BOTTOM, m_radio_valign_bottom);
+	DDX_Control(pDX, IDC_STATIC_TEXT_ALIGN, m_static_text_align);
+	DDX_Control(pDX, IDC_STATIC_CANVAS_COLOR, m_static_canvas_color);
+	DDX_Control(pDX, IDC_STATIC_GRID_COLOR, m_static_grid_color);
 }
 
 
@@ -140,11 +143,13 @@ void CPropertyDlg::init_controls()
 {
 	m_resize.Create(this);
 
-	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CX, 0, 0, 50, 0);
-	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CY, 50, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CX, 0, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CY, 25, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_CANVAS_COLOR, 50, 0, 50, 0);
 
-	m_resize.Add(IDC_STATIC_GRID_SIZE_CX, 0, 0, 50, 0);
-	m_resize.Add(IDC_STATIC_GRID_SIZE_CY, 50, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_GRID_SIZE_CX, 0, 0, 25, 0);
+	m_resize.Add(IDC_STATIC_GRID_SIZE_CY, 25, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_GRID_COLOR, 50, 0, 50, 0);
 
 	m_resize.Add(IDC_STATIC_LABEL, 0, 0, 100, 0);
 	m_resize.Add(IDC_STATIC_X1, 0, 0, 25, 0);
@@ -173,6 +178,7 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size.set_text_color(m_theme.cr_text);
 	m_static_canvas_size.set_back_color(m_theme.cr_back);
 	m_static_canvas_size.copy_properties(m_static_grid_size);
+	m_static_canvas_size.copy_properties(m_static_text_align);
 	m_static_canvas_size.copy_properties(m_static_font);
 	m_static_canvas_size.copy_properties(m_static_fill);
 	m_static_canvas_size.copy_properties(m_static_stroke);
@@ -185,6 +191,8 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size_cx.set_use_edit();
 	m_static_canvas_size_cx.set_edit_text_color(Gdiplus::Color::White);
 	m_static_canvas_size_cx.copy_properties(m_static_canvas_size_cy);
+	m_static_canvas_size_cx.copy_properties(m_static_canvas_color);
+	m_static_canvas_size_cx.copy_properties(m_static_grid_color);
 
 	m_static_canvas_size_cx.copy_properties(m_static_grid_size_cx);
 	m_static_canvas_size_cx.copy_properties(m_static_grid_size_cy);
@@ -219,6 +227,13 @@ void CPropertyDlg::init_controls()
 	m_check_font_italic.set_color(m_theme.cr_text, m_theme.cr_back, false);
 	m_static_canvas_size_cx.copy_properties(m_static_text_color);
 	m_static_canvas_size_cx.copy_properties(m_static_text_opacity);
+
+	m_radio_align_left.add_image(IDB_TEXT_ALIGN_LEFT);
+	m_radio_align_center.add_image(IDB_TEXT_ALIGN_CENTER);
+	m_radio_align_right.add_image(IDB_TEXT_ALIGN_RIGHT);
+	m_radio_valign_top.add_image(IDB_TEXT_ALIGN_TOP);
+	m_radio_valign_center.add_image(IDB_TEXT_ALIGN_MIDDLE);
+	m_radio_valign_bottom.add_image(IDB_TEXT_ALIGN_BOTTOM);
 
 	enable_window(false);
 }
@@ -274,35 +289,44 @@ void CPropertyDlg::OnSize(UINT nType, int cx, int cy)
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 }
 
-void CPropertyDlg::set_canvas_property(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy)
+void CPropertyDlg::set_canvas_property(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid)
 {
 	m_static_canvas_size_cx.set_text_value(i2S(canvas_cx));
 	m_static_canvas_size_cy.set_text_value(i2S(canvas_cy));
+	m_static_canvas_color.set_text_value(get_RGB_str(cr_canvas));
+
 	m_static_grid_size_cx.set_text_value(i2S(grid_cx));
 	m_static_grid_size_cy.set_text_value(i2S(grid_cy));
+	m_static_grid_color.set_text_value(get_RGB_str(cr_grid));
 }
 
 LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 {
-	if (!m_item_cur)
-		return 0;
-
 	CSCStaticMsg* msg = (CSCStaticMsg*)wParam;
 
 	if (msg->msg == CSCStaticMsg::msg_text_value_changed)
 	{
 		if (msg->pThis == &m_static_canvas_size_cx ||
 			msg->pThis == &m_static_canvas_size_cy ||
+			msg->pThis == &m_static_canvas_color ||
 			msg->pThis == &m_static_grid_size_cx ||
-			msg->pThis == &m_static_grid_size_cy)
+			msg->pThis == &m_static_grid_size_cy ||
+			msg->pThis == &m_static_grid_color)
 		{
 			int canvas_cx = _ttoi(m_static_canvas_size_cx.get_text_value());
 			int canvas_cy = _ttoi(m_static_canvas_size_cy.get_text_value());
+			Gdiplus::Color cr_canvas = get_color_from_token_str(m_static_canvas_color.get_text_value(), _T(", "));
+
 			int grid_cx = _ttoi(m_static_grid_size_cx.get_text_value());
 			int grid_cy = _ttoi(m_static_grid_size_cy.get_text_value());
-			((CUXStudioApp*)(AfxGetApp()))->apply_canvas_property_changed(canvas_cx, canvas_cy, grid_cx, grid_cy);
+			Gdiplus::Color cr_grid = get_color_from_token_str(m_static_grid_color.get_text_value(), _T(", "));
+
+			((CUXStudioApp*)(AfxGetApp()))->apply_canvas_property_changed(canvas_cx, canvas_cy, cr_canvas, grid_cx, grid_cy, cr_grid);
 			return 0;
 		}
+
+		if (!m_item_cur)
+			return 0;
 
 		if (msg->pThis == &m_static_label)
 			m_item_cur->m_text = msg->sValue;
@@ -359,11 +383,7 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 
 		else if (msg->pThis == &m_static_fill_color)
 		{
-			std::deque<CString> token;
-			msg->sValue.Remove(' ');	//공백제거 필수
-			get_token_string(msg->sValue, token, _T(","), false);
-			ASSERT(token.size() == 3);
-			m_item_cur->m_cr_fill = Gdiplus::Color(m_item_cur->m_cr_fill.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
+			m_item_cur->m_cr_fill = get_color_from_token_str(msg->sValue, _T(", "));
 		}
 		else if (msg->pThis == &m_static_fill_opacity)
 		{
@@ -372,11 +392,7 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 
 		else if (msg->pThis == &m_static_stroke_color)
 		{
-			std::deque<CString> token;
-			msg->sValue.Remove(' ');	//공백제거 필수
-			get_token_string(msg->sValue, token, _T(","), false);
-			ASSERT(token.size() == 3);
-			m_item_cur->m_cr_stroke = Gdiplus::Color(m_item_cur->m_cr_stroke.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
+			m_item_cur->m_cr_stroke = get_color_from_token_str(msg->sValue, _T(", "));
 		}
 		else if (msg->pThis == &m_static_stroke_opacity)
 		{
@@ -388,11 +404,7 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		}
 		else if (msg->pThis == &m_static_text_color)
 		{
-			std::deque<CString> token;
-			msg->sValue.Remove(' ');	//공백제거 필수
-			get_token_string(msg->sValue, token, _T(","), false);
-			ASSERT(token.size() == 3);
-			m_item_cur->m_cr_text = Gdiplus::Color(m_item_cur->m_cr_text.GetA(), _ttoi(token[0]), _ttoi(token[1]), _ttoi(token[2]));
+			m_item_cur->m_cr_text = get_color_from_token_str(msg->sValue, _T(", "));
 		}
 		else if (msg->pThis == &m_static_text_opacity)
 		{
@@ -413,6 +425,13 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 void CPropertyDlg::set_property(CSCUIElement* item)
 {
 	m_item_cur = item;
+
+	m_radio_align_left.SetCheck(BST_UNCHECKED);
+	m_radio_align_center.SetCheck(BST_UNCHECKED);
+	m_radio_align_right.SetCheck(BST_UNCHECKED);
+	m_radio_valign_top.SetCheck(BST_UNCHECKED);
+	m_radio_valign_center.SetCheck(BST_UNCHECKED);
+	m_radio_valign_bottom.SetCheck(BST_UNCHECKED);
 
 	if (item)
 	{
@@ -438,7 +457,7 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		Gdiplus::Color cr = item->m_cr_fill;
 		set_color(cr, 0, 255);
 		m_static_fill_color.set_text_color(cr);
-		str.Format(_T("%d, %d, %d"), cr.GetR(), cr.GetG(), cr.GetB());
+		str = get_RGB_str(cr);
 		m_static_fill_color.set_text_value(str);
 		m_static_fill_opacity.set_text_value(i2S(item->m_cr_fill.GetA()));
 
@@ -446,7 +465,7 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		cr = item->m_cr_stroke;
 		set_color(cr, 0, 255);
 		m_static_stroke_color.set_text_color(cr);
-		str.Format(_T("%d, %d, %d"), cr.GetR(), cr.GetG(), cr.GetB());
+		str = get_RGB_str(cr);
 		m_static_stroke_color.set_text_value(str);
 		m_static_stroke_opacity.set_text_value(i2S(item->m_cr_stroke.GetA()));
 		m_static_stroke_thickness.set_text_value(i2S(item->m_stroke_thickness));
@@ -455,7 +474,7 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		cr = item->m_cr_text;
 		set_color(cr, 0, 255);
 		m_static_text_color.set_text_color(cr);
-		str.Format(_T("%d, %d, %d"), cr.GetR(), cr.GetG(), cr.GetB());
+		str = get_RGB_str(cr);
 		m_static_text_color.set_text_value(str);
 		m_static_text_opacity.set_text_value(i2S(item->m_cr_text.GetA()));
 
@@ -464,7 +483,31 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 		m_check_font_bold.SetCheck(item->m_font_bold ? BST_CHECKED : BST_UNCHECKED);
 		m_check_font_italic.SetCheck(item->m_font_italic ? BST_CHECKED : BST_UNCHECKED);
 
-		
+		switch (item->m_text_align)
+		{
+			case DWRITE_TEXT_ALIGNMENT_LEADING:
+				m_radio_align_left.SetCheck(BST_CHECKED);
+				break;
+			case DWRITE_TEXT_ALIGNMENT_CENTER:
+				m_radio_align_center.SetCheck(BST_CHECKED);
+				break;
+			case DWRITE_TEXT_ALIGNMENT_TRAILING:
+				m_radio_align_right.SetCheck(BST_CHECKED);
+				break;
+		}
+
+		switch (item->m_text_valign)
+		{
+		case DWRITE_PARAGRAPH_ALIGNMENT_NEAR:
+			m_radio_valign_top.SetCheck(BST_CHECKED);
+			break;
+		case DWRITE_PARAGRAPH_ALIGNMENT_CENTER:
+			m_radio_valign_center.SetCheck(BST_CHECKED);
+			break;
+		case DWRITE_PARAGRAPH_ALIGNMENT_FAR:
+			m_radio_valign_bottom.SetCheck(BST_CHECKED);
+			break;
+		}
 
 		enable_window(true);
 	}

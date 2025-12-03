@@ -262,7 +262,7 @@ void CUXStudioApp::apply_changed_property(CSCUIElement* item)
 	}
 }
 
-void CUXStudioApp::apply_canvas_property_changed(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy)
+void CUXStudioApp::apply_canvas_property_changed(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid)
 {
 	CMDIFrameWnd* pMainFrame = (CMDIFrameWnd*)AfxGetMainWnd();
 	if (pMainFrame)
@@ -271,7 +271,7 @@ void CUXStudioApp::apply_canvas_property_changed(int canvas_cx, int canvas_cy, i
 		if (pChild)
 		{
 			CUXStudioView* pView = (CUXStudioView*)pChild->GetActiveView();                // Child 내부의 View
-			pView->apply_canvas_property_changed(canvas_cx, canvas_cy, grid_cx, grid_cy);
+			pView->apply_canvas_property_changed(canvas_cx, canvas_cy, cr_canvas, grid_cx, grid_cy, cr_grid);
 		}
 	}
 }

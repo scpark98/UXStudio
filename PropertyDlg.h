@@ -23,7 +23,7 @@ public:
 	CResizeCtrl			m_resize;
 	CSCColorTheme		m_theme = CSCColorTheme(this);
 
-	void				set_canvas_property(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy);
+	void				set_canvas_property(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	CSCUIElement*		m_item_cur = NULL;
 	void				set_property(CSCUIElement* item);
@@ -94,10 +94,13 @@ public:
 	afx_msg void OnBnClickedRadioVAlignTop();
 	afx_msg void OnBnClickedRadioVAlignCenter();
 	afx_msg void OnBnClickedRadioVAlignBottom();
+	CSCStatic m_static_text_align;
 	CGdiButton m_radio_align_left;
 	CGdiButton m_radio_align_center;
 	CGdiButton m_radio_align_right;
 	CGdiButton m_radio_valign_top;
 	CGdiButton m_radio_valign_center;
 	CGdiButton m_radio_valign_bottom;
+	CSCStatic m_static_canvas_color;
+	CSCStatic m_static_grid_color;
 };

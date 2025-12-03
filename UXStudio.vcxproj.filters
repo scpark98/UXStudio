@@ -279,6 +279,24 @@
     <Image Include="res\Toolbar256.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="res\images\text_align_bottom.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\images\text_align_center.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\images\text_align_left.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\images\text_align_middle.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\images\text_align_right.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\images\text_align_top.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Common\data_types\CSCUIElement\readme.txt">

@@ -87,6 +87,12 @@
 #define IDS_EDIT_MENU                   306
 #define IDR_MENU_VIEW_CONTEXT           311
 #define IDD_PROPERTY                    312
+#define IDB_TEXT_ALIGN_BOTTOM           314
+#define IDB_TEXT_ALIGN_CENTER           315
+#define IDB_TEXT_ALIGN_LEFT             316
+#define IDB_TEXT_ALIGN_MIDDLE           317
+#define IDB_TEXT_ALIGN_RIGHT            318
+#define IDB_TEXT_ALIGN_TOP              319
 #define IDC_BUTTON1                     1000
 #define IDC_STATIC_X                    1006
 #define IDC_STATIC_X1                   1006
@@ -132,8 +138,10 @@
 #define IDC_RADIO_ALIGN_RIGHT           1041
 #define IDC_RADIO_VALIGN_TOP            1042
 #define IDC_RADIO_VALIGN_CENTER         1043
-#define IDC_RADIO_ALIGN_BOTTOM          1044
 #define IDC_RADIO_VALIGN_BOTTOM         1044
+#define IDC_STATIC_CANVAS_COLOR         1045
+#define IDC_STATIC_CANVAS_COLOR2        1046
+#define IDC_STATIC_GRID_COLOR           1046
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773
@@ -154,7 +162,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
+#define _APS_NEXT_RESOURCE_VALUE        320
 #define _APS_NEXT_COMMAND_VALUE         32786
 #define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           310

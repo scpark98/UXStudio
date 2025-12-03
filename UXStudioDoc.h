@@ -22,7 +22,8 @@ public:
 
 	CSize							m_sz_canvas = CSize(1920, 1080);
 	CSize							m_sz_grid = CSize(8, 8);
-
+	Gdiplus::Color					m_cr_canvas = Gdiplus::Color::White;
+	Gdiplus::Color					m_cr_grid = Gdiplus::Color::LightGray;
 
 	std::deque<CSCUIElement*>		m_data;
 

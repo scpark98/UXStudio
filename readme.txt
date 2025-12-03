@@ -1,7 +1,7 @@
 [수정될 내용]
 - 순서 변경
 - 방향키로 위치, 크기 변경
-
+- canvas color or image
 
 [수정된 내용]
 
@@ -16,6 +16,11 @@
 - m_r_selected를 구하고 이는 최대 사각형을 의미한다.
 
 - OnMouseMove()에서는 m_r_selected안에 있으면 반응하지 않는다.
+
+[자석기능]
+- move/resize시에 다른 항목과의 자동 정렬을 지원해야 한다.
+- l, t, r, b, cp, canvas_cp 등 어디에 일치하는지를 기억해야 한다.
+- a라는 항목의 l, t에 일치한다면 이를 기억해서 OnDraw()에서 그려줘야 한다.
 
 [undo/redo]
 - m_data의 복사본을 vector에 저장해서 불러오는 방식으로 구현

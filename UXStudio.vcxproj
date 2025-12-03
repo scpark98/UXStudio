@@ -351,6 +351,12 @@
     <Image Include="res\fileview_hc.bmp" />
     <Image Include="res\file_view.ico" />
     <Image Include="res\file_view_hc.ico" />
+    <Image Include="res\images\text_align_bottom.png" />
+    <Image Include="res\images\text_align_center.png" />
+    <Image Include="res\images\text_align_left.png" />
+    <Image Include="res\images\text_align_middle.png" />
+    <Image Include="res\images\text_align_right.png" />
+    <Image Include="res\images\text_align_top.png" />
     <Image Include="res\menuimages.bmp" />
     <Image Include="res\menuimages_hc.bmp" />
     <Image Include="res\output_wnd.ico" />

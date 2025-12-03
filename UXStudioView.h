@@ -20,8 +20,9 @@ protected: // serialization에서만 만들어집니다.
 
 	CSCD2Context					m_d2dc;
 
-	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
+	ComPtr<ID2D1SolidColorBrush>	m_br_canvas;
 	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
+	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
 	ComPtr<ID2D1SolidColorBrush>	m_br_order;
 	ComPtr<ID2D1SolidColorBrush>	m_br_item;
 	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
@@ -66,22 +67,42 @@ protected: // serialization에서만 만들어집니다.
 	void							edit_end(bool valid = true);
 
 	void							apply_changed_property(CSCUIElement* item);
-	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, int grid_cx, int grid_cy);
+	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	CSCUIElement*					m_item_hover = NULL;
 	CSCUIElement*					m_item_selected = NULL;
 	CSCUIElement*					m_item_current = NULL;
 	CSCUIElement*					m_item_copy_src = NULL;
 
+	//move or resize시에 일치된 항목과 일치 인덱스를 기억해서 OnDraw()에서 그려줘야 한다.
+	//CSCUIElement*					m_item_align_fit = NULL;
+	//int								m_align_fit_index = -1;
+	D2D1_POINT_2F					m_pt_align_fit[2];
+	void							save_align_fit_info();
+
 	CSCUIElement*					get_hover_item(CPoint pt);
+
+	//move, resize시에 다른 항목과의 일치되는 위치로 자동 보정
+	void							get_fit_others(int index, CSCUIElement* el);
 
 	//가장 가까운 grid 좌표를 리턴한다.
 	//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
 	//grid로 나누고 다시 grid를 곱하는 과정에서 항상 버림만 발생하므로 문제가 있다.
 	//float으로 나누고 0.5를 넘으면 올림해야 한다.
-	template <class T> T get_near_grid(T src)
+	template <class T> T get_near_grid(T src, bool horz_grid = true)
 	{
-		if constexpr (std::is_same_v<T, CPoint>)
+		if constexpr (std::is_same_v<T, float>)
+			//if (typeid(T) == typeid(CPoint))	//compile error
+		{
+			float* f = reinterpret_cast<float*>(&src);
+			if (horz_grid)
+				*f = (int)(*f / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			else
+				*f = (int)(*f / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
+
+			return *f;
+		}
+		else if constexpr (std::is_same_v<T, CPoint>)
 		//if (typeid(T) == typeid(CPoint))	//compile error
 		{
 			CPoint* pt = reinterpret_cast<CPoint*>(&src);
@@ -145,6 +166,18 @@ protected: // serialization에서만 만들어집니다.
 			value = pt;
 			return value;
 		}
+		else if constexpr (std::is_same_v<T, D2D1_POINT_2F>)
+		{
+			D2D1_POINT_2F pt = value;
+			pt.x += sp.x;
+			pt.y += sp.y;
+
+			if (near_grid)
+				pt = get_near_grid(pt);
+
+			value = pt;
+			return value;
+		}
 		else if constexpr (std::is_same_v<T, Gdiplus::Rect>)
 		{
 			Gdiplus::Rect r = value;
@@ -202,6 +235,15 @@ public:
 protected:
 	CUXStudioDoc*	pDoc = NULL;
 
+	enum TIMER_ID
+	{
+		timer_doc_modified,
+	};
+
+	//항목이 변경되면 undo에 기록하고 속성창에도 이를 반영한다.
+	//단 mouse 액션은 너무 빈번하게 발생되므로 timer를 적용하여 반영한다.
+	void			set_property(bool doc_modified = true);
+
 	std::vector<std::deque<CSCUIElement*>*> m_undo;
 	std::vector<std::deque<CSCUIElement*>*>::iterator m_undo_iter;
 	void			push_undo();
@@ -243,6 +285,7 @@ public:
 	afx_msg void OnEditUndo();
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
 	afx_msg void OnMenuViewShowCoord();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

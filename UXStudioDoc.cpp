@@ -170,10 +170,12 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	AfxGetApp()->WriteProfileString(_T("setting"), _T("recent file"), m_filepath);
 
 	m_sz_canvas.cx = json.get("canvas_cx", 1920);
-	m_sz_canvas.cy = json.get("canvas_cy", 1920);
+	m_sz_canvas.cy = json.get("canvas_cy", 1080);
+	m_cr_canvas = json.get("cr_canvas", (UINT)(Gdiplus::Color::White));
 
 	m_sz_grid.cx = json.get("grid_cx", 8);
 	m_sz_grid.cy = json.get("grid_cy", 8);
+	m_cr_grid = json.get("cr_grid", (UINT)(Gdiplus::Color::LightGray));
 
 	rapidjson::Value& items = json.doc["items"];
 
@@ -231,9 +233,11 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 
 	json.doc.AddMember("canvas_cx", m_sz_canvas.cx, allocator);
 	json.doc.AddMember("canvas_cy", m_sz_canvas.cy, allocator);
+	json.doc.AddMember("cr_canvas", (UINT)m_cr_canvas.GetValue(), allocator);
 
 	json.doc.AddMember("grid_cx", m_sz_grid.cx, allocator);
 	json.doc.AddMember("grid_cy", m_sz_grid.cy, allocator);
+	json.doc.AddMember("cr_grid", (UINT)m_cr_grid.GetValue(), allocator);
 
 	rapidjson::Value items(rapidjson::kArrayType);
 
