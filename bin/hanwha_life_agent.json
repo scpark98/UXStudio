@@ -1,0 +1,735 @@
+{
+    "canvas_cx": 1920,
+    "canvas_cy": 1920,
+    "cr_canvas": 4294967295,
+    "grid_cx": 8,
+    "grid_cy": 8,
+    "cr_grid": 4292072403,
+    "items": [
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1547.0,
+                320.0,
+                120.0,
+                80.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": false,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4286611584
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1887.0,
+                18.0,
+                24.0,
+                24.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "X",
+            "label_align": 37,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4286085240,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 16,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1818.0,
+                20.0,
+                60.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "로그아웃",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1750.0,
+                20.0,
+                60.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담종료",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1664.0,
+                20.0,
+                80.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "내화면공유",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1582.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "교육",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1502.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "식사",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1424.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "후처리",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4290822336,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1730.0,
+                137.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "시작",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4288059030,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4292006610
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1809.0,
+                137.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "시작",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4288059030,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4292006610
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1348.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "대기",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1166.0,
+                32.0,
+                139.0,
+                22.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "(디지택트 정보)",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967273,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1842.0,
+                68.0,
+                77.0,
+                22.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "운영 모드",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4284111450,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 16777215
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1805.0,
+                92.0,
+                115.0,
+                22.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "최고 관리자(test1)",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4284111450,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 16777215
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1121.0,
+                20.0,
+                20.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "36",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Arabic Transparent",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 2236962
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1036.0,
+                20.0,
+                20.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "24",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Arabic Transparent",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 2236962
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                923.0,
+                20.0,
+                20.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "13",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Arabic Transparent",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 2236962
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1068.0,
+                20.0,
+                53.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담중",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4280427042
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1233.0,
+                12.0,
+                72.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "00:00:00",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1166.0,
+                12.0,
+                68.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담시간",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                956.0,
+                20.0,
+                72.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담대기자",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4280427042
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                858.0,
+                20.0,
+                60.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "근무인원",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 2236962
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                848.0,
+                12.0,
+                300.0,
+                33.0
+            ],
+            "round": [
+                5.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4280427042
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                828.0,
+                0.0,
+                1092.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1036.0,
+                211.0,
+                863.0,
+                152.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": false,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4294967295
+        }
+    ]
+}
