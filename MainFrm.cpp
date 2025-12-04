@@ -487,14 +487,19 @@ void CMainFrame::set_cursor_info(CPoint pt)
 	m_wndStatusBar.SetPaneText(2, str);
 }
 
-void CMainFrame::set_property(CSCUIElement* item, int item_index)
+void CMainFrame::set_property(std::vector<CSCUIElement*> items, int item_index)
 {
 	CString str;
 
-	if (item)
+	CSCUIElement* el = NULL;
+	
+	if (items.size() > 0)
+	{
+		el = items.back();
 		str.Format(_T("%d : %.0f, %.0f ~ %.0f, %.0f (%.0f x %.0f)"),
-			item_index, item->m_r.X, item->m_r.Y, item->m_r.GetRight(), item->m_r.GetBottom(),
-			item->m_r.Width, item->m_r.Height);
+			item_index, el->m_r.X, el->m_r.Y, el->m_r.GetRight(), el->m_r.GetBottom(),
+			el->m_r.Width, el->m_r.Height);
+	}
 
 	m_wndStatusBar.SetPaneText(1, str);
 	CClientDC dc(this);
@@ -503,5 +508,5 @@ void CMainFrame::set_property(CSCUIElement* item, int item_index)
 	m_wndStatusBar.SetPaneInfo(1, ID_SEPARATOR, SBPS_NORMAL, dc.GetTextExtent(str).cx);
 	dc.SelectObject(pOldFont);
 
-	m_propertyDlg.set_property(item);
+	m_propertyDlg.set_property(el);
 }

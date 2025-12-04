@@ -47,20 +47,21 @@ protected: // serialization에서만 만들어집니다.
 	bool							m_show_element_coord = true;
 
 	int								m_handle_index = -1;
-	CRect							m_resize_handle[9];
-	void							draw_resize_handle(ID2D1DeviceContext* d2dc);
+	std::vector<std::vector<CRect>>	m_resize_handle;
+	void							draw_resize_handle(ID2D1DeviceContext* d2dc, CRect* resize_handle);
+	void							draw_resize_handle(ID2D1DeviceContext* d2dc, std::vector<CRect>* resize_handle);
 	//이동 또는 크기이동 중...
 	bool							m_is_resizing = false;
 	void							move_or_resize_item(CPoint pt);	//마우스를 이용한 이동, 크기조정
 	void							move_or_resize_item(int key);		//방향키를 이용한 이동, 크기조정
 
 	//max rect of all selected items
-	Gdiplus::RectF					m_r_selected;
-	std::deque<CSCUIElement*>		get_selected_items();
-	void							select_item(CSCUIElement* item);
+	//Gdiplus::RectF					m_r_selected;
+	//std::deque<CSCUIElement*>		get_selected_items();
+	//void							select_item(CSCUIElement* item);
 
 	//선택된 모든 항목의 최대 사각형인 m_r_selected를 구한다. new_rect가 NULL이 아니면 이것까지 포함해서 구한다.
-	void							get_bound_selected_rect(Gdiplus::RectF* new_rect = NULL);
+	//void							get_bound_selected_rect(Gdiplus::RectF* new_rect = NULL);
 	//모든 항목을 선택 또는 해제한다.
 	void							select_all(bool select);
 	void							delete_selected_items();
@@ -74,9 +75,15 @@ protected: // serialization에서만 만들어집니다.
 	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	CSCUIElement*					m_item_hover = NULL;
-	CSCUIElement*					m_item_selected = NULL;
 	CSCUIElement*					m_item_current = NULL;
-	CSCUIElement*					m_item_copy_src = NULL;
+	std::vector<CSCUIElement*>		m_item_copy_src;
+
+//멀티 선택
+	std::vector<CSCUIElement*>		m_selected_items;
+	//item이 선택된 항목인지 판별한다.
+	bool							is_selected(CSCUIElement* item);
+	//item의 iterator를 리턴한다.
+	std::deque<CSCUIElement*>::iterator	get_iterator(std::deque<CSCUIElement*>* dq, CSCUIElement* item);
 
 	//move or resize시에 일치된 항목과 일치 인덱스를 기억해서 OnDraw()에서 그려줘야 한다.
 	std::vector<D2D1_POINT_2F>		m_pt_align_fit;

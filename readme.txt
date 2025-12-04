@@ -6,14 +6,16 @@
 [수정된 내용]
 
 [멀티선택 구현방식]
-1. 각 el의 is_selected flag를 저장하는 방법
+1. 각 el의 is_selected flag를 저장하는 방법 (figma 방식)
 - 선택항목은 선택되었음을 그려준다.
+- 선택정보 또한 저장할 수 있다. vector 방식도 선택여부를 저장할 수 있다.(save시에 flag 세팅)
 - m_r_selected를 구하고 이는 최대 사각형을 의미한다.
+- move, resize시에 모든 루프를 돌면서 선택된 항목에 대해서만 처리하므로 매번 모든 루프를 돌아야 한다.
 
 2. std::vector<CSCUIElement*> m_item_selected;
-- 선택된 항목들을 vector로 저장한다.
-- 선택항목은 선택되었음을 그려준다.
-- m_r_selected를 구하고 이는 최대 사각형을 의미한다.
+- 선택된 항목들을 vector로 저장한다. (ppt 방식)
+- 선택 항목은 선택되었음을 그려준다.
+- m_r_selected? 를 구하고 이는 최대 사각형을 의미한다.
 
 - OnMouseMove()에서는 m_r_selected안에 있으면 반응하지 않는다.
 
