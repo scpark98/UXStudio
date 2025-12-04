@@ -8,12 +8,12 @@
     "items": [
         {
             "type": 0,
-            "selected": false,
+            "selected": true,
             "r": [
-                1547.0,
-                320.0,
-                120.0,
-                80.0
+                1179.0,
+                129.0,
+                347.0,
+                225.0
             ],
             "round": [
                 0.0,
@@ -31,9 +31,9 @@
             "font_size": 10,
             "font_bold": false,
             "font_italic": false,
-            "stroke_thickness": 1.0,
+            "stroke_thickness": 0.0,
             "cr_stroke": 4282477025,
-            "cr_fill": 4286611584
+            "cr_fill": 4290888655
         },
         {
             "type": 0,
@@ -242,8 +242,8 @@
             "type": 0,
             "selected": false,
             "r": [
-                1730.0,
-                137.0,
+                1824.0,
+                138.0,
                 68.0,
                 28.0
             ],
@@ -253,7 +253,7 @@
                 0.0,
                 0.0
             ],
-            "label": "½ÃÀÛ",
+            "label": "Reset",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -271,8 +271,37 @@
             "type": 0,
             "selected": false,
             "r": [
-                1809.0,
-                137.0,
+                1749.0,
+                138.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "Á¾·á",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4288059030,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4292006610
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1674.0,
+                138.0,
                 68.0,
                 28.0
             ],
@@ -358,9 +387,9 @@
             "type": 0,
             "selected": false,
             "r": [
-                1842.0,
-                68.0,
-                77.0,
+                1799.0,
+                70.0,
+                103.0,
                 22.0
             ],
             "round": [
@@ -387,9 +416,38 @@
             "type": 0,
             "selected": false,
             "r": [
-                1805.0,
-                92.0,
-                115.0,
+                1592.0,
+                138.0,
+                72.0,
+                28.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "½ÅºÐÁõ ½ºÄµ",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4284111450,
+            "cr_back": 16777215,
+            "font_name": "³ª´®½ºÄù¾î",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 16777215
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1799.0,
+                93.0,
+                103.0,
                 22.0
             ],
             "round": [
@@ -706,10 +764,10 @@
             "type": 0,
             "selected": false,
             "r": [
-                1036.0,
-                211.0,
-                863.0,
-                152.0
+                1575.0,
+                129.0,
+                327.0,
+                204.0
             ],
             "round": [
                 0.0,

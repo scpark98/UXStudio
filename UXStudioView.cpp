@@ -344,11 +344,11 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		draw_resize_handle(d2dc);
 	}
 
-	if (m_pt_align_fit[0].x >= 0.0f)
+	for (int i = 0; i < m_pt_align_fit.size(); i += 2)
 	{
 		D2D1_POINT_2F pt[2];
-		pt[0] = m_pt_align_fit[0];
-		pt[1] = m_pt_align_fit[1];
+		pt[0] = m_pt_align_fit[i];
+		pt[1] = m_pt_align_fit[i + 1];
 		adjust_scroll_offset(pt[0], false, true);
 		adjust_scroll_offset(pt[1], false, true);
 
@@ -564,7 +564,7 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	adjust_scroll_offset(pt, true);
 	//pt = get_near_grid(pt);
 
-	m_pt_align_fit[0].x = -1;
+	m_pt_align_fit.clear();
 
 	if (m_is_resizing)
 	{
@@ -639,13 +639,12 @@ void CUXStudioView::move_or_resize_item(CPoint pt)
 		case corner_inside:
 			item->m_r.X += pt.x - m_pt_lbutton_down.x;
 			item->m_r.Y += pt.y - m_pt_lbutton_down.y;
+			get_fit_others(m_handle_index, item);
 			m_pt_lbutton_down = pt;
 			break;
 		case corner_left:
-			TRACE(_T("old item->m_r.X = %.1f\n"), item->m_r.X);
 			set_left(item->m_r, pt.x);
 			get_fit_others(m_handle_index, item);
-			TRACE(_T("new item->m_r.X = %.1f\n"), item->m_r.X);
 			break;
 		case corner_right:
 			item->m_r.Width = pt.x - item->m_r.X;
@@ -711,7 +710,7 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el)
 {
 	int gravity = 4;
 
-	m_pt_align_fit[0].x = -1.0f;
+	m_pt_align_fit.clear();
 
 	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
@@ -722,13 +721,19 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el)
 
 		//range에 맞는 항목을 찾았다면 left를 맞춰주고 바로 리턴해야 한다.
 		//그렇지 않으면 다른 항목들과도 또 left가 맞는지 확인하고 그렇지 않으면 grid로 움직이게 된다.
-		if (index == corner_left)
+		//=>바로 리턴하면 left와 top모두 일치하는 경우를 처리하지 못한다.
+		//left fit flag를 true로 하고 계속 검사해야 한다. true인 코너는 더 이상 검사하지 않는다.
+		if (index == corner_inside)
+		{
+
+		}
+		else if (index == corner_left)
 		{
 			if (is_in_range(el->m_r.X, r.X - gravity, r.X + gravity))
 			{
 				set_left(el->m_r, r.X);
-				m_pt_align_fit[0] = D2D1::Point2F(el->m_r.X, MIN(r.Y, el->m_r.Y));
-				m_pt_align_fit[1] = D2D1::Point2F(el->m_r.X, MAX(r.GetBottom(), el->m_r.GetBottom()));
+				m_pt_align_fit.push_back(D2D1::Point2F(el->m_r.X, MIN(r.Y, el->m_r.Y)));
+				m_pt_align_fit.push_back(D2D1::Point2F(el->m_r.X, MAX(r.GetBottom(), el->m_r.GetBottom())));
 				return;
 			}
 			else
@@ -741,6 +746,8 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el)
 			if (is_in_range(el->m_r.Y, r.Y - gravity, r.Y + gravity))
 			{
 				set_top(el->m_r, r.Y);
+				m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X), el->m_r.Y));
+				m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()), el->m_r.Y));
 				return;
 			}
 			else
@@ -753,6 +760,8 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el)
 			if (is_in_range(el->m_r.GetRight(), r.GetRight() - gravity, r.GetRight() + gravity))
 			{
 				el->m_r.Width = r.GetRight() - el->m_r.X;
+				m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MIN(r.Y, el->m_r.Y)));
+				m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MAX(r.GetBottom(), el->m_r.GetBottom())));
 				return;
 			}
 			else
@@ -762,8 +771,21 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el)
 			}
 			TRACE(_T("new : %.1f\n"), el->m_r.Width);
 		}
-		else if (index == corner_bottom && is_in_range(el->m_r.GetBottom(), r.GetBottom() - gravity, r.GetBottom() + gravity))
-			el->m_r.Height = r.GetBottom() - el->m_r.Y;
+		else if (index == corner_bottom)
+		{
+			if (is_in_range(el->m_r.GetBottom(), r.GetBottom() - gravity, r.GetBottom() + gravity))
+			{
+				el->m_r.Height = r.GetBottom() - el->m_r.Y;
+				m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X), r.GetBottom()));
+				m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()), r.GetBottom()));
+				return;
+			}
+			else
+			{
+				float bottom = get_near_grid(el->m_r.GetBottom());
+				el->m_r.Height = bottom - el->m_r.Y;
+			}
+		}
 	}
 }
 
@@ -1322,7 +1344,7 @@ void CUXStudioView::set_property(bool doc_modified)
 	//if (doc_modified)
 	//	pDoc->SetModifiedFlag(true);
 
-	SetTimer(timer_doc_modified, 50, NULL);
+	SetTimer(timer_doc_modified, 10, NULL);
 }
 
 void CUXStudioView::OnTimer(UINT_PTR nIDEvent)

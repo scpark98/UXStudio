@@ -79,10 +79,8 @@ protected: // serialization에서만 만들어집니다.
 	CSCUIElement*					m_item_copy_src = NULL;
 
 	//move or resize시에 일치된 항목과 일치 인덱스를 기억해서 OnDraw()에서 그려줘야 한다.
-	//CSCUIElement*					m_item_align_fit = NULL;
-	//int								m_align_fit_index = -1;
-	D2D1_POINT_2F					m_pt_align_fit[2];
-	void							save_align_fit_info();
+	std::vector<D2D1_POINT_2F>		m_pt_align_fit;
+	void							push_align_fit_info();
 
 	CSCUIElement*					get_hover_item(CPoint pt);
 
