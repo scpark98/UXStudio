@@ -27,6 +27,7 @@ IMPLEMENT_DYNCREATE(CUXStudioDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CUXStudioDoc, CDocument)
 	ON_COMMAND(ID_FILE_SAVE, &CUXStudioDoc::OnFileSave)
+	ON_COMMAND(ID_FILE_SAVE_AS, &CUXStudioDoc::OnFileSaveAs)
 END_MESSAGE_MAP()
 
 
@@ -308,4 +309,22 @@ void CUXStudioDoc::OnFileSave()
 	}
 
 	OnSaveDocument(m_filepath);
+}
+
+void CUXStudioDoc::OnFileSaveAs()
+{
+	if (m_filepath.IsEmpty())
+	{
+		m_filepath.Format(_T("%s\\UXStudio.json"), get_exe_directory());
+	}
+
+	CString filter = _T("Json Files (*.json)|*.json|Text Files (*.txt)|*.txt|All Files (*.*)|*.*||");
+	CFileDialog dlg(FALSE, _T("json"), m_filepath, OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY, filter);
+	if (dlg.DoModal() == IDCANCEL)
+		return;
+
+	m_filepath = dlg.GetPathName();
+	OnSaveDocument(m_filepath);
+
+	SetPathName(m_filepath);
 }

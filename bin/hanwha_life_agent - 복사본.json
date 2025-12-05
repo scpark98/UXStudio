@@ -8,6 +8,35 @@
     "items": [
         {
             "type": 0,
+            "selected": false,
+            "r": [
+                608.0,
+                395.0,
+                304.0,
+                63.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": false,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4286611584
+        },
+        {
+            "type": 0,
             "selected": true,
             "r": [
                 1179.0,

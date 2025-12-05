@@ -76,10 +76,10 @@ protected: // serialization에서만 만들어집니다.
 
 	CSCUIElement*					m_item_hover = NULL;
 	CSCUIElement*					m_item_current = NULL;
-	std::vector<CSCUIElement*>		m_item_copy_src;
+	std::deque<CSCUIElement*>		m_item_copy_src;
 
 //멀티 선택
-	std::vector<CSCUIElement*>		m_selected_items;
+	std::deque<CSCUIElement*>		m_selected_items;
 	//item이 선택된 항목인지 판별한다.
 	bool							is_selected(CSCUIElement* item);
 	//item의 iterator를 리턴한다.
@@ -92,7 +92,7 @@ protected: // serialization에서만 만들어집니다.
 	CSCUIElement*					get_hover_item(CPoint pt);
 
 	//move, resize시에 다른 항목과의 일치되는 위치로 자동 보정
-	void							get_fit_others(int index, CSCUIElement* el);
+	void							get_fit_others(int index, CSCUIElement* el, CPoint pt = CPoint(), CPoint pt_down = CPoint());
 
 	//가장 가까운 grid 좌표를 리턴한다.
 	//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
@@ -100,7 +100,18 @@ protected: // serialization에서만 만들어집니다.
 	//float으로 나누고 0.5를 넘으면 올림해야 한다.
 	template <class T> T get_near_grid(T src, bool horz_grid = true)
 	{
-		if constexpr (std::is_same_v<T, float>)
+		if constexpr (std::is_same_v<T, int>)
+			//if (typeid(T) == typeid(CPoint))	//compile error
+		{
+			int* f = reinterpret_cast<int*>(&src);
+			if (horz_grid)
+				*f = (int)(*f / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			else
+				*f = (int)(*f / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
+
+			return *f;
+		}
+		else if constexpr (std::is_same_v<T, float>)
 			//if (typeid(T) == typeid(CPoint))	//compile error
 		{
 			float* f = reinterpret_cast<float*>(&src);
@@ -138,10 +149,10 @@ protected: // serialization에서만 만들어집니다.
 			Gdiplus::RectF* r = reinterpret_cast<Gdiplus::RectF*>(&src);
 			//float div = r->X / pDoc->m_sz_grid.cx;
 			//div = ROUND(div, 0) * pDoc->m_sz_grid.cx;
-			r->X = ROUND(r->X / pDoc->m_sz_grid.cx, 0) * pDoc->m_sz_grid.cx;
-			r->Y = ROUND(r->Y / pDoc->m_sz_grid.cy, 0) * pDoc->m_sz_grid.cy;
-			//r->X = int(r->X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
-			//r->Y = int(r->Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
+			//r->X = ROUND(r->X / pDoc->m_sz_grid.cx, 0) * pDoc->m_sz_grid.cx;
+			//r->Y = ROUND(r->Y / pDoc->m_sz_grid.cy, 0) * pDoc->m_sz_grid.cy;
+			r->X = int(r->X / pDoc->m_sz_grid.cx) * pDoc->m_sz_grid.cx;
+			r->Y = int(r->Y / pDoc->m_sz_grid.cy) * pDoc->m_sz_grid.cy;
 
 			//TRACE(_T("src->X = %.2f, div = %.2f, r->X = %.2f\n"), src.X, div, r->X);
 
@@ -295,6 +306,7 @@ public:
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
 	afx_msg void OnMenuViewShowCoord();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnMenuViewSort();
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

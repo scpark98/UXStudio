@@ -8,67 +8,9 @@
     "items": [
         {
             "type": 0,
-            "selected": true,
-            "r": [
-                1179.0,
-                129.0,
-                347.0,
-                225.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4278190080,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 10,
-            "font_bold": false,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 4290888655
-        },
-        {
-            "type": 0,
             "selected": false,
             "r": [
-                1887.0,
-                18.0,
-                24.0,
-                24.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "X",
-            "label_align": 37,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4286085240,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 16,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1818.0,
+                858.0,
                 20.0,
                 60.0,
                 18.0
@@ -79,448 +21,13 @@
                 0.0,
                 0.0
             ],
-            "label": "로그아웃",
-            "label_align": 0,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294934528,
-            "cr_back": 16777215,
-            "font_name": "Cascadia Mono ExtraLight",
-            "font_size": 13,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1750.0,
-                20.0,
-                60.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "상담종료",
+            "label": "근무인원",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
             "cr_text": 4293717228,
             "cr_back": 16777215,
             "font_name": "Cascadia Mono ExtraLight",
-            "font_size": 13,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1664.0,
-                20.0,
-                80.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "내화면공유",
-            "label_align": 0,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4293717228,
-            "cr_back": 16777215,
-            "font_name": "Cascadia Mono ExtraLight",
-            "font_size": 13,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1582.0,
-                16.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "교육",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294967295,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1502.0,
-                16.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "식사",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294967295,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1424.0,
-                16.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "후처리",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4290822336,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1824.0,
-                138.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "Reset",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4288059030,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 12,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4292006610
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1749.0,
-                138.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "종료",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4288059030,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 12,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4292006610
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1674.0,
-                138.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "시작",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4288059030,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 12,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4292006610
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1348.0,
-                16.0,
-                68.0,
-                28.0
-            ],
-            "round": [
-                14.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "대기",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294967295,
-            "cr_back": 16777215,
-            "font_name": "Arial",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 4294967295,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1166.0,
-                32.0,
-                139.0,
-                22.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "(디지택트 정보)",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294967273,
-            "cr_back": 16777215,
-            "font_name": "나눔스퀘어",
-            "font_size": 13,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1799.0,
-                70.0,
-                103.0,
-                22.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "운영 모드",
-            "label_align": 1,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4284111450,
-            "cr_back": 16777215,
-            "font_name": "나눔스퀘어",
-            "font_size": 12,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 16777215
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1592.0,
-                138.0,
-                72.0,
-                28.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "신분증 스캔",
-            "label_align": 0,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4284111450,
-            "cr_back": 16777215,
-            "font_name": "나눔스퀘어",
-            "font_size": 12,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 16777215
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1799.0,
-                93.0,
-                103.0,
-                22.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "최고 관리자(test1)",
-            "label_align": 1,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4284111450,
-            "cr_back": 16777215,
-            "font_name": "나눔스퀘어",
-            "font_size": 12,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 0.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 16777215
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1121.0,
-                20.0,
-                20.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "36",
-            "label_align": 1,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294934528,
-            "cr_back": 16777215,
-            "font_name": "Arabic Transparent",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 2236962
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1036.0,
-                20.0,
-                20.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "24",
-            "label_align": 1,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4294934528,
-            "cr_back": 16777215,
-            "font_name": "Arabic Transparent",
             "font_size": 14,
             "font_bold": true,
             "font_italic": false,
@@ -544,6 +51,64 @@
                 0.0
             ],
             "label": "13",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Arabic Transparent",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 2236962
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                956.0,
+                20.0,
+                72.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담대기자",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4280427042
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1036.0,
+                20.0,
+                20.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "24",
             "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
@@ -590,9 +155,9 @@
             "type": 0,
             "selected": false,
             "r": [
-                1233.0,
-                12.0,
-                72.0,
+                1121.0,
+                20.0,
+                20.0,
                 18.0
             ],
             "round": [
@@ -601,100 +166,13 @@
                 0.0,
                 0.0
             ],
-            "label": "00:00:00",
-            "label_align": 2,
+            "label": "36",
+            "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
             "cr_text": 4294934528,
             "cr_back": 16777215,
-            "font_name": "Cascadia Mono ExtraLight",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                1166.0,
-                12.0,
-                68.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "상담시간",
-            "label_align": 2,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4293717228,
-            "cr_back": 16777215,
-            "font_name": "Cascadia Mono ExtraLight",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 4282071867
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                956.0,
-                20.0,
-                72.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "상담대기자",
-            "label_align": 0,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4293717228,
-            "cr_back": 16777215,
-            "font_name": "Cascadia Mono ExtraLight",
-            "font_size": 14,
-            "font_bold": true,
-            "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 2236962,
-            "cr_fill": 4280427042
-        },
-        {
-            "type": 0,
-            "selected": false,
-            "r": [
-                858.0,
-                20.0,
-                60.0,
-                18.0
-            ],
-            "round": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "label": "근무인원",
-            "label_align": 0,
-            "label_valign": 2,
-            "label_visible": true,
-            "cr_text": 4293717228,
-            "cr_back": 16777215,
-            "font_name": "Cascadia Mono ExtraLight",
+            "font_name": "Arabic Transparent",
             "font_size": 14,
             "font_bold": true,
             "font_italic": false,
@@ -730,6 +208,586 @@
             "stroke_thickness": 0.0,
             "cr_stroke": 4282477025,
             "cr_fill": 4280427042
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1166.0,
+                32.0,
+                139.0,
+                22.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "(디지택트 정보)",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967273,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1166.0,
+                12.0,
+                68.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담시간",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1233.0,
+                12.0,
+                72.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "00:00:00",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1348.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "대기",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1424.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "후처리",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4290822336,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1502.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "식사",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1582.0,
+                16.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "교육",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 14,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1664.0,
+                20.0,
+                80.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "내화면공유",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1750.0,
+                20.0,
+                60.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "상담종료",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4293717228,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1818.0,
+                20.0,
+                60.0,
+                18.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "로그아웃",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294934528,
+            "cr_back": 16777215,
+            "font_name": "Cascadia Mono ExtraLight",
+            "font_size": 13,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 2236962,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1887.0,
+                18.0,
+                24.0,
+                24.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "X",
+            "label_align": 37,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4286085240,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 16,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4282071867
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1799.0,
+                70.0,
+                103.0,
+                22.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "운영 모드",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4284111450,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 16777215
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1799.0,
+                93.0,
+                103.0,
+                22.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "최고 관리자(test1)",
+            "label_align": 1,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4284111450,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 16777215
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1179.0,
+                129.0,
+                347.0,
+                225.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": false,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4290888655
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1592.0,
+                138.0,
+                72.0,
+                28.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "신분증 스캔",
+            "label_align": 0,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4284111450,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 16777215
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1674.0,
+                138.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "시작",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4288059030,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4292006610
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1749.0,
+                138.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "종료",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4288059030,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4292006610
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                1824.0,
+                138.0,
+                68.0,
+                28.0
+            ],
+            "round": [
+                14.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "Reset",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4288059030,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 12,
+            "font_bold": true,
+            "font_italic": false,
+            "stroke_thickness": 0.0,
+            "cr_stroke": 4294967295,
+            "cr_fill": 4292006610
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                448.0,
+                286.0,
+                48.0,
+                80.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": false,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4286611584
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                576.0,
+                370.0,
+                96.0,
+                64.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "Arial",
+            "font_size": 10,
+            "font_bold": false,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4286611584
         },
         {
             "type": 0,

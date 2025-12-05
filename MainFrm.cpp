@@ -487,7 +487,7 @@ void CMainFrame::set_cursor_info(CPoint pt)
 	m_wndStatusBar.SetPaneText(2, str);
 }
 
-void CMainFrame::set_property(std::vector<CSCUIElement*> items, int item_index)
+void CMainFrame::set_property(std::deque<CSCUIElement*> items, int item_index)
 {
 	CString str;
 
