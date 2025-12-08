@@ -24,7 +24,8 @@ protected: // serialization에서만 만들어집니다.
 	ComPtr<ID2D1SolidColorBrush>	m_br_grid;
 	ComPtr<ID2D1SolidColorBrush>	m_br_draw;
 	ComPtr<ID2D1SolidColorBrush>	m_br_align_fit;
-	ComPtr<ID2D1SolidColorBrush>	m_br_order;
+	ComPtr<ID2D1SolidColorBrush>	m_br_index;
+	ComPtr<ID2D1SolidColorBrush>	m_br_index_back;
 	ComPtr<ID2D1SolidColorBrush>	m_br_item;
 	ComPtr<ID2D1SolidColorBrush>	m_br_hover;
 	ComPtr<ID2D1SolidColorBrush>	m_br_selected;
@@ -82,8 +83,11 @@ protected: // serialization에서만 만들어집니다.
 	std::deque<CSCUIElement*>		m_selected_items;
 	//item이 선택된 항목인지 판별한다.
 	bool							is_selected(CSCUIElement* item);
-	//item의 iterator를 리턴한다.
-	std::deque<CSCUIElement*>::iterator	get_iterator(std::deque<CSCUIElement*>* dq, CSCUIElement* item);
+	//item의 iterator를 리턴한다. dq = NULL이면 pDoc->m_data를 대상으로 한다.
+	std::deque<CSCUIElement*>::iterator	get_iterator(CSCUIElement* item, std::deque<CSCUIElement*>* dq = NULL);
+
+	//item의 index를 리턴한다. dq = NULL이면 pDoc->m_data를 대상으로 한다.
+	int								get_index(CSCUIElement* item, std::deque<CSCUIElement*>* dq = NULL);
 
 	//move or resize시에 일치된 항목과 일치 인덱스를 기억해서 OnDraw()에서 그려줘야 한다.
 	std::vector<D2D1_POINT_2F>		m_pt_align_fit;
@@ -91,8 +95,12 @@ protected: // serialization에서만 만들어집니다.
 
 	CSCUIElement*					get_hover_item(CPoint pt);
 
-	//move, resize시에 다른 항목과의 일치되는 위치로 자동 보정
+	//resize시에 다른 항목과의 일치되는 위치로 자동 보정
 	void							get_fit_others(int index, CSCUIElement* el, CPoint pt = CPoint(), CPoint pt_down = CPoint());
+
+	//move시에 다른 항목과의 일치되는 위치로 자동 보정.
+	//resize시의 처리 함수인 get_fit_others() 내에서 분기처리 하려 했으나 예상보다 복잡하여 분리함.
+	void							get_fit_others_of_inside(CSCUIElement* el);
 
 	//가장 가까운 grid 좌표를 리턴한다.
 	//스크롤을 하면 grid 또한 함께 스크롤되므로 pt는 이미 스크롤 오프셋이 적용된 값으로 전달되어야 한다.
@@ -268,11 +276,12 @@ protected:
 	std::vector<std::deque<CSCUIElement*>*>::iterator m_undo_iter;
 	void			push_undo();
 	void			undo();
-	//after = true이면 현재 선택된 항목의 뒤에 추가한다.
-	void			insert(CSCUIElement* new_item, bool after = true);
 
-	//현재 항목의 index 리턴.
-	int				get_index(CSCUIElement* cur);
+	//pos 항목 뒤에 new_items를 insert한다.
+	void			insert(CSCUIElement* pos, std::deque<CSCUIElement*>* new_items);
+
+	//선택된 항목들 중 맨 마지막 인덱스의 항목을 리턴한다.
+	CSCUIElement*	get_last_selected_item();
 
 // 생성된 메시지 맵 함수
 protected:

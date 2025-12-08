@@ -107,7 +107,7 @@ void CUXStudioView::OnInitialUpdate()
 	HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_WriteFactory));
 	if (SUCCEEDED(hr))
 	{
-		m_WriteFactory->CreateTextFormat(_T("맑은 고딕"), nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, _T("ko-kr"), &m_WriteFormat);
+		m_WriteFactory->CreateTextFormat(_T("맑은 고딕"), nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 8.0f, _T("ko-kr"), &m_WriteFormat);
 		m_WriteFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 	}
@@ -116,13 +116,15 @@ void CUXStudioView::OnInitialUpdate()
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(get_d2color(pDoc->m_cr_grid), m_br_grid.GetAddressOf());
 
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_draw.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_order.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_item.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_align_fit.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), m_br_multi_selected.GetAddressOf());
 	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), m_br_label.GetAddressOf());
+
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_br_index.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_index_back.GetAddressOf());
 
 	D2D1_STROKE_STYLE_PROPERTIES strokeStyle =
 		D2D1::StrokeStyleProperties(
@@ -323,29 +325,31 @@ void CUXStudioView::OnDraw(CDC* pDC)
 			m_resize_handle.push_back(resize_handle);
 			draw_resize_handle(d2dc, &resize_handle);
 		}
+	}
 
-		//좌표 확인용 코드
-		if (m_show_element_coord)
+	//모든 도형을 그려준 후 인덱스를 표시한다.
+	if (m_show_element_coord)
+	{
+		for (int i = pDoc->m_data.size() - 1; i >= 0; i--)
 		{
+			CSCUIElement* el = pDoc->m_data[i];
+			Gdiplus::RectF r = el->m_r;
+
+			r.Offset(-hs, -vs);
+			D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
+
 			CString text;
 			//text.Format(_T("%d. %s"), i, get_rect_info_str(gpRectF_to_CRect(el->m_r), 0));
 			text.Format(_T("%d"), i);
 
-			//rf.left -= 4;
-			//rf.top -= 8;
-			//rf.bottom = rf.bottom + 20;
-
-			if (rf.left < 0)
-				rf.left = 0;
-			if (rf.top < 0)
-				rf.top = 0;
-
-			//rf.right = rf.left + 100;
-			//rf.bottom = rf.top + 20;
+			D2D1_RECT_F rtext = make_center_d2rect(r.X, r.Y, pDC->GetTextExtent(text).cx, 8);
+			//D2D1_ELLIPSE ellipse = { D2D1::Point2F(center(r).X, center(r).Y), 8, 8 };
+			//d2dc->FillEllipse(&ellipse, m_br_grid.Get());
+			draw_rect(d2dc, rtext, Gdiplus::Color::Transparent, Gdiplus::Color(128, 255, 0, 0), 1.0f, 2);
 
 			m_WriteFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-			m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-			d2dc->DrawText(text, text.GetLength(), m_WriteFormat, rf, m_br_order.Get());
+			m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			d2dc->DrawText(text, text.GetLength(), m_WriteFormat, rtext, m_br_index.Get());
 		}
 	}
 
@@ -453,25 +457,28 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 	//선택된 항목들을 이동, 크기를 변경 모드 시작
 	//if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
 	//trace(m_selected_items);
-	//trace(m_handle_index);
+	trace(m_handle_index);
 	if (m_selected_items.size() && m_handle_index >= corner_inside)
 	{
 		//Ctrl키를 누른채로 드래깅하면 복사모드로 동작한다.
 		//원래 선택된 항목들을 해제하고 복사된 항목들이 선택된 상태로 만들어줘야 한다.
+		//복사된 항목들은 선택항목들 중 맨 마지막 항목의 뒤에 추가된다.
 		if (IsCtrlPressed() && (m_handle_index == corner_inside))
 		{
-			std::vector<CSCUIElement*> selected_new;
+			std::deque<CSCUIElement*> new_items;
+			CSCUIElement* last_of_selected_items = get_last_selected_item();
 
 			for (int i = 0; i < m_selected_items.size(); i++)
 			{
 				CSCUIElement* new_item = new CSCUIElement();
 				m_selected_items[i]->copy(new_item);
-				insert(new_item, false);
-				selected_new.push_back(new_item);
+				new_items.push_back(new_item);
 			}
 
+			insert(last_of_selected_items, &new_items);
+
 			m_selected_items.clear();
-			m_selected_items.assign(selected_new.begin(), selected_new.end());
+			m_selected_items.assign(new_items.begin(), new_items.end());
 		}
 
 		m_pt_lbutton_down = adjust_scroll_offset(pt, false);
@@ -492,10 +499,29 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		if (m_item_hover->pt_in_rect(pt.x, pt.y))
 		{
+			//shift나 ctrl을 누르지 않은채로 클릭하면 단일 선택된다.
 			if (!IsShiftPressed() && !IsCtrlPressed())
+			{
 				select_all(false);
+				m_selected_items.push_back(m_item_hover);
+			}
+			//shift나 ctrl을 누른 채 hover 항목을 클릭하면 멀티선택된다.
+			else if (IsShiftPressed() || IsCtrlPressed())
+			{
+				//현재 hover 항목이 선택되지 않은 상태였다면 선택 목록에 추가하고
+				if (!is_selected(m_item_hover))
+				{
+					m_selected_items.push_back(m_item_hover);
+				}
+				//선택된 항목이었다면 그 항목만 선택 해제한다.
+				else
+				{
+					auto it = get_iterator(m_item_hover, &m_selected_items);
+					if (it != m_selected_items.end())
+						m_selected_items.erase(it);
+				}
+			}
 
-			m_selected_items.push_back(m_item_hover);
 			//m_item_hover->m_selected = true;
 			////get_bound_selected_rect();
 			////get_resizable_handle(m_r_selected, m_resize_handle);
@@ -550,7 +576,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	if (m_is_resizing)
 	{
 		move_or_resize_item(pt);
-		m_pt_lbutton_down = pt;
+		//m_pt_lbutton_down = pt;
 		set_property();
 	}
 	else if (m_lbutton_down)
@@ -599,7 +625,10 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		m_is_resizing = false;
 		m_pt_lbutton_down = CPoint(-1, -1);
-		//normalize_rect(m_selected_items->m_r);
+
+		for (int i = 0; i < m_selected_items.size(); i++)
+			normalize_rect(m_selected_items[i]->m_r);
+
 		set_property();
 	}
 
@@ -622,8 +651,12 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 
 			m_pt_lbutton_down = CPoint(-1, -1);
 
+			//그려진 크기가 일정 크기 미만이라면 무시한다.
 			if (r.Width < 20 && r.Height < 20)
+			{
+				Invalidate();
 				return;
+			}
 
 			//가장 최종으로 그려진 항목이 가장 첫번째가 되어야 한다.
 			pDoc->m_data.push_front(new CSCUIElement(r));
@@ -642,7 +675,7 @@ void CUXStudioView::move_or_resize_item(CPoint pt)
 	if (m_selected_items.size() == 0 || m_handle_index < corner_inside)
 		return;
 
-	CPoint pt_lbutton_down = m_pt_lbutton_down;
+	CPoint pt_down = m_pt_lbutton_down;
 
 	//선택된 항목들에 대해 모두 처리해줘야 한다.
 	for (int i = 0; i < m_selected_items.size(); i++)
@@ -652,10 +685,18 @@ void CUXStudioView::move_or_resize_item(CPoint pt)
 		switch (m_handle_index)
 		{
 			case corner_inside:
-				item->m_r.X += pt.x - pt_lbutton_down.x;
-				item->m_r.Y += pt.y - pt_lbutton_down.y;
-				//pt_lbutton_down = pt;
-				get_fit_others(corner_inside, item, pt, pt_lbutton_down);
+				{
+					item->m_r.X += pt.x - pt_down.x;
+					item->m_r.Y += pt.y - pt_down.y;
+					get_fit_others_of_inside(item);
+
+					//if (fit[0] < 0.0f)// && fit[2] < 0.0f)
+					//	item->m_r.X = pt.x - pt_offset.x;
+					//else
+					//	item->m_r.X = fit[0];
+					//if (fit[1] < 0.0f && fit[3] < 0.0f)
+					//	item->m_r.Y = pt.y - pt_offset.y;
+				}
 				break;
 			case corner_left:
 				set_left(item->m_r, pt.x);
@@ -696,11 +737,115 @@ void CUXStudioView::move_or_resize_item(CPoint pt)
 		adjust_rect_range(item->m_r, Gdiplus::RectF(0, 0, pDoc->m_sz_canvas.cx, pDoc->m_sz_canvas.cy));
 	}
 
-	//m_pt_lbutton_down = pt_lbutton_down;
+	if (m_handle_index == corner_inside)
+	{
+		m_pt_lbutton_down = pt;
+		//if (m_pt_align_fit.size() == 0)
+		//{
+		//	m_selected_items[0]->m_r = get_near_grid(m_selected_items[0]->m_r);
+		//	//m_selected_items[0]->m_r.X = get_near_grid(m_selected_items[0]->m_r.X, true);
+		//	//m_selected_items[0]->m_r.Y = get_near_grid(m_selected_items[0]->m_r.Y, false);
+		//}
+	}
+
 	Invalidate();
 }
 
-//move, resize시에 다른 항목과의 일치되는 위치로 자동 보정
+//move시에 다른 항목과의 일치되는 위치로 자동 보정. resize시의 코드내에서 분기처리 하려 했으나 예상보다 복잡하여 분리함.
+void CUXStudioView::get_fit_others_of_inside(CSCUIElement* el)
+{
+	//left, top 등과는 다르게 inside는 옮길 때 마우스를 미세하게 움직이면 이동이 거의 되지 않는다.
+	//이는 gravity = 4 였을때 마우스 변동이 4보다 크지 않으면 계속 r.X에 잡혀있기 때문이다.
+	//여러 방법들로 시도해봤으나 현재로서는 gravity = 1 ~ 2로 세팅하여 사용한다.
+	int gravity = 1;
+	int extend = 16;		//fit line을 좀 더 늘려서 그려준다.
+
+	m_pt_align_fit.clear();
+
+	//예를 들어 어떤 항목과 left fit이 발생했다면 다른 항목들과는 left fit인지 검사할 필요가 없다.
+	float fit[4] = { -1.0f, -1.0f, -1.0f, -1.0f };
+
+	for (int i = 0; i < pDoc->m_data.size(); i++)
+	{
+		//자기자신일 경우와 selected인 항목일 경우는 비교를 스킵한다.
+		if (el == pDoc->m_data[i] || is_selected(pDoc->m_data[i]))
+			continue;
+
+		Gdiplus::RectF r = pDoc->m_data[i]->m_r;
+
+		//left가 다른 도형에 left fit인지
+		if (fit[0] < 0.0f && is_in_range(el->m_r.X, r.X - gravity, r.X + gravity))
+		{
+			el->m_r.X = fit[0] = r.X;
+			m_pt_align_fit.push_back(D2D1::Point2F(r.X, MIN(r.Y, el->m_r.Y) - extend));
+			m_pt_align_fit.push_back(D2D1::Point2F(r.X, MAX(r.GetBottom(), el->m_r.GetBottom()) + extend));
+		}
+		//left가 다른 도형에 right fit인지
+		else if (fit[0] < 0.0f && is_in_range(el->m_r.X, r.GetRight() - gravity, r.GetRight() + gravity))
+		{
+			el->m_r.X = fit[0] = r.GetRight();
+			m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MIN(r.Y, el->m_r.Y) - extend));
+			m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MAX(r.GetBottom(), el->m_r.GetBottom()) + extend));
+		}
+		else
+		{
+			//el->m_r.X = get_near_grid(el->m_r.X);
+		}
+
+		//right가 다른 도형에 left fit인지
+		if (fit[2] < 0.0f && is_in_range(el->m_r.GetRight(), r.X - gravity, r.X + gravity))
+		{
+			el->m_r.X = fit[2] = r.X - el->m_r.Width;
+			m_pt_align_fit.push_back(D2D1::Point2F(r.X, MIN(r.Y, el->m_r.Y) - extend));
+			m_pt_align_fit.push_back(D2D1::Point2F(r.X, MAX(r.GetBottom(), el->m_r.GetBottom()) + extend));
+		}
+		//right가 다른 도형에 right fit인지
+		else if (fit[2] < 0.0f && is_in_range(el->m_r.GetRight(), r.GetRight() - gravity, r.GetRight() + gravity))
+		{
+			el->m_r.X = fit[2] = r.GetRight() - el->m_r.Width;
+			m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MIN(r.Y, el->m_r.Y) - extend));
+			m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MAX(r.GetBottom(), el->m_r.GetBottom() + extend)));
+		}
+
+		//top이 다른 도형에 top fit인지
+		if (fit[1] < 0.0f && is_in_range(el->m_r.Y, r.Y - gravity, r.Y + gravity))
+		{
+			el->m_r.Y = fit[1] = r.Y;
+			m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, el->m_r.Y));
+			m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()) + extend, el->m_r.Y));
+		}
+		//top이 다른 도형에 bottom fit인지
+		else if (fit[1] < 0.0f && is_in_range(el->m_r.Y, r.GetBottom() - gravity, r.GetBottom() + gravity))
+		{
+			el->m_r.Y = fit[1] = r.GetBottom();
+			m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, r.GetBottom()));
+			m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()) + extend, r.GetBottom()));
+		}
+
+		//bottom이 다른 도형에 top fit인지
+		if (fit[3] < 0.0f && is_in_range(el->m_r.GetBottom(), r.Y - gravity, r.Y + gravity))
+		{
+			el->m_r.Y = fit[3] = r.Y - el->m_r.Height;
+			m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, r.Y));
+			m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()) + extend, r.Y));
+		}
+		//bottom이 다른 도형에 bottom fit인지
+		else if (fit[3] < 0.0f && is_in_range(el->m_r.GetBottom(), r.GetBottom() - gravity, r.GetBottom() + gravity))
+		{
+			el->m_r.Y = fit[3] = r.GetBottom() - el->m_r.Height;
+			m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, r.GetBottom()));
+			m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight() + extend), r.GetBottom()));
+		}
+	}
+
+	//if (fit[0] < 0.0f && fit[2] < 0.0f)
+	//	el->m_r.X = get_near_grid(el->m_r.X);
+
+	//if (fit[1] < 0.0f && fit[3] < 0.0f)
+	//	el->m_r.Y = get_near_grid(el->m_r.Y);
+}
+
+//resize시에 다른 항목과의 일치되는 위치로 자동 보정
 void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoint pt_down)
 {
 	int gravity = 4;
@@ -710,8 +855,8 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 
 	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
-		//자기자신일 경우는 비교 스킵.
-		if (el == pDoc->m_data[i])
+		//자기자신일 경우와 selected인 항목일 경우는 비교를 스킵한다.
+		if (el == pDoc->m_data[i] || is_selected(pDoc->m_data[i]))
 			continue;
 
 		Gdiplus::RectF r = pDoc->m_data[i]->m_r;
@@ -720,16 +865,12 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 		//그렇지 않으면 다른 항목들과도 또 left가 맞는지 확인하고 그렇지 않으면 grid로 움직이게 된다.
 		//=>바로 리턴하면 left와 top모두 일치하는 경우를 처리하지 못한다.
 		//left fit flag를 true로 하고 계속 검사해야 한다. true인 코너는 더 이상 검사하지 않는다.
-		if (index == corner_inside || index == corner_left)
+		if (index == corner_left)
 		{
 			//다른 도형에 left fit인지
 			if (is_in_range(el->m_r.X, r.X - gravity, r.X + gravity))
 			{
-				if (index == corner_inside)
-					el->m_r.X = r.X;
-				else
-					set_left(el->m_r, r.X);
-
+				set_left(el->m_r, r.X);
 				m_pt_align_fit.push_back(D2D1::Point2F(el->m_r.X, MIN(r.Y, el->m_r.Y) - extend));
 				m_pt_align_fit.push_back(D2D1::Point2F(el->m_r.X, MAX(r.GetBottom(), el->m_r.GetBottom()) + extend));
 				return;
@@ -737,14 +878,7 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 			//다른 도형에 right fit인지
 			else if (is_in_range(el->m_r.X, r.GetRight() - gravity, r.GetRight() + gravity))
 			{
-				if (index == corner_inside)
-				{
-					el->m_r.Width = r.GetRight() - el->m_r.X;
-				}
-				else
-				{
-					set_left(el->m_r, r.GetRight());
-				}
+				set_left(el->m_r, r.GetRight());
 
 				m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MIN(r.Y, el->m_r.Y) - extend));
 				m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MAX(r.GetBottom(), el->m_r.GetBottom()) + extend));
@@ -752,33 +886,15 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 			}
 			else
 			{
-				if (index == corner_inside)
-				{
-					//el->m_r.X = get_near_grid((float)(pt.x - pt_down.x));
-					//el->m_r.Y = get_near_grid((float)(pt.y - pt_down.y));
-					//el->m_r = get_near_grid(el->m_r);
-					TRACE(_T("old = %.1f\n"), el->m_r.X);
-					//el->m_r.X = get_near_grid((float)(pt.x - pt_down.x));
-					//el->m_r.X = get_near_grid(el->m_r.X);
-					TRACE(_T("new = %.1f\n"), get_near_grid(el->m_r.X));
-				}
-				else
-					set_left(el->m_r, get_near_grid(el->m_r.X));
+				set_left(el->m_r, get_near_grid(el->m_r.X));
 			}
 		}
-		else if (index == corner_inside || index == corner_right)
+		else if (index == corner_right)
 		{
 			if (is_in_range(el->m_r.GetRight(), r.GetRight() - gravity, r.GetRight() + gravity))
 			{
-				if (index == corner_inside)
-				{
-					el->m_r.Width = r.GetRight() - el->m_r.X;
-				}
-				else
-				{
-					el->m_r.Width = r.GetRight() - el->m_r.X;
-					TRACE(_T("i = %d, w = %.1f\n"), i, el->m_r.Width);
-				}
+				el->m_r.Width = r.GetRight() - el->m_r.X;
+				TRACE(_T("i = %d, w = %.1f\n"), i, el->m_r.Width);
 
 				m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MIN(r.Y, el->m_r.Y) - extend));
 				m_pt_align_fit.push_back(D2D1::Point2F(r.GetRight(), MAX(r.GetBottom(), el->m_r.GetBottom() + extend)));
@@ -787,10 +903,7 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 			//다른 도형에 left fit인지
 			else if (is_in_range(el->m_r.GetRight(), r.X - gravity, r.X + gravity))
 			{
-				if (index == corner_inside)
-					el->m_r.X = r.X;
-				else
-					el->m_r.Width = r.X - el->m_r.X;
+				el->m_r.Width = r.X - el->m_r.X;
 
 				m_pt_align_fit.push_back(D2D1::Point2F(r.X, MIN(r.Y, el->m_r.Y) - extend));
 				m_pt_align_fit.push_back(D2D1::Point2F(r.X, MAX(r.GetBottom(), el->m_r.GetBottom()) + extend));
@@ -798,66 +911,44 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 			}
 			else
 			{
-				if (index == corner_inside)
-					;
-				else
-				{
-					float right = get_near_grid(el->m_r.GetRight());
-					el->m_r.Width = right - el->m_r.X;
-				}
+				float right = get_near_grid(el->m_r.GetRight());
+				el->m_r.Width = right - el->m_r.X;
 			}
 			//TRACE(_T("new : %.1f\n"), el->m_r.Width);
 		}
-		else if (index == corner_inside || index == corner_top)
+		else if (index == corner_top)
 		{
 			if (is_in_range(el->m_r.Y, r.Y - gravity, r.Y + gravity))
 			{
-				if (index == corner_inside)
-					el->m_r.Y = r.Y;
-				else
-					set_top(el->m_r, r.Y);
-
+				set_top(el->m_r, r.Y);
 				m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, el->m_r.Y));
 				m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()) + extend, el->m_r.Y));
 				return;
 			}
 			else if (is_in_range(el->m_r.Y, r.GetBottom() - gravity, r.GetBottom() + gravity))
 			{
-				if (index == corner_inside)
-					el->m_r.Y = r.GetBottom() - el->m_r.Height;
-				else
-					set_top(el->m_r, r.GetBottom());
-
+				set_top(el->m_r, r.GetBottom());
 				m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, r.GetBottom()));
 				m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()) + extend, r.GetBottom()));
 				return;
 			}
 			else
 			{
-				if (index == corner_inside)
-					;
-				else
-					set_top(el->m_r, get_near_grid(el->m_r.Y, false));
+				set_top(el->m_r, get_near_grid(el->m_r.Y, false));
 			}
 		}
-		else if (index == corner_inside || index == corner_bottom)
+		else if (index == corner_bottom)
 		{
 			if (is_in_range(el->m_r.GetBottom(), r.GetBottom() - gravity, r.GetBottom() + gravity))
 			{
-				if (index == corner_inside)
-					el->m_r.Y = r.GetBottom() - el->m_r.Height;
-				else
-					el->m_r.Height = r.GetBottom() - el->m_r.Y;
+				el->m_r.Height = r.GetBottom() - el->m_r.Y;
 				m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, r.GetBottom()));
 				m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight() + extend), r.GetBottom()));
 				return;
 			}
 			else if (is_in_range(el->m_r.GetBottom(), r.Y - gravity, r.Y + gravity))
 			{
-				if (index == corner_inside)
-					el->m_r.Y = r.Y;
-				else
-					el->m_r.Height = r.Y - el->m_r.Y;
+				el->m_r.Height = r.Y - el->m_r.Y;
 
 				m_pt_align_fit.push_back(D2D1::Point2F(MIN(r.X, el->m_r.X) - extend, r.Y));
 				m_pt_align_fit.push_back(D2D1::Point2F(MAX(r.GetRight(), el->m_r.GetRight()) + extend, r.Y));
@@ -865,13 +956,8 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 			}
 			else
 			{
-				if (index == corner_inside)
-					;
-				else
-				{
-					float bottom = get_near_grid(el->m_r.GetBottom());
-					el->m_r.Height = bottom - el->m_r.Y;
-				}
+				float bottom = get_near_grid(el->m_r.GetBottom());
+				el->m_r.Height = bottom - el->m_r.Y;
 			}
 		}
 	}
@@ -1423,23 +1509,35 @@ void CUXStudioView::OnMenuViewShowCoord()
 	Invalidate();
 }
 
-//현재 항목의 index 리턴.
-int CUXStudioView::get_index(CSCUIElement* cur)
-{
-	std::deque<CSCUIElement*>::iterator it = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), cur);
-	return std::distance(pDoc->m_data.begin(), it);
-}
-
 //after = true이면 현재 선택된 항목의 뒤에 추가한다.
-void CUXStudioView::insert(CSCUIElement* new_item, bool after)
+void CUXStudioView::insert(CSCUIElement* pos, std::deque<CSCUIElement*>* new_items)
 {
-	std::deque<CSCUIElement*>::iterator it = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_selected_items.back());
+	auto it = get_iterator(pos);
+	pDoc->m_data.insert(it + 1, new_items->begin(), new_items->end());
+	/*
 	if (after && it == pDoc->m_data.end())
 		pDoc->m_data.push_back(new_item);
 	else if (!after && it == pDoc->m_data.begin())
 		pDoc->m_data.push_front(new_item);
 	else
 		pDoc->m_data.insert(it + 1, new_item);	
+	*/
+}
+
+//선택된 항목들 중 맨 마지막 인덱스의 항목을 리턴한다.
+CSCUIElement* CUXStudioView::get_last_selected_item()
+{
+	int distance = 0;
+	int last_index = 0;
+
+	for (int i = 0; i < m_selected_items.size(); i++)
+	{
+		int index = get_index(m_selected_items[i], &pDoc->m_data);
+		if (index > last_index)
+			last_index = index;
+	}
+
+	return pDoc->m_data[last_index];
 }
 
 //항목이 변경되면 undo에 기록하고 속성창에도 이를 반영한다.
@@ -1478,11 +1576,24 @@ bool CUXStudioView::is_selected(CSCUIElement* item)
 	return (it != m_selected_items.end());
 }
 
-//item이 선택 항목이면 해당하는 iter를 리턴한다. iter == m_data.end()이면 선택항목이 아니다.
-std::deque<CSCUIElement*>::iterator CUXStudioView::get_iterator(std::deque<CSCUIElement*> *dq, CSCUIElement* item)
+//item의 iterator를 리턴한다. dq = NULL이면 pDoc->m_data를 대상으로 한다.
+std::deque<CSCUIElement*>::iterator CUXStudioView::get_iterator(CSCUIElement* item, std::deque<CSCUIElement*> *dq)
 {
+	if (dq == NULL)
+		dq = &pDoc->m_data;
+
 	auto it = std::find(dq->begin(), dq->end(), item);
 	return it;
+}
+
+//item의 index를 리턴한다. dq = NULL이면 pDoc->m_data를 대상으로 한다.
+int CUXStudioView::get_index(CSCUIElement* item, std::deque<CSCUIElement*>* dq)
+{
+	if (dq == NULL)
+		dq = &pDoc->m_data;
+
+	auto it = std::find(dq->begin(), dq->end(), item);
+	return std::distance(dq->begin(), it);
 }
 
 void CUXStudioView::OnMenuViewSort()

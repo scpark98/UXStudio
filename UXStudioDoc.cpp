@@ -194,6 +194,8 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_r.Width = r[2].GetFloat();
 		el->m_r.Height = r[3].GetFloat();
 
+		normalize_rect(el->m_r);
+
 		rapidjson::Value& round = items[i]["round"];
 		el->m_round[0] = round[0].GetFloat();
 		el->m_round[1] = round[1].GetFloat();
@@ -209,7 +211,7 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_cr_text = Gdiplus::Color(json.get_array_member("items", i, "cr_text", (UINT)(Gdiplus::Color::Black)));
 		el->m_cr_back = Gdiplus::Color(json.get_array_member("items", i, "cr_back", (UINT)(Gdiplus::Color::Transparent)));
 
-		el->m_font_name = json.get_array_member("items", i, "font_name", "Arial");
+		el->m_font_name = _T("나눔스퀘어 Bold");// json.get_array_member("items", i, "font_name", "Arial");
 		el->m_font_size = json.get_array_member("items", i, "font_size", 10);
 		el->m_font_bold = json.get_array_member("items", i, "font_bold", false);
 		el->m_font_italic = json.get_array_member("items", i, "font_italic", false);
