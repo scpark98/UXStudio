@@ -332,56 +332,56 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		if (!m_cur_items || m_cur_items->size() == 0)
 			return 0;
 
-		if (msg->pThis == &m_static_label)
-			update_all_values(m_cur_items, VAR_TO_CSTRING(m_text), msg->sValue);
-			//m_cur_items->m_text = msg->sValue;
+		if (msg->sValue.IsEmpty())
+			return 0;
 
+		if (msg->pThis == &m_static_label)
+		{
+			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(m_text), msg->sValue);
+		}
 		//좌표값 또는 w, h를 변경하면 서로 영향을 주는데 이 때 기준은 좌표값을 유지시키도록 한다.
 		//즉, x2를 변경하면 x1을 변경시키는 것이 아니라 width를 변경시켜준다.
 		else if (msg->pThis == &m_static_x1)
 		{
 			//x1를 변경하면 x2을 변경하는 것이 아니라 width를 조정해준다.
-			//m_cur_items->m_r.X = _ttof(msg->sValue);
-			update_all_values(m_cur_items, VAR_TO_CSTRING(m_r.X), _ttof(msg->sValue));
-
-			//m_cur_items->m_r.Width = m_cur_items->m_r.GetRight() - m_cur_items->m_r.X;
-			update_all_values(m_cur_items, VAR_TO_CSTRING(m_r.Width), _ttof(msg->sValue));
-
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.X), _ttof(msg->sValue));
 			m_static_w.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Width);
 		}
-		/*
 		else if (msg->pThis == &m_static_y1)
 		{
 			//y1를 변경하면 y2을 변경하는 것이 아니라 height를 조정해준다.
-			m_cur_items->m_r.Y = _ttof(msg->sValue);
-			m_cur_items->m_r.Height = m_cur_items->m_r.GetBottom() - m_cur_items->m_r.Y;
-			m_static_h.set_text_value(_T("%.1f"), m_cur_items->m_r.Height);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Y), _ttof(msg->sValue));
+			m_static_h.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_x2)
 		{
 			//x2를 변경하면 x1을 변경하는 것이 아니라 width를 조정해준다.
-			m_cur_items->m_r.Width = _ttof(msg->sValue) - m_cur_items->m_r.X;
-			m_static_w.set_text_value(_T("%.1f"), m_cur_items->m_r.Width);
+			//m_cur_items->m_r.Width = _ttof(msg->sValue) - m_cur_items->m_r.X;
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.X2), _ttof(msg->sValue));
+			m_static_w.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Width);
 		}
 		else if (msg->pThis == &m_static_y2)
 		{
 			//y2를 변경하면 y1을 변경하는 것이 아니라 height를 조정해준다.
-			m_cur_items->m_r.Height = _ttof(msg->sValue) - m_cur_items->m_r.Y;
-			m_static_h.set_text_value(_T("%.1f"), m_cur_items->m_r.Height);
+			//m_cur_items->m_r.Height = _ttof(msg->sValue) - m_cur_items->m_r.Y;
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Y2), _ttof(msg->sValue));
+			m_static_h.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_w)
 		{
 			//width를 변경하면 x2를 조정해준다.
-			m_cur_items->m_r.Width = _ttof(msg->sValue);
-			m_static_x2.set_text_value(d2S(m_cur_items->m_r.GetRight(), false, 1));
+			//m_cur_items->m_r.Width = _ttof(msg->sValue);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Width), _ttof(msg->sValue));
+			m_static_x2.set_text_value(d2S(m_cur_items->at(0)->m_r.GetRight(), false, 1));
 		}
 		else if (msg->pThis == &m_static_h)
 		{
 			//height를 변경하면 y2를 조정해준다.
-			m_cur_items->m_r.Height = _ttof(msg->sValue);
-			m_static_y2.set_text_value(d2S(m_cur_items->m_r.GetBottom(), false, 1));
+			//m_cur_items->m_r.Height = _ttof(msg->sValue);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Height), _ttof(msg->sValue));
+			m_static_y2.set_text_value(d2S(m_cur_items->at(0)->m_r.GetBottom(), false, 1));
 		}
-
+		/*
 		else if (msg->pThis == &m_static_round0)
 			m_cur_items->m_round[0] = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_round1)
@@ -452,27 +452,34 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 	m_radio_valign_bottom.SetCheck(BST_UNCHECKED);
 
 	CSCUIElement el;
+	CSCUIElement copied;
+
 	Gdiplus::Color cr_unused(123, 234, 123, 234);
 
 	if (items->size() > 0)
+	{
 		items->at(0)->copy(&el);
+		items->at(0)->copy(&copied);
+	}
 
-	//0번 항목의 각 변수값이 다른 값들과 하나라도 다르다면 해당 항목은 ""로 표시한다.
+	//2개 이상 멀티 선택되었을 때는 0번 항목의 각 변수값이 다른 값들과 하나라도 다르다면 해당 항목은 ""로 표시한다.
 	for (int i = 1; i < items->size(); i++)
 	{
 		if (!el.m_text.IsEmpty() && el.m_text != items->at(i)->m_text)
 			el.m_text = _T("");
 
-		if (el.m_r.X != FLT_MAX && el.m_r.X != items->at(i)->m_r.X)
+		//다른 항목들과는 달리 m_r의 X, Y, Width, Height는 서로 영향이 있기 때문에 el의 값을 직접 변경하지 않고 copied를 이용해야 한다.
+		//ex. Width를 비교할 때 X가 이미 FLT_MAX값으로 변경됐다면 올바른 Width값이 아니게 된다.
+		if (copied.m_r.X != FLT_MAX && copied.m_r.X != items->at(i)->m_r.X)
 			el.m_r.X = FLT_MAX;
 
-		if (el.m_r.Y != FLT_MAX && el.m_r.Y != items->at(i)->m_r.Y)
+		if (copied.m_r.Y != FLT_MAX && copied.m_r.Y != items->at(i)->m_r.Y)
 			el.m_r.Y = FLT_MAX;
 
-		if (el.m_r.Width != FLT_MAX && el.m_r.GetRight() != items->at(i)->m_r.GetRight())
+		if (copied.m_r.Width != FLT_MAX && copied.m_r.Width != items->at(i)->m_r.Width)
 			el.m_r.Width = FLT_MAX;
 
-		if (el.m_r.Height != FLT_MAX && el.m_r.GetBottom() != items->at(i)->m_r.GetBottom())
+		if (copied.m_r.Height != FLT_MAX && copied.m_r.Height != items->at(i)->m_r.Height)
 			el.m_r.Height = FLT_MAX;
 
 		for (int j = 0; j < 4; j++)
@@ -513,8 +520,8 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 
 		m_static_x1.set_text_value(el.m_r.X == FLT_MAX ? _T("") : d2S(el.m_r.X, false, 1));
 		m_static_y1.set_text_value(el.m_r.Y == FLT_MAX ? _T("") : d2S(el.m_r.Y, false, 1));
-		m_static_x2.set_text_value(el.m_r.Width == FLT_MAX ? _T("") : d2S(el.m_r.GetRight(), false, 1));
-		m_static_y2.set_text_value(el.m_r.Height == FLT_MAX ? _T("") : d2S(el.m_r.GetBottom(), false, 1));
+		m_static_x2.set_text_value((el.m_r.X == FLT_MAX || el.m_r.Width == FLT_MAX) ? _T("") : d2S(el.m_r.X + el.m_r.Width, false, 1));
+		m_static_y2.set_text_value((el.m_r.Y == FLT_MAX || el.m_r.Height == FLT_MAX) ? _T("") : d2S(el.m_r.Y + el.m_r.Height, false, 1));
 		m_static_w.set_text_value(el.m_r.Width == FLT_MAX ? _T("") : d2S(el.m_r.Width, false, 1));
 		m_static_h.set_text_value(el.m_r.Height == FLT_MAX ? _T("") : d2S(el.m_r.Height, false, 1));
 
@@ -522,7 +529,6 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 		m_static_round1.set_text_value(el.m_round[1] == FLT_MAX ? _T("") : d2S(el.m_round[1], false, 1));
 		m_static_round2.set_text_value(el.m_round[2] == FLT_MAX ? _T("") : d2S(el.m_round[2], false, 1));
 		m_static_round3.set_text_value(el.m_round[3] == FLT_MAX ? _T("") : d2S(el.m_round[3], false, 1));
-
 
 		switch (el.m_text_align)
 		{

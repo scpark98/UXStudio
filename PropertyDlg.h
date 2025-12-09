@@ -35,9 +35,42 @@ public:
 		for (auto it = items->begin(); it != items->end(); ++it)
 		{
 			if (member == _T("m_text"))
-				(*it)->m_text = value;
+			{
+				CString* str = reinterpret_cast<CString*>(&value);
+				(*it)->m_text = *str;
+			}
 			else if (member == _T("m_r.X"))
-				(*it)->m_r.X = value;
+			{
+				float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.X = *f;
+				(*it)->m_r.Width = (*it)->m_r.GetRight() - (*it)->m_r.X;
+			}
+			else if (member == _T("m_r.Y"))
+			{
+				float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.Y = *f;
+				(*it)->m_r.Height = (*it)->m_r.GetBottom() - (*it)->m_r.Y;
+			}
+			else if (member == _T("m_r.X2"))
+			{
+				float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.Width = *f - (*it)->m_r.X;
+			}
+			else if (member == _T("m_r.Y2"))
+			{
+				float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.Height = *f - (*it)->m_r.Y;
+			}
+			else if (member == _T("m_r.Width"))
+			{
+				float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.Width = *f;
+			}
+			else if (member == _T("m_r.Height"))
+			{
+				float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.Height = *f;
+			}
 		}
 	}
 
