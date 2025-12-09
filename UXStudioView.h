@@ -72,7 +72,7 @@ protected: // serialization에서만 만들어집니다.
 	LRESULT							on_message_CSCEdit(WPARAM wParam, LPARAM lParam);
 	void							edit_end(bool valid = true);
 
-	void							apply_changed_property(CSCUIElement* item);
+	void							apply_changed_property(std::deque<CSCUIElement*>* items);
 	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	CSCUIElement*					m_item_hover = NULL;

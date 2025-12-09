@@ -295,18 +295,18 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
-		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0]);
+		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
 
 		//hover된 항목 highlight
 		if (el == m_item_hover && !el->m_selected)
-			draw_rect(d2dc, rf, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 2.0f, el->m_round[0]);
+			draw_rect(d2dc, rf, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 2.0f, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
 
 		m_br_label->SetColor(get_d2color(pDoc->m_data[i]->m_cr_text));
 
 		IDWriteTextFormat* wf = NULL;
 		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&wf));
 		m_WriteFactory->CreateTextFormat(pDoc->m_data[i]->m_font_name, nullptr,
-			pDoc->m_data[i]->m_font_bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
+			(DWRITE_FONT_WEIGHT)pDoc->m_data[i]->m_font_weight,
 			pDoc->m_data[i]->m_font_italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
 			pDoc->m_data[i]->m_font_size, _T("ko-kr"), &wf);
@@ -318,7 +318,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		{
 			//Gdiplus::RectF r_selected = el->m_r;
 			//r_selected.Offset(-hs, -vs);
-			draw_rect(d2dc, r, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 1.0f, el->m_round[0]);
+			draw_rect(d2dc, r, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 1.0f, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
 
 			std::vector<CRect> resize_handle;
 			get_resizable_handle(r, &resize_handle);
@@ -364,6 +364,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		d2dc->DrawLine(pt[0], pt[1], m_br_align_fit.Get(), 1.0f, m_stroke_style.Get());
 	}
+
 
 	HRESULT hr = d2dc->EndDraw();
 
@@ -1379,7 +1380,7 @@ void CUXStudioView::OnMenuViewLabelEdit()
 	//m_edit.set_back_color(el->m_cr_fill);
 	m_edit.set_font_name(el->m_font_name);
 	m_edit.set_font_size(el->m_font_size);
-	m_edit.set_font_weight(el->m_font_bold ? FW_BOLD : FW_NORMAL);
+	m_edit.set_font_weight(el->m_font_weight);
 
 	m_edit.set_text(el->m_text);
 	m_edit.ShowWindow(SW_SHOW);
@@ -1412,7 +1413,7 @@ void CUXStudioView::edit_end(bool valid)
 }
 
 //속성창에서 값 변경 시 view에 적용시킨다.
-void CUXStudioView::apply_changed_property(CSCUIElement* item)
+void CUXStudioView::apply_changed_property(std::deque<CSCUIElement*>* items)
 {
 	Invalidate();
 }
@@ -1563,7 +1564,7 @@ void CUXStudioView::OnTimer(UINT_PTR nIDEvent)
 		if (m_selected_items.size())
 			index = get_index(m_selected_items.back());
 
-		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_property(m_selected_items, index);
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_property(&m_selected_items, index);
 	}
 
 	CFormView::OnTimer(nIDEvent);

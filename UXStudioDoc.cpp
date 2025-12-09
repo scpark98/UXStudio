@@ -213,7 +213,9 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 		el->m_font_name = _T("나눔스퀘어 Bold");// json.get_array_member("items", i, "font_name", "Arial");
 		el->m_font_size = json.get_array_member("items", i, "font_size", 10);
-		el->m_font_bold = json.get_array_member("items", i, "font_bold", false);
+		int font_weight = json.get_array_member("items", i, "font_weight", (int)DWRITE_FONT_WEIGHT_BOLD);
+		Validate(font_weight, (int)DWRITE_FONT_WEIGHT_THIN, (int)DWRITE_FONT_WEIGHT_ULTRA_BLACK, (int)DWRITE_FONT_WEIGHT_NORMAL);
+		el->m_font_weight = font_weight;
 		el->m_font_italic = json.get_array_member("items", i, "font_italic", false);
 
 		el->m_stroke_thickness = json.get_array_member("items", i, "stroke_thickness", 1.0f);
@@ -282,7 +284,7 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		sstr = CT2CA(m_data[i]->m_font_name);
 		item.AddMember(rapidjson::Value("font_name", allocator).Move(), sstr, allocator);
 		item.AddMember(rapidjson::Value("font_size", allocator).Move(), m_data[i]->m_font_size, allocator);
-		item.AddMember(rapidjson::Value("font_bold", allocator).Move(), m_data[i]->m_font_bold, allocator);
+		item.AddMember(rapidjson::Value("font_weight", allocator).Move(), m_data[i]->m_font_weight, allocator);
 		item.AddMember(rapidjson::Value("font_italic", allocator).Move(), m_data[i]->m_font_italic, allocator);
 
 		item.AddMember(rapidjson::Value("stroke_thickness", allocator).Move(), m_data[i]->m_stroke_thickness, allocator);

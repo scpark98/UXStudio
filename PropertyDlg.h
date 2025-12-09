@@ -25,10 +25,22 @@ public:
 
 	void				set_canvas_property(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
-	CSCUIElement*		m_item_cur = NULL;
-	void				set_property(CSCUIElement* item);
+	std::deque<CSCUIElement*>* m_cur_items = NULL;
+	void				set_property(std::deque<CSCUIElement*>* items);
 
 	LRESULT				on_message_CSCStatic(WPARAM wParam, LPARAM lParam);
+
+	template <class T> void	update_all_values(std::deque<CSCUIElement*>* items, CString member, T value)
+	{
+		for (auto it = items->begin(); it != items->end(); ++it)
+		{
+			if (member == _T("m_text"))
+				(*it)->m_text = value;
+			else if (member == _T("m_r.X"))
+				(*it)->m_r.X = value;
+		}
+	}
+
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -81,10 +93,9 @@ public:
 	CSCComboBox m_combo_font;
 	CSCStatic m_static_font;
 	CSCStatic m_static_font_size;
-	CGdiButton m_check_font_bold;
+	CSCStatic m_static_font_weight;
 	CGdiButton m_check_font_italic;
 	CSCStatic m_static_text_color;
-	afx_msg void OnBnClickedCheckFontBold();
 	afx_msg void OnBnClickedCheckFontItalic();
 	CSCStatic m_static_text_opacity;
 	afx_msg void OnCbnSelchangeComboFont();

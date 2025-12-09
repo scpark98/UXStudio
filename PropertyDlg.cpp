@@ -56,7 +56,7 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_FONT, m_combo_font);
 	DDX_Control(pDX, IDC_STATIC_FONT, m_static_font);
 	DDX_Control(pDX, IDC_STATIC_FONT_SIZE, m_static_font_size);
-	DDX_Control(pDX, IDC_CHECK_FONT_BOLD, m_check_font_bold);
+	DDX_Control(pDX, IDC_STATIC_FONT_WEIGHT, m_static_font_weight);
 	DDX_Control(pDX, IDC_CHECK_FONT_ITALIC, m_check_font_italic);
 	DDX_Control(pDX, IDC_STATIC_TEXT_COLOR, m_static_text_color);
 	DDX_Control(pDX, IDC_STATIC_TEXT_OPACITY, m_static_text_opacity);
@@ -81,7 +81,6 @@ BEGIN_MESSAGE_MAP(CPropertyDlg, CPaneDialog)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_REGISTERED_MESSAGE(Message_CSCStatic, &CPropertyDlg::on_message_CSCStatic)
-	ON_BN_CLICKED(IDC_CHECK_FONT_BOLD, &CPropertyDlg::OnBnClickedCheckFontBold)
 	ON_BN_CLICKED(IDC_CHECK_FONT_ITALIC, &CPropertyDlg::OnBnClickedCheckFontItalic)
 	ON_CBN_SELCHANGE(IDC_COMBO_FONT, &CPropertyDlg::OnCbnSelchangeComboFont)
 	ON_BN_CLICKED(IDC_RADIO_ALIGN_LEFT, &CPropertyDlg::OnBnClickedRadioAlignLeft)
@@ -164,6 +163,11 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_ROUND2, 50, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_ROUND3, 75, 0, 25, 0);
 
+	m_resize.Add(IDC_COMBO_FONT, 0, 0, 100, 0);
+	m_resize.Add(IDC_STATIC_FONT_SIZE, 0, 0, 50, 0);
+	m_resize.Add(IDC_STATIC_FONT_WEIGHT, 50, 0, 50, 0);
+	m_resize.Add(IDC_CHECK_FONT_ITALIC, 100, 0, 0, 0);
+
 	m_resize.Add(IDC_STATIC_FILL_COLOR, 0, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_FILL_OPACITY, 50, 0, 50, 0);
 
@@ -219,11 +223,11 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size_cx.copy_properties(m_static_round3);
 
 	m_combo_font.set_color_theme(m_theme.get_color_theme());
-	m_combo_font.set_font_combo();
+	m_combo_font.set_as_font_combo();
 	m_combo_font.set_line_height(14);
 
 	m_static_grid_size_cx.copy_properties(m_static_font_size);
-	m_check_font_bold.set_color(m_theme.cr_text, m_theme.cr_back, false);
+	m_static_grid_size_cx.copy_properties(m_static_font_weight);
 	m_check_font_italic.set_color(m_theme.cr_text, m_theme.cr_back, false);
 	m_static_canvas_size_cx.copy_properties(m_static_text_color);
 	m_static_canvas_size_cx.copy_properties(m_static_text_opacity);
@@ -325,106 +329,120 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 
-		if (!m_item_cur)
+		if (!m_cur_items || m_cur_items->size() == 0)
 			return 0;
 
 		if (msg->pThis == &m_static_label)
-			m_item_cur->m_text = msg->sValue;
+			update_all_values(m_cur_items, VAR_TO_CSTRING(m_text), msg->sValue);
+			//m_cur_items->m_text = msg->sValue;
 
 		//좌표값 또는 w, h를 변경하면 서로 영향을 주는데 이 때 기준은 좌표값을 유지시키도록 한다.
 		//즉, x2를 변경하면 x1을 변경시키는 것이 아니라 width를 변경시켜준다.
 		else if (msg->pThis == &m_static_x1)
 		{
 			//x1를 변경하면 x2을 변경하는 것이 아니라 width를 조정해준다.
-			m_item_cur->m_r.X = _ttof(msg->sValue);
-			m_item_cur->m_r.Width = m_item_cur->m_r.GetRight() - m_item_cur->m_r.X;
-			m_static_w.set_text_value(_T("%.1f"), m_item_cur->m_r.Width);
+			//m_cur_items->m_r.X = _ttof(msg->sValue);
+			update_all_values(m_cur_items, VAR_TO_CSTRING(m_r.X), _ttof(msg->sValue));
+
+			//m_cur_items->m_r.Width = m_cur_items->m_r.GetRight() - m_cur_items->m_r.X;
+			update_all_values(m_cur_items, VAR_TO_CSTRING(m_r.Width), _ttof(msg->sValue));
+
+			m_static_w.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Width);
 		}
+		/*
 		else if (msg->pThis == &m_static_y1)
 		{
 			//y1를 변경하면 y2을 변경하는 것이 아니라 height를 조정해준다.
-			m_item_cur->m_r.Y = _ttof(msg->sValue);
-			m_item_cur->m_r.Height = m_item_cur->m_r.GetBottom() - m_item_cur->m_r.Y;
-			m_static_h.set_text_value(_T("%.1f"), m_item_cur->m_r.Height);
+			m_cur_items->m_r.Y = _ttof(msg->sValue);
+			m_cur_items->m_r.Height = m_cur_items->m_r.GetBottom() - m_cur_items->m_r.Y;
+			m_static_h.set_text_value(_T("%.1f"), m_cur_items->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_x2)
 		{
 			//x2를 변경하면 x1을 변경하는 것이 아니라 width를 조정해준다.
-			m_item_cur->m_r.Width = _ttof(msg->sValue) - m_item_cur->m_r.X;
-			m_static_w.set_text_value(_T("%.1f"), m_item_cur->m_r.Width);
+			m_cur_items->m_r.Width = _ttof(msg->sValue) - m_cur_items->m_r.X;
+			m_static_w.set_text_value(_T("%.1f"), m_cur_items->m_r.Width);
 		}
 		else if (msg->pThis == &m_static_y2)
 		{
 			//y2를 변경하면 y1을 변경하는 것이 아니라 height를 조정해준다.
-			m_item_cur->m_r.Height = _ttof(msg->sValue) - m_item_cur->m_r.Y;
-			m_static_h.set_text_value(_T("%.1f"), m_item_cur->m_r.Height);
+			m_cur_items->m_r.Height = _ttof(msg->sValue) - m_cur_items->m_r.Y;
+			m_static_h.set_text_value(_T("%.1f"), m_cur_items->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_w)
 		{
 			//width를 변경하면 x2를 조정해준다.
-			m_item_cur->m_r.Width = _ttof(msg->sValue);
-			m_static_x2.set_text_value(d2S(m_item_cur->m_r.GetRight(), false, 1));
+			m_cur_items->m_r.Width = _ttof(msg->sValue);
+			m_static_x2.set_text_value(d2S(m_cur_items->m_r.GetRight(), false, 1));
 		}
 		else if (msg->pThis == &m_static_h)
 		{
 			//height를 변경하면 y2를 조정해준다.
-			m_item_cur->m_r.Height = _ttof(msg->sValue);
-			m_static_y2.set_text_value(d2S(m_item_cur->m_r.GetBottom(), false, 1));
+			m_cur_items->m_r.Height = _ttof(msg->sValue);
+			m_static_y2.set_text_value(d2S(m_cur_items->m_r.GetBottom(), false, 1));
 		}
 
 		else if (msg->pThis == &m_static_round0)
-			m_item_cur->m_round[0] = _ttof(msg->sValue);
+			m_cur_items->m_round[0] = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_round1)
-			m_item_cur->m_round[1] = _ttof(msg->sValue);
+			m_cur_items->m_round[1] = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_round2)
-			m_item_cur->m_round[2] = _ttof(msg->sValue);
+			m_cur_items->m_round[2] = _ttof(msg->sValue);
 		else if (msg->pThis == &m_static_round3)
-			m_item_cur->m_round[3] = _ttof(msg->sValue);
+			m_cur_items->m_round[3] = _ttof(msg->sValue);
 
 		else if (msg->pThis == &m_static_fill_color)
 		{
-			m_item_cur->m_cr_fill = get_color_from_token_str(msg->sValue, _T(", "));
+			m_cur_items->m_cr_fill = get_color_from_token_str(msg->sValue, _T(", "));
 		}
 		else if (msg->pThis == &m_static_fill_opacity)
 		{
-			set_color(m_item_cur->m_cr_fill, 0, _ttoi(msg->sValue));
+			set_color(m_cur_items->m_cr_fill, 0, _ttoi(msg->sValue));
 		}
 
 		else if (msg->pThis == &m_static_stroke_color)
 		{
-			m_item_cur->m_cr_stroke = get_color_from_token_str(msg->sValue, _T(", "));
+			m_cur_items->m_cr_stroke = get_color_from_token_str(msg->sValue, _T(", "));
 		}
 		else if (msg->pThis == &m_static_stroke_opacity)
 		{
-			set_color(m_item_cur->m_cr_stroke, 0, _ttoi(msg->sValue));
+			set_color(m_cur_items->m_cr_stroke, 0, _ttoi(msg->sValue));
 		}
 		else if (msg->pThis == &m_static_stroke_thickness)
 		{
-			m_item_cur->m_stroke_thickness = _ttof(msg->sValue);
+			m_cur_items->m_stroke_thickness = _ttof(msg->sValue);
 		}
 		else if (msg->pThis == &m_static_text_color)
 		{
-			m_item_cur->m_cr_text = get_color_from_token_str(msg->sValue, _T(", "));
+			m_cur_items->m_cr_text = get_color_from_token_str(msg->sValue, _T(", "));
 		}
 		else if (msg->pThis == &m_static_text_opacity)
 		{
-			set_color(m_item_cur->m_cr_text, 0, _ttoi(msg->sValue));
+			set_color(m_cur_items->m_cr_text, 0, _ttoi(msg->sValue));
 		}
 		else if (msg->pThis == &m_static_font_size)
 		{
-			m_item_cur->m_font_size = _ttoi(msg->sValue);
+			m_cur_items->m_font_size = _ttoi(msg->sValue);
 		}
-		
-		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+		else if (msg->pThis == &m_static_font_weight)
+		{
+			int font_weight = _ttoi(msg->sValue);
+			Validate(font_weight, (int)DWRITE_FONT_WEIGHT_THIN, (int)DWRITE_FONT_WEIGHT_ULTRA_BLACK, (int)DWRITE_FONT_WEIGHT_NORMAL);
+			m_static_font_weight.set_text_value(i2S(font_weight));
+			m_cur_items->m_font_weight = font_weight;
+		}
+		*/
+
+		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 	}
 
 
 	return 0;
 }
 
-void CPropertyDlg::set_property(CSCUIElement* item)
+void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 {
-	m_item_cur = item;
+	m_cur_items = items;
 
 	m_radio_align_left.SetCheck(BST_UNCHECKED);
 	m_radio_align_center.SetCheck(BST_UNCHECKED);
@@ -433,70 +451,93 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 	m_radio_valign_center.SetCheck(BST_UNCHECKED);
 	m_radio_valign_bottom.SetCheck(BST_UNCHECKED);
 
-	if (item)
+	CSCUIElement el;
+	Gdiplus::Color cr_unused(123, 234, 123, 234);
+
+	if (items->size() > 0)
+		items->at(0)->copy(&el);
+
+	//0번 항목의 각 변수값이 다른 값들과 하나라도 다르다면 해당 항목은 ""로 표시한다.
+	for (int i = 1; i < items->size(); i++)
+	{
+		if (!el.m_text.IsEmpty() && el.m_text != items->at(i)->m_text)
+			el.m_text = _T("");
+
+		if (el.m_r.X != FLT_MAX && el.m_r.X != items->at(i)->m_r.X)
+			el.m_r.X = FLT_MAX;
+
+		if (el.m_r.Y != FLT_MAX && el.m_r.Y != items->at(i)->m_r.Y)
+			el.m_r.Y = FLT_MAX;
+
+		if (el.m_r.Width != FLT_MAX && el.m_r.GetRight() != items->at(i)->m_r.GetRight())
+			el.m_r.Width = FLT_MAX;
+
+		if (el.m_r.Height != FLT_MAX && el.m_r.GetBottom() != items->at(i)->m_r.GetBottom())
+			el.m_r.Height = FLT_MAX;
+
+		for (int j = 0; j < 4; j++)
+		{
+			if (el.m_round[j] != FLT_MAX && el.m_round[j] != items->at(i)->m_round[j])
+				el.m_round[j] = FLT_MAX;
+		}
+
+		if (!el.m_font_name.IsEmpty() && el.m_font_name != items->at(i)->m_font_name)
+			el.m_font_name = _T("");
+
+		if (el.m_font_weight != INT_MAX && el.m_font_weight != items->at(i)->m_font_weight)
+			el.m_font_weight = -1;
+
+
+		if (el.m_text_align != INT_MAX && el.m_text_align != items->at(i)->m_text_align)
+			el.m_text_align = INT_MAX;
+
+		if (el.m_text_valign != INT_MAX && el.m_text_valign != items->at(i)->m_text_valign)
+			el.m_text_valign = INT_MAX;
+
+		if (el.m_cr_fill.GetValue() != cr_unused.GetValue() && el.m_cr_fill.GetValue() != items->at(i)->m_cr_fill.GetValue())
+			el.m_cr_fill = cr_unused;
+
+		if (el.m_cr_stroke.GetValue() != cr_unused.GetValue() && el.m_cr_stroke.GetValue() != items->at(i)->m_cr_stroke.GetValue())
+			el.m_cr_stroke = cr_unused;
+
+		if (el.m_cr_text.GetValue() != cr_unused.GetValue() && el.m_cr_text.GetValue() != items->at(i)->m_cr_text.GetValue())
+			el.m_cr_text = cr_unused;
+	}
+
+	if (items->size() > 0)
 	{
 		CString str;
 
-		m_static_label.set_text_value(item->m_text);
+		//items deque 목록에 있는 각 m_text를 검사하여 모두 동일한 값이면 해당값을 사용하고 동일하지 않으면 해당 항목을 "" 처리한다.
+		m_static_label.set_text_value(el.m_text);
 
-		m_static_x1.set_text_value(d2S(item->m_r.X, false, 1));
-		m_static_y1.set_text_value(d2S(item->m_r.Y, false, 1));
-		m_static_x2.set_text_value(d2S(item->m_r.GetRight(), false, 1));
-		m_static_y2.set_text_value(d2S(item->m_r.GetBottom(), false, 1));
-		m_static_w.set_text_value(d2S(item->m_r.Width, false, 1));
-		m_static_h.set_text_value(d2S(item->m_r.Height, false, 1));
+		m_static_x1.set_text_value(el.m_r.X == FLT_MAX ? _T("") : d2S(el.m_r.X, false, 1));
+		m_static_y1.set_text_value(el.m_r.Y == FLT_MAX ? _T("") : d2S(el.m_r.Y, false, 1));
+		m_static_x2.set_text_value(el.m_r.Width == FLT_MAX ? _T("") : d2S(el.m_r.GetRight(), false, 1));
+		m_static_y2.set_text_value(el.m_r.Height == FLT_MAX ? _T("") : d2S(el.m_r.GetBottom(), false, 1));
+		m_static_w.set_text_value(el.m_r.Width == FLT_MAX ? _T("") : d2S(el.m_r.Width, false, 1));
+		m_static_h.set_text_value(el.m_r.Height == FLT_MAX ? _T("") : d2S(el.m_r.Height, false, 1));
 
-		m_static_round0.set_text_value(d2S(item->m_round[0], false, 1));
-		m_static_round1.set_text_value(d2S(item->m_round[1], false, 1));
-		m_static_round2.set_text_value(d2S(item->m_round[2], false, 1));
-		m_static_round3.set_text_value(d2S(item->m_round[3], false, 1));
+		m_static_round0.set_text_value(el.m_round[0] == FLT_MAX ? _T("") : d2S(el.m_round[0], false, 1));
+		m_static_round1.set_text_value(el.m_round[1] == FLT_MAX ? _T("") : d2S(el.m_round[1], false, 1));
+		m_static_round2.set_text_value(el.m_round[2] == FLT_MAX ? _T("") : d2S(el.m_round[2], false, 1));
+		m_static_round3.set_text_value(el.m_round[3] == FLT_MAX ? _T("") : d2S(el.m_round[3], false, 1));
 
-		//"color picker"일 때 현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
-		//그런데 만약 red 컬러인데 alpha값이 0일 경우, 투명하게 그려지게 되므로 문제가 된다.
-		//a를 255로 강제 세팅해서 그려줘야 한다.
-		Gdiplus::Color cr = item->m_cr_fill;
-		set_color(cr, 0, 255);
-		m_static_fill_color.set_text_color(cr);
-		str = get_RGB_str(cr);
-		m_static_fill_color.set_text_value(str);
-		m_static_fill_opacity.set_text_value(i2S(item->m_cr_fill.GetA()));
 
-		//stroke color 적용
-		cr = item->m_cr_stroke;
-		set_color(cr, 0, 255);
-		m_static_stroke_color.set_text_color(cr);
-		str = get_RGB_str(cr);
-		m_static_stroke_color.set_text_value(str);
-		m_static_stroke_opacity.set_text_value(i2S(item->m_cr_stroke.GetA()));
-		m_static_stroke_thickness.set_text_value(i2S(item->m_stroke_thickness));
-
-		//글자색 적용
-		cr = item->m_cr_text;
-		set_color(cr, 0, 255);
-		m_static_text_color.set_text_color(cr);
-		str = get_RGB_str(cr);
-		m_static_text_color.set_text_value(str);
-		m_static_text_opacity.set_text_value(i2S(item->m_cr_text.GetA()));
-
-		//font
-		m_static_font_size.set_text_value(i2S(item->m_font_size));
-		m_check_font_bold.SetCheck(item->m_font_bold ? BST_CHECKED : BST_UNCHECKED);
-		m_check_font_italic.SetCheck(item->m_font_italic ? BST_CHECKED : BST_UNCHECKED);
-
-		switch (item->m_text_align)
+		switch (el.m_text_align)
 		{
-			case DWRITE_TEXT_ALIGNMENT_LEADING:
-				m_radio_align_left.SetCheck(BST_CHECKED);
-				break;
-			case DWRITE_TEXT_ALIGNMENT_CENTER:
-				m_radio_align_center.SetCheck(BST_CHECKED);
-				break;
-			case DWRITE_TEXT_ALIGNMENT_TRAILING:
-				m_radio_align_right.SetCheck(BST_CHECKED);
-				break;
+		case DWRITE_TEXT_ALIGNMENT_LEADING:
+			m_radio_align_left.SetCheck(BST_CHECKED);
+			break;
+		case DWRITE_TEXT_ALIGNMENT_CENTER:
+			m_radio_align_center.SetCheck(BST_CHECKED);
+			break;
+		case DWRITE_TEXT_ALIGNMENT_TRAILING:
+			m_radio_align_right.SetCheck(BST_CHECKED);
+			break;
 		}
 
-		switch (item->m_text_valign)
+		switch (el.m_text_valign)
 		{
 		case DWRITE_PARAGRAPH_ALIGNMENT_NEAR:
 			m_radio_valign_top.SetCheck(BST_CHECKED);
@@ -508,6 +549,41 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 			m_radio_valign_bottom.SetCheck(BST_CHECKED);
 			break;
 		}
+
+		//"color picker"일 때 현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
+		//그런데 만약 red 컬러인데 alpha값이 0일 경우, 투명하게 그려지게 되므로 문제가 된다.
+		//a를 255로 강제 세팅해서 그려줘야 한다.
+		Gdiplus::Color cr;
+
+
+		cr = (el.m_cr_fill.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_fill);
+		set_color(cr, 0, 255);
+		m_static_fill_color.set_text_color(cr);
+		str = get_RGB_str(cr);
+		m_static_fill_color.set_text_value(str);
+		m_static_fill_opacity.set_text_value(i2S(el.m_cr_fill.GetA()));
+
+		//stroke color 적용
+		cr = (el.m_cr_stroke.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_stroke);
+		set_color(cr, 0, 255);
+		m_static_stroke_color.set_text_color(cr);
+		str = get_RGB_str(cr);
+		m_static_stroke_color.set_text_value(str);
+		m_static_stroke_opacity.set_text_value(i2S(el.m_cr_stroke.GetA()));
+		m_static_stroke_thickness.set_text_value(i2S(el.m_stroke_thickness));
+
+		//글자색 적용
+		cr = (el.m_cr_text.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_text);
+		set_color(cr, 0, 255);
+		m_static_text_color.set_text_color(cr);
+		str = get_RGB_str(cr);
+		m_static_text_color.set_text_value(str);
+		m_static_text_opacity.set_text_value(i2S(el.m_cr_text.GetA()));
+
+		//font
+		m_static_font_size.set_text_value(i2S(el.m_font_size));
+		m_static_font_weight.set_text_value(el.m_font_weight < DWRITE_FONT_WEIGHT_THIN ? _T("") : i2S(el.m_font_weight));
+		m_check_font_italic.SetCheck(el.m_font_italic ? BST_CHECKED : BST_UNCHECKED);
 
 		enable_window(true);
 	}
@@ -544,56 +620,50 @@ void CPropertyDlg::set_property(CSCUIElement* item)
 	}
 }
 
-void CPropertyDlg::OnBnClickedCheckFontBold()
-{
-	m_item_cur->m_font_bold = (m_check_font_bold.GetCheck() == BST_CHECKED);
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
-}
-
 void CPropertyDlg::OnBnClickedCheckFontItalic()
 {
-	m_item_cur->m_font_italic = (m_check_font_italic.GetCheck() == BST_CHECKED);
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_font_italic = (m_check_font_italic.GetCheck() == BST_CHECKED);
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnCbnSelchangeComboFont()
 {
-	m_item_cur->m_font_name = m_combo_font.get_text();
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_font_name = m_combo_font.get_text();
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignLeft()
 {
-	m_item_cur->m_text_align = DWRITE_TEXT_ALIGNMENT_LEADING;
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_text_align = DWRITE_TEXT_ALIGNMENT_LEADING;
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignCenter()
 {
-	m_item_cur->m_text_align = DWRITE_TEXT_ALIGNMENT_CENTER;
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_text_align = DWRITE_TEXT_ALIGNMENT_CENTER;
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignRight()
 {
-	m_item_cur->m_text_align = DWRITE_TEXT_ALIGNMENT_TRAILING;
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_text_align = DWRITE_TEXT_ALIGNMENT_TRAILING;
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioVAlignTop()
 {
-	m_item_cur->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioVAlignCenter()
 {
-	m_item_cur->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioVAlignBottom()
 {
-	m_item_cur->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_FAR;
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_item_cur);
+	//m_cur_items->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_FAR;
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }

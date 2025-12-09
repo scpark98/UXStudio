@@ -127,6 +127,8 @@
 #define IDC_STATIC_FONT_SIZE            1032
 #define IDC_STATIC_FONT                 1033
 #define IDC_CHECK_FONT_BOLD             1034
+#define IDC_STATIC_FONT_SIZE2           1034
+#define IDC_STATIC_FONT_WEIGHT          1034
 #define IDC_CHECK_FONT_ITALIC           1035
 #define IDC_STATIC_FONT_COLOR           1036
 #define IDC_STATIC_TEXT_COLOR           1036

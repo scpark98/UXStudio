@@ -248,7 +248,7 @@ void CUXStudioApp::SaveCustomState()
 
 // CUXStudioApp 메시지 처리기
 
-void CUXStudioApp::apply_changed_property(CSCUIElement* item)
+void CUXStudioApp::apply_changed_property(std::deque<CSCUIElement*>* items)
 {
 	CMDIFrameWnd* pMainFrame = (CMDIFrameWnd*)AfxGetMainWnd();
 	if (pMainFrame)
@@ -257,7 +257,7 @@ void CUXStudioApp::apply_changed_property(CSCUIElement* item)
 		if (pChild)
 		{
 			CUXStudioView* pView = (CUXStudioView*)pChild->GetActiveView();                // Child 내부의 View
-			pView->apply_changed_property(item);
+			pView->apply_changed_property(items);
 		}
 	}
 }
