@@ -356,82 +356,62 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		else if (msg->pThis == &m_static_x2)
 		{
 			//x2를 변경하면 x1을 변경하는 것이 아니라 width를 조정해준다.
-			//m_cur_items->m_r.Width = _ttof(msg->sValue) - m_cur_items->m_r.X;
 			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.X2), _ttof(msg->sValue));
 			m_static_w.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Width);
 		}
 		else if (msg->pThis == &m_static_y2)
 		{
 			//y2를 변경하면 y1을 변경하는 것이 아니라 height를 조정해준다.
-			//m_cur_items->m_r.Height = _ttof(msg->sValue) - m_cur_items->m_r.Y;
 			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Y2), _ttof(msg->sValue));
 			m_static_h.set_text_value(_T("%.1f"), m_cur_items->at(0)->m_r.Height);
 		}
 		else if (msg->pThis == &m_static_w)
 		{
 			//width를 변경하면 x2를 조정해준다.
-			//m_cur_items->m_r.Width = _ttof(msg->sValue);
 			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Width), _ttof(msg->sValue));
 			m_static_x2.set_text_value(d2S(m_cur_items->at(0)->m_r.GetRight(), false, 1));
 		}
 		else if (msg->pThis == &m_static_h)
 		{
 			//height를 변경하면 y2를 조정해준다.
-			//m_cur_items->m_r.Height = _ttof(msg->sValue);
 			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_r.Height), _ttof(msg->sValue));
 			m_static_y2.set_text_value(d2S(m_cur_items->at(0)->m_r.GetBottom(), false, 1));
 		}
-		/*
 		else if (msg->pThis == &m_static_round0)
-			m_cur_items->m_round[0] = _ttof(msg->sValue);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_round[0]), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_round1)
-			m_cur_items->m_round[1] = _ttof(msg->sValue);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_round[1]), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_round2)
-			m_cur_items->m_round[2] = _ttof(msg->sValue);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_round[2]), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_round3)
-			m_cur_items->m_round[3] = _ttof(msg->sValue);
-
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_round[3]), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_fill_color)
-		{
-			m_cur_items->m_cr_fill = get_color_from_token_str(msg->sValue, _T(", "));
-		}
+			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(fill_color), msg->sValue);
 		else if (msg->pThis == &m_static_fill_opacity)
-		{
-			set_color(m_cur_items->m_cr_fill, 0, _ttoi(msg->sValue));
-		}
-
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(fill_opacity), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_stroke_color)
-		{
-			m_cur_items->m_cr_stroke = get_color_from_token_str(msg->sValue, _T(", "));
-		}
+			//m_cur_items->m_cr_stroke = get_color_from_token_str(msg->sValue, _T(", "));
+			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(stroke_color), msg->sValue);
 		else if (msg->pThis == &m_static_stroke_opacity)
-		{
-			set_color(m_cur_items->m_cr_stroke, 0, _ttoi(msg->sValue));
-		}
+			//set_color(m_cur_items->m_cr_stroke, 0, _ttoi(msg->sValue));
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(stroke_opacity), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_stroke_thickness)
-		{
-			m_cur_items->m_stroke_thickness = _ttof(msg->sValue);
-		}
+			//m_cur_items->m_stroke_thickness = _ttof(msg->sValue);
+			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(stroke_thickness), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_text_color)
-		{
-			m_cur_items->m_cr_text = get_color_from_token_str(msg->sValue, _T(", "));
-		}
+			//m_cur_items->m_cr_text = get_color_from_token_str(msg->sValue, _T(", "));
+			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(text_color), msg->sValue);
 		else if (msg->pThis == &m_static_text_opacity)
-		{
-			set_color(m_cur_items->m_cr_text, 0, _ttoi(msg->sValue));
-		}
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_opacity), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_font_size)
-		{
-			m_cur_items->m_font_size = _ttoi(msg->sValue);
-		}
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(font_size), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_font_weight)
 		{
 			int font_weight = _ttoi(msg->sValue);
 			Validate(font_weight, (int)DWRITE_FONT_WEIGHT_THIN, (int)DWRITE_FONT_WEIGHT_ULTRA_BLACK, (int)DWRITE_FONT_WEIGHT_NORMAL);
 			m_static_font_weight.set_text_value(i2S(font_weight));
-			m_cur_items->m_font_weight = font_weight;
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(font_weight), _ttoi(msg->sValue));
 		}
-		*/
 
 		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 	}
@@ -628,48 +608,51 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 
 void CPropertyDlg::OnBnClickedCheckFontItalic()
 {
-	//m_cur_items->m_font_italic = (m_check_font_italic.GetCheck() == BST_CHECKED);
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(font_italic), m_check_font_italic.GetCheck());
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnCbnSelchangeComboFont()
 {
-	//m_cur_items->m_font_name = m_combo_font.get_text();
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), m_combo_font.get_text());
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignLeft()
 {
-	//m_cur_items->m_text_align = DWRITE_TEXT_ALIGNMENT_LEADING;
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_align), (int)DWRITE_TEXT_ALIGNMENT_LEADING);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignCenter()
 {
-	//m_cur_items->m_text_align = DWRITE_TEXT_ALIGNMENT_CENTER;
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_align), (int)DWRITE_TEXT_ALIGNMENT_CENTER);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignRight()
 {
-	//m_cur_items->m_text_align = DWRITE_TEXT_ALIGNMENT_TRAILING;
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_align), (int)DWRITE_TEXT_ALIGNMENT_TRAILING);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioVAlignTop()
 {
 	//m_cur_items->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_valign), (int)DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioVAlignCenter()
 {
 	//m_cur_items->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_valign), (int)DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioVAlignBottom()
 {
 	//m_cur_items->m_text_valign = DWRITE_PARAGRAPH_ALIGNMENT_FAR;
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_valign), (int)DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }

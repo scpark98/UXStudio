@@ -10,18 +10,18 @@
             "type": 0,
             "selected": false,
             "r": [
-                225.0,
-                334.0,
+                490.0,
+                508.0,
                 80.0,
                 70.0
             ],
             "round": [
-                25.0,
+                20.0,
                 25.0,
                 0.0,
-                0.0
+                20.0
             ],
-            "label": "abc123",
+            "label": "ÇÑ±Û",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -29,28 +29,28 @@
             "cr_back": 16777215,
             "font_name": "³ª´®½ºÄù¾î Bold",
             "font_size": 30,
-            "font_weight": 100,
+            "font_weight": 700,
             "font_italic": false,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 4286611584
+            "stroke_thickness": 5.0,
+            "cr_stroke": 2151770593,
+            "cr_fill": 1090453504
         },
         {
             "type": 0,
             "selected": false,
             "r": [
-                115.0,
-                334.0,
+                382.0,
+                508.0,
                 80.0,
                 70.0
             ],
             "round": [
+                20.0,
                 0.0,
                 0.0,
-                0.0,
-                0.0
+                20.0
             ],
-            "label": "abc123",
+            "label": "ÇÑ±Û",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -60,9 +60,9 @@
             "font_size": 30,
             "font_weight": 700,
             "font_italic": true,
-            "stroke_thickness": 1.0,
-            "cr_stroke": 4282477025,
-            "cr_fill": 4286611584
+            "stroke_thickness": 5.0,
+            "cr_stroke": 2151770593,
+            "cr_fill": 1090453504
         },
         {
             "type": 0,
@@ -1217,8 +1217,8 @@
             "cr_text": 4294934528,
             "cr_back": 16777215,
             "font_name": "³ª´®½ºÄù¾î Bold",
-            "font_size": 12,
-            "font_weight": 700,
+            "font_size": 14,
+            "font_weight": 900,
             "font_italic": false,
             "stroke_thickness": 1.0,
             "cr_stroke": 4294934528,
@@ -1246,8 +1246,8 @@
             "cr_text": 4294934528,
             "cr_back": 16777215,
             "font_name": "³ª´®½ºÄù¾î Bold",
-            "font_size": 12,
-            "font_weight": 700,
+            "font_size": 14,
+            "font_weight": 900,
             "font_italic": false,
             "stroke_thickness": 1.0,
             "cr_stroke": 4294934528,
@@ -1275,8 +1275,8 @@
             "cr_text": 4294934528,
             "cr_back": 16777215,
             "font_name": "³ª´®½ºÄù¾î Bold",
-            "font_size": 12,
-            "font_weight": 700,
+            "font_size": 14,
+            "font_weight": 900,
             "font_italic": false,
             "stroke_thickness": 1.0,
             "cr_stroke": 4294934528,

@@ -30,6 +30,8 @@ public:
 
 	LRESULT				on_message_CSCStatic(WPARAM wParam, LPARAM lParam);
 
+	//items의 특정 멤버를 value값으로 변경해야 하는데 c++에서는 정식 방법을 지원하지 않는다.
+	//할 수 없이 아래와 같이 변수명을 문자열로 주고 해당 변수명에 따라 처리한다.
 	template <class T> void	update_all_values(std::deque<CSCUIElement*>* items, CString member, T value)
 	{
 		for (auto it = items->begin(); it != items->end(); ++it)
@@ -63,13 +65,91 @@ public:
 			}
 			else if (member == _T("m_r.Width"))
 			{
-				float* f = reinterpret_cast<float*>(&value);
-				(*it)->m_r.Width = *f;
+				//float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_r.Width = *(reinterpret_cast<float*>(&value));
 			}
 			else if (member == _T("m_r.Height"))
 			{
 				float* f = reinterpret_cast<float*>(&value);
-				(*it)->m_r.Height = *f;
+				(*it)->m_r.Height = *(reinterpret_cast<float*>(&value));
+			}
+			else if (member == _T("m_round[0]"))
+			{
+				//float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_round[0] = *(reinterpret_cast<float*>(&value));
+			}
+			else if (member == _T("m_round[1]"))
+			{
+				//float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_round[1] = *(reinterpret_cast<float*>(&value));
+			}
+			else if (member == _T("m_round[2]"))
+			{
+				//float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_round[2] = *(reinterpret_cast<float*>(&value));
+			}
+			else if (member == _T("m_round[3]"))
+			{
+				//float* f = reinterpret_cast<float*>(&value);
+				(*it)->m_round[3] = *(reinterpret_cast<float*>(&value));
+			}
+			else if (member == _T("fill_color"))
+			{
+				CString* str = reinterpret_cast<CString*>(&value);
+				(*it)->m_cr_fill = get_color_from_token_str(*str, _T(", "));
+			}
+			else if (member == _T("fill_opacity"))
+			{
+				int* alpha = reinterpret_cast<int*>(&value);
+				set_color((*it)->m_cr_fill, 0, *alpha);
+			}
+			else if (member == _T("stroke_color"))
+			{
+				CString* str = reinterpret_cast<CString*>(&value);
+				(*it)->m_cr_stroke = get_color_from_token_str(*str, _T(", "));
+			}
+			else if (member == _T("stroke_opacity"))
+			{
+				int* alpha = reinterpret_cast<int*>(&value);
+				set_color((*it)->m_cr_stroke, 0, *alpha);
+			}
+			else if (member == _T("stroke_thickness"))
+			{
+				(*it)->m_stroke_thickness = *(reinterpret_cast<float*>(&value));
+			}
+			else if (member == _T("text_color"))
+			{
+				CString* str = reinterpret_cast<CString*>(&value);
+				(*it)->m_cr_text = get_color_from_token_str(*str, _T(", "));
+			}
+			else if (member == _T("text_opacity"))
+			{
+				int* alpha = reinterpret_cast<int*>(&value);
+				set_color((*it)->m_cr_text, 0, *alpha);
+			}
+			else if (member == _T("font_size"))
+			{
+				(*it)->m_font_size = *(reinterpret_cast<int*>(&value));
+			}
+			else if (member == _T("font_weight"))
+			{
+				(*it)->m_font_weight = *(reinterpret_cast<int*>(&value));
+			}
+			else if (member == _T("font_italic"))
+			{
+				(*it)->m_font_italic = *(reinterpret_cast<int*>(&value));
+			}
+			else if (member == _T("font_name"))
+			{
+				(*it)->m_font_name = *(reinterpret_cast<CString*>(&value));
+			}
+			else if (member == _T("text_align"))
+			{
+				(*it)->m_text_align = *(reinterpret_cast<int*>(&value));
+			}
+			else if (member == _T("text_valign"))
+			{
+				(*it)->m_text_valign = *(reinterpret_cast<int*>(&value));
 			}
 		}
 	}
