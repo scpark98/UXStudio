@@ -10,15 +10,15 @@
             "type": 0,
             "selected": false,
             "r": [
-                490.0,
-                508.0,
-                80.0,
-                70.0
+                347.0,
+                545.0,
+                128.0,
+                119.0
             ],
             "round": [
                 20.0,
                 25.0,
-                0.0,
+                50.0,
                 20.0
             ],
             "label": "ÇÑ±Û",
@@ -32,17 +32,17 @@
             "font_weight": 700,
             "font_italic": false,
             "stroke_thickness": 5.0,
-            "cr_stroke": 2151770593,
-            "cr_fill": 1090453504
+            "cr_stroke": 4294901760,
+            "cr_fill": 4294950912
         },
         {
             "type": 0,
             "selected": false,
             "r": [
-                382.0,
-                508.0,
-                80.0,
-                70.0
+                252.0,
+                410.0,
+                146.0,
+                88.0
             ],
             "round": [
                 20.0,
@@ -62,7 +62,7 @@
             "font_italic": true,
             "stroke_thickness": 5.0,
             "cr_stroke": 2151770593,
-            "cr_fill": 1090453504
+            "cr_fill": 4294950912
         },
         {
             "type": 0,
