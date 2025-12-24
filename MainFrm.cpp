@@ -75,7 +75,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // 만들지 못했습니다.
 	}
 
-	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | /*CBRS_SIZE_DYNAMIC |*/ CBRS_TOOLTIPS | CBRS_FLYBY);
+	//CMFCMenuBar::SetMenuShowDelay(0);
+	//CMFCToolBar::EnableQuickCustomization(FALSE);
 
 	// 메뉴 모음을 활성화해도 포커스가 이동하지 않게 합니다.
 	CMFCPopupMenu::SetForceMenuFocus(FALSE);
@@ -212,6 +214,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 창 제목 표시줄에서 문서 이름 및 애플리케이션 이름의 순서를 전환합니다.
 	// 문서 이름이 축소판 그림과 함께 표시되므로 작업 표시줄의 기능성이 개선됩니다.
 	ModifyStyle(0, FWS_PREFIXTITLE);
+
+	//CMFCMenuBar::EnableMenuPersonalization(FALSE);
+	m_wndMenuBar.SetRecentlyUsedMenus(FALSE);
+	m_wndMenuBar.SetShowAllCommands(TRUE);
 
 	return 0;
 }

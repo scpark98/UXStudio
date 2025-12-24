@@ -451,6 +451,14 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	SetCapture();
 
+	if (m_spacebar_down)
+	{
+		m_lbutton_down = true;
+		adjust_scroll_offset(point, true);
+		m_pt_lbutton_down = point;
+		return;
+	}
+
 	//hover인 항목을 클릭하면 편집모드로 전환된다.
 	CPoint pt = point;
 	//adjust_scroll_offset(pt, true);
@@ -574,6 +582,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 
 	//trace(m_handle_index);
 
+	//현재 move or resizing 중일때
 	if (m_is_resizing)
 	{
 		move_or_resize_item(pt);
@@ -582,10 +591,13 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 	else if (m_lbutton_down)
 	{
+		//spacebar + lbutton으로 스크롤 중
 		if (m_spacebar_down)
 		{
 			SetScrollPos(SB_HORZ, m_pt_lbutton_down.x - point.x);
 			SetScrollPos(SB_VERT, m_pt_lbutton_down.y - point.y);
+			Invalidate();
+			return;
 		}
 		else
 		{
@@ -593,7 +605,8 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		Invalidate();
 	}
-	else
+	//lbutton down도 아니고 spacebar down도 아니라면 hover item...
+	else if (!m_spacebar_down)
 	{
 		CSCUIElement* hover = get_hover_item(pt);
 
@@ -1187,7 +1200,7 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
 	//팝업메뉴가 표시중이거나 편집중이거나 선택항목이 없다면 커서의 변경은 없다.
-	if (m_is_context_menu_displaying || m_selected_items.size() == 0 || m_in_editing)
+	if (m_is_context_menu_displaying || m_selected_items.size() == 0 || m_in_editing || m_spacebar_down)
 		return CFormView::OnSetCursor(pWnd, nHitTest, message);
 
 	CPoint pt;
