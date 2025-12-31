@@ -127,7 +127,6 @@
 #define IDC_STATIC_FONT_SIZE            1032
 #define IDC_STATIC_FONT                 1033
 #define IDC_CHECK_FONT_BOLD             1034
-#define IDC_STATIC_FONT_SIZE2           1034
 #define IDC_STATIC_FONT_WEIGHT          1034
 #define IDC_CHECK_FONT_ITALIC           1035
 #define IDC_STATIC_FONT_COLOR           1036
@@ -143,6 +142,8 @@
 #define IDC_RADIO_VALIGN_BOTTOM         1044
 #define IDC_STATIC_CANVAS_COLOR         1045
 #define IDC_STATIC_GRID_COLOR           1046
+#define IDC_STATIC_IMG_PATH             1047
+#define IDC_STATIC_IMAGE_PATH           1047
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
 #define ID_MENU_VIEW_SEND_TO_BACK       32773

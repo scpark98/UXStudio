@@ -22,7 +22,7 @@ public:
 public:
 	void				set_cursor_info(CPoint pt);
 	CPropertyDlg		m_propertyDlg;
-	void				set_property(std::deque<CSCUIElement*>* items, int item_index);
+	void				update_property(std::deque<CSCUIElement*>* items, int item_index);
 
 
 // 재정의입니다.

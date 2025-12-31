@@ -26,7 +26,7 @@ public:
 	void				set_canvas_property(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	std::deque<CSCUIElement*>* m_cur_items = NULL;
-	void				set_property(std::deque<CSCUIElement*>* items);
+	void				update_property(std::deque<CSCUIElement*>* items);
 
 	LRESULT				on_message_CSCStatic(WPARAM wParam, LPARAM lParam);
 
@@ -227,4 +227,5 @@ public:
 	CGdiButton m_radio_valign_bottom;
 	CSCStatic m_static_canvas_color;
 	CSCStatic m_static_grid_color;
+	CSCStatic m_static_image_path;
 };

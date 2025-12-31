@@ -76,7 +76,7 @@ protected: // serialization에서만 만들어집니다.
 	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	CSCUIElement*					m_item_hover = NULL;
-	CSCUIElement*					m_item_current = NULL;
+	//CSCUIElement*					m_item_current = NULL;
 	std::deque<CSCUIElement*>		m_item_copy_src;
 
 //멀티 선택
@@ -270,7 +270,7 @@ protected:
 
 	//항목이 변경되면 undo에 기록하고 속성창에도 이를 반영한다.
 	//단 mouse 액션은 너무 빈번하게 발생되므로 timer를 적용하여 반영한다.
-	void			set_property(bool doc_modified = true);
+	void			update_property(bool doc_modified = true);
 
 	std::vector<std::deque<CSCUIElement*>*> m_undo;
 	std::vector<std::deque<CSCUIElement*>*>::iterator m_undo_iter;
@@ -316,6 +316,7 @@ public:
 	afx_msg void OnMenuViewShowCoord();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnMenuViewSort();
+	afx_msg void OnDropFiles(HDROP hDropInfo);
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

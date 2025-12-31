@@ -146,6 +146,10 @@ void CUXStudioDoc::release_data()
 {
 	for (int i = 0; i < m_data.size(); i++)
 	{
+		//if (m_data[i]->m_image)
+		//{
+		//	delete m_data[i]->m_image;
+		//}
 		delete m_data[i];
 	}
 
@@ -203,8 +207,7 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_round[3] = round[3].GetFloat();
 
 		el->m_text = json.get_array_member("items", i, "label", CString());
-		//TRACE(_T("%s\n"), CString(json.get_array_member("items", i, "label", std::string("")).c_str()));
-		//TRACE(_T("%S\n"), json.get_array_member("items", i, "label", ""));
+		el->m_image_path = json.get_array_member("items", i, "image_path", CString());
 		el->m_text_align = json.get_array_member("items", i, "label_align", (int)DWRITE_TEXT_ALIGNMENT_CENTER);
 		el->m_text_valign = json.get_array_member("items", i, "label_valign", (int)DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		el->m_text_visible = json.get_array_member("items", i, "label_visible", true);
@@ -275,6 +278,9 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		//CT2CA(m_data[i]->m_text)을 직접 파라미터로 넘기면 컴파일 에러가 발생한다.
 		std::string sstr = CT2CA(m_data[i]->m_text);
 		item.AddMember(rapidjson::Value("label", allocator).Move(), sstr, allocator);
+		sstr = CT2CA(m_data[i]->m_image_path);
+		item.AddMember(rapidjson::Value("image_path", allocator).Move(), sstr, allocator);
+
 		item.AddMember(rapidjson::Value("label_align", allocator).Move(), m_data[i]->m_text_align, allocator);
 		item.AddMember(rapidjson::Value("label_valign", allocator).Move(), m_data[i]->m_text_valign, allocator);
 		item.AddMember(rapidjson::Value("label_visible", allocator).Move(), m_data[i]->m_text_visible, allocator);

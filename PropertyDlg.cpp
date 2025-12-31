@@ -69,6 +69,7 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_TEXT_ALIGN, m_static_text_align);
 	DDX_Control(pDX, IDC_STATIC_CANVAS_COLOR, m_static_canvas_color);
 	DDX_Control(pDX, IDC_STATIC_GRID_COLOR, m_static_grid_color);
+	DDX_Control(pDX, IDC_STATIC_IMAGE_PATH, m_static_image_path);
 }
 
 
@@ -151,6 +152,7 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_GRID_COLOR, 50, 0, 50, 0);
 
 	m_resize.Add(IDC_STATIC_LABEL, 0, 0, 100, 0);
+	m_resize.Add(IDC_STATIC_IMAGE_PATH, 0, 0, 100, 0);
 	m_resize.Add(IDC_STATIC_X1, 0, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_Y1, 25, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_X2, 50, 0, 25, 0);
@@ -202,6 +204,7 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size_cx.copy_properties(m_static_grid_size_cy);
 
 	m_static_canvas_size_cx.copy_properties(m_static_label);
+	m_static_canvas_size_cx.copy_properties(m_static_image_path);
 
 	m_static_canvas_size_cx.copy_properties(m_static_x1);
 	m_static_canvas_size_cx.copy_properties(m_static_y1);
@@ -332,8 +335,8 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		if (!m_cur_items || m_cur_items->size() == 0)
 			return 0;
 
-		if (msg->sValue.IsEmpty())
-			return 0;
+		//if (msg->sValue.IsEmpty())
+		//	return 0;
 
 		if (msg->pThis == &m_static_label)
 		{
@@ -420,7 +423,7 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
+void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 {
 	m_cur_items = items;
 
@@ -447,6 +450,9 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 	{
 		if (!el.m_text.IsEmpty() && el.m_text != items->at(i)->m_text)
 			el.m_text = _T("");
+
+		if (!el.m_image_path.IsEmpty() && el.m_image_path != items->at(i)->m_image_path)
+			el.m_image_path = _T("");
 
 		//다른 항목들과는 달리 m_r의 X, Y, Width, Height는 서로 영향이 있기 때문에 el의 값을 직접 변경하지 않고 copied를 이용해야 한다.
 		//ex. Width를 비교할 때 X가 이미 FLT_MAX값으로 변경됐다면 올바른 Width값이 아니게 된다.
@@ -497,6 +503,7 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 
 		//items deque 목록에 있는 각 m_text를 검사하여 모두 동일한 값이면 해당값을 사용하고 동일하지 않으면 해당 항목을 "" 처리한다.
 		m_static_label.set_text_value(el.m_text);
+		m_static_image_path.set_text_value(el.m_image_path);
 
 		m_static_x1.set_text_value(el.m_r.X == FLT_MAX ? _T("") : d2S(el.m_r.X, false, 1));
 		m_static_y1.set_text_value(el.m_r.Y == FLT_MAX ? _T("") : d2S(el.m_r.Y, false, 1));
@@ -536,7 +543,7 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 			break;
 		}
 
-		//"color picker"일 때 현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
+		//"_color picker_"일 때 현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
 		//그런데 만약 red 컬러인데 alpha값이 0일 경우, 투명하게 그려지게 되므로 문제가 된다.
 		//a를 255로 강제 세팅해서 그려줘야 한다.
 		Gdiplus::Color cr;
@@ -576,6 +583,7 @@ void CPropertyDlg::set_property(std::deque<CSCUIElement*>* items)
 	else
 	{
 		m_static_label.set_text_value();
+		m_static_image_path.set_text_value();
 
 		m_static_x1.set_text_value();
 		m_static_y1.set_text_value();

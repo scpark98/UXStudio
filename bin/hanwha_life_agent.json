@@ -1,6 +1,6 @@
 {
     "canvas_cx": 1920,
-    "canvas_cy": 1920,
+    "canvas_cy": 1080,
     "cr_canvas": 4294967295,
     "grid_cx": 8,
     "grid_cy": 8,
@@ -10,59 +10,271 @@
             "type": 0,
             "selected": false,
             "r": [
-                347.0,
-                545.0,
-                128.0,
-                119.0
+                10.0,
+                0.0,
+                662.0,
+                1064.0
             ],
             "round": [
-                20.0,
-                25.0,
-                50.0,
-                20.0
+                0.0,
+                0.0,
+                0.0,
+                0.0
             ],
-            "label": "한글",
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Customer_Desk_BG.bmp",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
             "cr_text": 4278190080,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 10,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 1.0,
+            "cr_stroke": 4282477025,
+            "cr_fill": 4286611584
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                517.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Arrow_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
             "cr_back": 16777215,
             "font_name": "나눔스퀘어 Bold",
             "font_size": 30,
             "font_weight": 700,
             "font_italic": false,
             "stroke_thickness": 5.0,
-            "cr_stroke": 4294901760,
-            "cr_fill": 4294950912
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
         },
         {
             "type": 0,
             "selected": false,
             "r": [
-                252.0,
-                410.0,
-                146.0,
-                88.0
+                722.0,
+                457.0,
+                60.0,
+                60.0
             ],
             "round": [
-                20.0,
                 0.0,
                 0.0,
-                20.0
+                0.0,
+                0.0
             ],
-            "label": "한글",
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Laser_Normal.png",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
-            "cr_text": 4278190080,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 30,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 5.0,
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                397.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Trash_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 30,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 5.0,
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                337.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Color_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 30,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 5.0,
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                277.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Rectangle_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 30,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 5.0,
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                217.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Circle_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 30,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 5.0,
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                157.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_FreeHand_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
+            "cr_back": 16777215,
+            "font_name": "나눔스퀘어 Bold",
+            "font_size": 30,
+            "font_weight": 700,
+            "font_italic": false,
+            "stroke_thickness": 5.0,
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
+        },
+        {
+            "type": 0,
+            "selected": false,
+            "r": [
+                722.0,
+                97.0,
+                60.0,
+                60.0
+            ],
+            "round": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "label": "",
+            "image_path": "D:\\1.Projects_C++\\hanwha_life\\livewebagentnew\\LiveWebAgent\\res\\Hanwha\\Images\\Tool_Line_Normal.png",
+            "label_align": 2,
+            "label_valign": 2,
+            "label_visible": true,
+            "cr_text": 4294967295,
             "cr_back": 16777215,
             "font_name": "나눔스퀘어 Bold",
             "font_size": 30,
             "font_weight": 700,
             "font_italic": true,
             "stroke_thickness": 5.0,
-            "cr_stroke": 2151770593,
-            "cr_fill": 4294950912
+            "cr_stroke": 4286945,
+            "cr_fill": 16760832
         },
         {
             "type": 0,
@@ -80,6 +292,7 @@
                 0.0
             ],
             "label": "고객데스크",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -109,6 +322,7 @@
                 16.0
             ],
             "label": "원격재연결",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -126,9 +340,9 @@
             "type": 0,
             "selected": false,
             "r": [
-                864.0,
+                828.0,
                 129.0,
-                688.0,
+                724.0,
                 391.0
             ],
             "round": [
@@ -138,6 +352,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -167,6 +382,7 @@
                 4.0
             ],
             "label": "전송",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -196,6 +412,7 @@
                 4.0
             ],
             "label": "  대 카테고리",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -225,6 +442,7 @@
                 4.0
             ],
             "label": "  중 카테고리",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -254,6 +472,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -283,6 +502,7 @@
                 0.0
             ],
             "label": "근무인원",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -312,6 +532,7 @@
                 0.0
             ],
             "label": "13",
+            "image_path": "",
             "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
@@ -341,6 +562,7 @@
                 0.0
             ],
             "label": "상담대기자",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -370,6 +592,7 @@
                 0.0
             ],
             "label": "24",
+            "image_path": "",
             "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
@@ -399,6 +622,7 @@
                 0.0
             ],
             "label": "상담중",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -428,6 +652,7 @@
                 0.0
             ],
             "label": "36",
+            "image_path": "",
             "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
@@ -457,6 +682,7 @@
                 5.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -486,6 +712,7 @@
                 0.0
             ],
             "label": "(디지택트 정보)",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -515,6 +742,7 @@
                 0.0
             ],
             "label": "상담시간",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -544,6 +772,7 @@
                 0.0
             ],
             "label": "00:00:00",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -573,6 +802,7 @@
                 14.0
             ],
             "label": "대기",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -602,6 +832,7 @@
                 14.0
             ],
             "label": "후처리",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -631,6 +862,7 @@
                 14.0
             ],
             "label": "식사",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -660,6 +892,7 @@
                 14.0
             ],
             "label": "교육",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -689,6 +922,7 @@
                 0.0
             ],
             "label": "내화면공유",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -718,6 +952,7 @@
                 0.0
             ],
             "label": "상담종료",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -747,6 +982,7 @@
                 0.0
             ],
             "label": "로그아웃",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -776,6 +1012,7 @@
                 0.0
             ],
             "label": "X",
+            "image_path": "",
             "label_align": 37,
             "label_valign": 2,
             "label_visible": true,
@@ -805,6 +1042,7 @@
                 0.0
             ],
             "label": "운영 모드",
+            "image_path": "",
             "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
@@ -834,6 +1072,7 @@
                 0.0
             ],
             "label": "최고 관리자(test1)",
+            "image_path": "",
             "label_align": 1,
             "label_valign": 2,
             "label_visible": true,
@@ -863,6 +1102,7 @@
                 0.0
             ],
             "label": "신분증 스캔",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -892,6 +1132,7 @@
                 0.0
             ],
             "label": "문서 스캔",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -921,6 +1162,7 @@
                 0.0
             ],
             "label": "인감 스캔",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -950,6 +1192,7 @@
                 14.0
             ],
             "label": "시작",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -979,6 +1222,7 @@
                 14.0
             ],
             "label": "종료",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1008,6 +1252,7 @@
                 14.0
             ],
             "label": "Reset",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1037,6 +1282,7 @@
                 14.0
             ],
             "label": "시작",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1066,6 +1312,7 @@
                 14.0
             ],
             "label": "종료",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1095,6 +1342,7 @@
                 14.0
             ],
             "label": "Reset",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1124,6 +1372,7 @@
                 14.0
             ],
             "label": "시작",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1153,6 +1402,7 @@
                 14.0
             ],
             "label": "종료",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1182,6 +1432,7 @@
                 14.0
             ],
             "label": "Reset",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1211,6 +1462,7 @@
                 14.0
             ],
             "label": "새로고침",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1240,6 +1492,7 @@
                 14.0
             ],
             "label": "화면 OFF",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1269,6 +1522,7 @@
                 14.0
             ],
             "label": "주/부 전환",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1286,9 +1540,9 @@
             "type": 0,
             "selected": false,
             "r": [
-                864.0,
+                828.0,
                 1016.0,
-                584.0,
+                620.0,
                 48.0
             ],
             "round": [
@@ -1298,13 +1552,14 @@
                 24.0
             ],
             "label": "    마음으로 듣고 미소로 말하겠습니다. 무엇을 도와드릴까요?",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
             "cr_text": 4290032820,
             "cr_back": 16777215,
             "font_name": "나눔스퀘어 Bold",
-            "font_size": 16,
+            "font_size": 18,
             "font_weight": 700,
             "font_italic": false,
             "stroke_thickness": 1.0,
@@ -1327,6 +1582,7 @@
                 24.0
             ],
             "label": "전송",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1356,6 +1612,7 @@
                 14.0
             ],
             "label": "전자문서 닫기",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1385,6 +1642,7 @@
                 14.0
             ],
             "label": "기간계연동 Reset",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1414,6 +1672,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -1443,6 +1702,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1472,6 +1732,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1501,6 +1762,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1530,6 +1792,7 @@
                 0.0
             ],
             "label": "디바이스",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -1559,6 +1822,7 @@
                 0.0
             ],
             "label": "상담유형",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -1588,6 +1852,7 @@
                 0.0
             ],
             "label": "My문구",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -1605,7 +1870,7 @@
             "type": 0,
             "selected": false,
             "r": [
-                864.0,
+                828.0,
                 97.0,
                 160.0,
                 23.0
@@ -1617,6 +1882,7 @@
                 0.0
             ],
             "label": "데스크 촬영 영상",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -1634,7 +1900,7 @@
             "type": 0,
             "selected": false,
             "r": [
-                864.0,
+                828.0,
                 571.0,
                 160.0,
                 28.0
@@ -1646,6 +1912,7 @@
                 0.0
             ],
             "label": "고객화상 PC",
+            "image_path": "",
             "label_align": 0,
             "label_valign": 2,
             "label_visible": true,
@@ -1663,9 +1930,9 @@
             "type": 0,
             "selected": false,
             "r": [
-                864.0,
+                828.0,
                 609.0,
-                688.0,
+                724.0,
                 386.0
             ],
             "round": [
@@ -1675,6 +1942,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,
@@ -1704,6 +1972,7 @@
                 0.0
             ],
             "label": "",
+            "image_path": "",
             "label_align": 2,
             "label_valign": 2,
             "label_visible": true,

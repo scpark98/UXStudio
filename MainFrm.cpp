@@ -493,7 +493,7 @@ void CMainFrame::set_cursor_info(CPoint pt)
 	m_wndStatusBar.SetPaneText(2, str);
 }
 
-void CMainFrame::set_property(std::deque<CSCUIElement*>* items, int item_index)
+void CMainFrame::update_property(std::deque<CSCUIElement*>* items, int item_index)
 {
 	CString str;
 
@@ -515,5 +515,5 @@ void CMainFrame::set_property(std::deque<CSCUIElement*>* items, int item_index)
 	m_wndStatusBar.SetPaneInfo(1, ID_SEPARATOR, SBPS_NORMAL, dc.GetTextExtent(str).cx);
 	dc.SelectObject(pOldFont);
 
-	m_propertyDlg.set_property(items);
+	m_propertyDlg.update_property(items);
 }

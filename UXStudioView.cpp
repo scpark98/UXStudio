@@ -56,6 +56,7 @@ ON_COMMAND(ID_EDIT_UNDO, &CUXStudioView::OnEditUndo)
 ON_COMMAND(ID_MENU_VIEW_SHOW_COORD, &CUXStudioView::OnMenuViewShowCoord)
 ON_WM_TIMER()
 ON_COMMAND(ID_MENU_VIEW_SORT, &CUXStudioView::OnMenuViewSort)
+ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -77,7 +78,14 @@ CUXStudioView::~CUXStudioView()
 		std::deque<CSCUIElement*>* data = m_undo[i];
 
 		for (int j = 0; j < data->size(); j++)
+		{
+			//if (data->at(j)->m_image)
+			//{
+			//	delete data->at(j)->m_image;
+			//}
+
 			delete data->at(j);
+		}
 
 		delete data;
 	}
@@ -101,48 +109,7 @@ void CUXStudioView::OnInitialUpdate()
 	ResizeParentToFit();
 
 	pDoc = GetDocument();
-
-	m_d2dc.init(m_hWnd);
-
-	HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_WriteFactory));
-	if (SUCCEEDED(hr))
-	{
-		m_WriteFactory->CreateTextFormat(_T("맑은 고딕"), nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 8.0f, _T("ko-kr"), &m_WriteFormat);
-		m_WriteFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-		m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-	}
-
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(get_d2color(pDoc->m_cr_canvas), m_br_canvas.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(get_d2color(pDoc->m_cr_grid), m_br_grid.GetAddressOf());
-
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_draw.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_item.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_align_fit.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), m_br_multi_selected.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), m_br_label.GetAddressOf());
-
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_br_index.GetAddressOf());
-	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_index_back.GetAddressOf());
-
-	D2D1_STROKE_STYLE_PROPERTIES strokeStyle =
-		D2D1::StrokeStyleProperties(
-			D2D1_CAP_STYLE_FLAT,  // startCap
-			D2D1_CAP_STYLE_FLAT,  // endCap
-			D2D1_CAP_STYLE_ROUND, // dashCap
-			D2D1_LINE_JOIN_ROUND, // lineJoin
-			1.0f,                // miterLimit
-			D2D1_DASH_STYLE_DASH_DOT, // dashStyle 
-			0.f);
-
-	m_d2dc.get_factory()->CreateStrokeStyle(strokeStyle, NULL, 0, m_stroke_style.GetAddressOf());
-
-	SetScrollSizes(MM_TEXT, pDoc->m_sz_canvas);
-
-	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_canvas_property(1920, 1080, pDoc->m_cr_canvas, pDoc->m_sz_grid.cx, pDoc->m_sz_grid.cy, pDoc->m_cr_grid);
-
-	m_show_element_coord = AfxGetApp()->GetProfileInt(_T("setting"), _T("m_show_element_coord"), false);
+	DragAcceptFiles();
 }
 
 // CUXStudioView 인쇄
@@ -295,14 +262,27 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
-		draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
+		//도형을 그려주고
+		ID2D1PathGeometry* path = draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
+
+		//image path가 있다면 도형 모양으로 이미지를 그려준다.
+		if (el->m_image)
+		{
+			d2dc->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), path), nullptr);
+
+			d2dc->DrawBitmap(el->m_image->get(), rf, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+			d2dc->PopLayer();
+		}
+
 
 		//hover된 항목 highlight
 		if (el == m_item_hover && !el->m_selected)
 			draw_rect(d2dc, rf, Gdiplus::Color::RoyalBlue, Gdiplus::Color::Transparent, 2.0f, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
 
+		//글자색 설정 후
 		m_br_label->SetColor(get_d2color(pDoc->m_data[i]->m_cr_text));
 
+		//텍스트를 출력시킨다.
 		IDWriteTextFormat* wf = NULL;
 		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&wf));
 		m_WriteFactory->CreateTextFormat(pDoc->m_data[i]->m_font_name, nullptr,
@@ -554,7 +534,7 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		Invalidate();
 
-		set_property();
+		update_property();
 		return;
 	}
 	else
@@ -562,7 +542,7 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 		select_all(false);
 		//m_selected_items = NULL;
 		//m_r_selected.Width = 0;
-		set_property();
+		update_property();
 	}
 
 	//새로운 항목을 그리기 시작...
@@ -587,7 +567,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	{
 		move_or_resize_item(pt);
 		//m_pt_lbutton_down = pt;
-		set_property();
+		update_property();
 	}
 	else if (m_lbutton_down)
 	{
@@ -615,9 +595,9 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 			m_item_hover = get_hover_item(pt);
 			//TRACE(_T("hover = %p\n"), m_item_hover);
 
-			CRect rc;
-			GetClientRect(rc);
-			m_d2dc.on_size_changed(rc.Width(), rc.Height());
+			//CRect rc;
+			//GetClientRect(rc);
+			//m_d2dc.on_size_changed(rc.Width(), rc.Height());
 			Invalidate();
 		}
 	}
@@ -643,7 +623,7 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 		for (int i = 0; i < m_selected_items.size(); i++)
 			normalize_rect(m_selected_items[i]->m_r);
 
-		set_property();
+		update_property();
 	}
 
 	if (m_lbutton_down)
@@ -1028,7 +1008,7 @@ void CUXStudioView::move_or_resize_item(int key)
 
 	Invalidate();
 
-	set_property();
+	update_property();
 }
 
 CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
@@ -1190,7 +1170,7 @@ void CUXStudioView::delete_selected_items()
 		}
 	}
 
-	set_property();
+	update_property();
 
 	Invalidate();
 }
@@ -1340,30 +1320,39 @@ std::deque<CSCUIElement*> CUXStudioView::get_selected_items()
 */
 void CUXStudioView::OnMenuViewCopy()
 {
+	m_d2dc.save(_T("d:\\saved.png"));
+
 	m_item_copy_src.clear();
 	m_item_copy_src.assign(m_selected_items.begin(), m_selected_items.end());
 }
 
 void CUXStudioView::OnMenuViewPaste()
 {
-	/*
-	CSCUIElement* new_item = new CSCUIElement();
-	m_item_copy_src->copy(new_item);
+	std::deque<CSCUIElement*> new_selected_items;
 
-	new_item->m_r.Offset(20, 20);
-	//adjust_scroll_offset(new_item->m_r, false);
+	for (int i = 0; i < m_item_copy_src.size(); i++)
+	{
+		CSCUIElement* new_item = new CSCUIElement();
+		m_item_copy_src[i]->copy(new_item);
 
-	//맨 끝에 넣지 않고 현재 선택된 항목의 바로 다음 차례로 넣어준다.
-	auto it = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_selected_items);
-	if (it == pDoc->m_data.end())
-		pDoc->m_data.push_front(new_item);
-	else
-		pDoc->m_data.insert(it, new_item);
+		new_item->m_r.Offset(20, 20);
+		//adjust_scroll_offset(new_item->m_r, false);
 
-	m_selected_items = new_item;
+		//전체 element의 맨 처음에 넣지 않고 맨 마지막에 선택된 항목의 바로 다음 차례로 넣어준다.
+		auto it = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_selected_items.back());
+		if (it == pDoc->m_data.end())
+			pDoc->m_data.push_front(new_item);
+		else
+			pDoc->m_data.insert(it, new_item);
+		//pDoc->m_data.insert(m_selected_items.back(), new_item);
+
+		new_selected_items.push_back(new_item);
+	}
+
+	m_selected_items.clear();
+	m_selected_items.assign(new_selected_items.begin(), new_selected_items.end());
 
 	Invalidate();
-	*/
 }
 
 void CUXStudioView::OnMenuViewLabelEdit()
@@ -1447,7 +1436,7 @@ void CUXStudioView::apply_canvas_property_changed(int canvas_cx, int canvas_cy, 
 void CUXStudioView::OnMenuViewDelete()
 {
 	delete_selected_items();
-	set_property();
+	update_property();
 }
 
 //m_data의 사본을 만들고 m_undo에 push한다.
@@ -1512,8 +1501,62 @@ void CUXStudioView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pH
 	if (!pDoc)
 		return;
 
+	SetScrollSizes(MM_TEXT, pDoc->m_sz_canvas);
+
+	m_d2dc.init(m_hWnd, pDoc->m_sz_canvas.cx, pDoc->m_sz_canvas.cy);
+
+	HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_WriteFactory));
+	if (SUCCEEDED(hr))
+	{
+		m_WriteFactory->CreateTextFormat(_T("맑은 고딕"), nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 8.0f, _T("ko-kr"), &m_WriteFormat);
+		m_WriteFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+		m_WriteFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	}
+
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(get_d2color(pDoc->m_cr_canvas), m_br_canvas.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(get_d2color(pDoc->m_cr_grid), m_br_grid.GetAddressOf());
+
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_draw.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_item.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_align_fit.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_hover.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::RoyalBlue), m_br_selected.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), m_br_multi_selected.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), m_br_label.GetAddressOf());
+
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_br_index.GetAddressOf());
+	m_d2dc.get_d2dc()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_br_index_back.GetAddressOf());
+
+	D2D1_STROKE_STYLE_PROPERTIES strokeStyle =
+		D2D1::StrokeStyleProperties(
+			D2D1_CAP_STYLE_FLAT,  // startCap
+			D2D1_CAP_STYLE_FLAT,  // endCap
+			D2D1_CAP_STYLE_ROUND, // dashCap
+			D2D1_LINE_JOIN_ROUND, // lineJoin
+			1.0f,                // miterLimit
+			D2D1_DASH_STYLE_DASH_DOT, // dashStyle 
+			0.f);
+
+	m_d2dc.get_factory()->CreateStrokeStyle(strokeStyle, NULL, 0, m_stroke_style.GetAddressOf());
+
+	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_propertyDlg.set_canvas_property(1920, 1080, pDoc->m_cr_canvas, pDoc->m_sz_grid.cx, pDoc->m_sz_grid.cy, pDoc->m_cr_grid);
+
+	m_show_element_coord = AfxGetApp()->GetProfileInt(_T("setting"), _T("m_show_element_coord"), false);
+
+	//맨 처음 data를 로딩한 후 image path가 유효한 element들에 대해 이미지를 로딩한다.
+	for (int i = 0; i < pDoc->m_data.size(); i++)
+	{
+		pDoc->m_data[i]->load_image(m_d2dc.get_WICFactory(), m_d2dc.get_d2dc());
+		//if ((pDoc->m_data[i]->m_image_path.IsEmpty() == false) && PathFileExists(pDoc->m_data[i]->m_image_path))
+		//{
+
+		//	pDoc->m_data[i]->m_image = new CSCD2Image;
+		//	pDoc->m_data[i]->m_image->load(m_d2dc.get_WICFactory(), m_d2dc.get_d2dc(), pDoc->m_data[i]->m_image_path);
+		//}
+	}
+
 	push_undo();
-	set_property(false);
+	update_property(false);
 }
 
 void CUXStudioView::OnMenuViewShowCoord()
@@ -1556,7 +1599,7 @@ CSCUIElement* CUXStudioView::get_last_selected_item()
 
 //항목이 변경되면 undo에 기록하고 속성창에도 이를 반영한다.
 //단 mouse 액션일 경우는 너무 빈번하게 발생되므로 timer를 적용하여 반영한다.
-void CUXStudioView::set_property(bool doc_modified)
+void CUXStudioView::update_property(bool doc_modified)
 {
 	//개발단계에서는 임시 주석처리.
 	//if (doc_modified)
@@ -1577,7 +1620,7 @@ void CUXStudioView::OnTimer(UINT_PTR nIDEvent)
 		if (m_selected_items.size())
 			index = get_index(m_selected_items.back());
 
-		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_property(&m_selected_items, index);
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->update_property(&m_selected_items, index);
 	}
 
 	CFormView::OnTimer(nIDEvent);
@@ -1634,4 +1677,43 @@ void CUXStudioView::OnMenuViewSort()
 
 	Invalidate();
 	push_undo();
+}
+
+void CUXStudioView::OnDropFiles(HDROP hDropInfo)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	//이미지를 element에 drop하면 이미지 경로를 저장시킨다.
+	TCHAR sfile[MAX_PATH] = { 0, };
+	CPoint pt;
+
+	DragQueryFile(hDropInfo, 0, sfile, MAX_PATH);
+	DragQueryPoint(hDropInfo, &pt);
+
+	if (get_filetype_from_filename(sfile) != FILE_TYPE_IMAGE)
+		return;
+	
+	//drop된 element를 찾는다.
+	adjust_scroll_offset(pt, false);
+
+	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
+		[&](const auto& el)
+		{
+			Gdiplus::RectF r = el->m_r;
+			if (pt_in_rect(r, pt))
+			{
+				return el;
+			}
+		});
+
+	if (res == pDoc->m_data.end())
+		return;
+
+	(*res)->m_image_path = sfile;
+	(*res)->load_image(m_d2dc.get_WICFactory(), m_d2dc.get_d2dc());
+
+	m_selected_items.clear();
+	m_selected_items.push_back(*res);
+	update_property();
+
+	CFormView::OnDropFiles(hDropInfo);
 }
