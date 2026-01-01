@@ -283,6 +283,8 @@ protected:
 	//선택된 항목들 중 맨 마지막 인덱스의 항목을 리턴한다.
 	CSCUIElement*	get_last_selected_item();
 
+	float			m_zoom = 1.0f;
+
 // 생성된 메시지 맵 함수
 protected:
 	afx_msg void OnFilePrintPreview();
@@ -317,6 +319,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnMenuViewSort();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

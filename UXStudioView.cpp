@@ -57,6 +57,7 @@ ON_COMMAND(ID_MENU_VIEW_SHOW_COORD, &CUXStudioView::OnMenuViewShowCoord)
 ON_WM_TIMER()
 ON_COMMAND(ID_MENU_VIEW_SORT, &CUXStudioView::OnMenuViewSort)
 ON_WM_DROPFILES()
+ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -219,11 +220,17 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	//TRACE(_T("size = %.0f x %.0f, vs = %d, hs = %d\n"), sz_dc.width, sz_dc.height, vs, hs);
 
 	d2dc->BeginDraw();
-	d2dc->SetTransform(D2D1::Matrix3x2F::Identity());
+
+	D2D1_POINT_2F offset = D2D1::Point2F(0.0f, 0.0f);
+	auto transform = D2D1::Matrix3x2F::Scale(m_zoom, m_zoom) *
+		D2D1::Matrix3x2F::Translation(offset.x, offset.y);
+	d2dc->SetTransform(transform);
+	//d2dc->SetTransform(D2D1::Matrix3x2F::Identity());
 
 	//배경색으로 칠한 후
 	d2dc->Clear(get_d2color(pDoc->m_cr_canvas));
 
+	//grid dot 표시
 	int ix = pDoc->m_sz_grid.cx;
 	int iy = pDoc->m_sz_grid.cy;
 	int x, y;
@@ -235,7 +242,6 @@ void CUXStudioView::OnDraw(CDC* pDC)
 			d2dc->FillRectangle(D2D1::RectF(x - hs, y - vs, x - hs  + 1, y - vs + 1), m_br_grid.Get());
 		}
 	}
-
 
 	//도형을 그리는 중에는 스크롤 보정된 실제 좌표이므로 그릴때는 역보정하여 화면에 그려줘야 한다.
 	if (m_lbutton_down && !m_spacebar_down && m_pt_lbutton_down.x >= 0 && m_pt_lbutton_down.y >= 0)
@@ -1716,4 +1722,18 @@ void CUXStudioView::OnDropFiles(HDROP hDropInfo)
 	update_property();
 
 	CFormView::OnDropFiles(hDropInfo);
+}
+
+BOOL CUXStudioView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (IsCtrlPressed() || IsShiftPressed())
+	{
+		m_zoom += (zDelta < 0 ? -0.1f : 0.1f);
+		Clamp(m_zoom, 0.1f, 10.0f);
+		SetScrollSizes(MM_TEXT, CSize((float)(pDoc->m_sz_canvas.cx) * m_zoom, (float)(pDoc->m_sz_canvas.cy) * m_zoom));
+		Invalidate();
+	}
+
+	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
 }
