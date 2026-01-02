@@ -212,6 +212,9 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	GetClientRect(rc);
 
 	ID2D1DeviceContext* d2dc = m_d2dc.get_d2dc();
+	if (!d2dc)
+		return;
+
 	D2D1_SIZE_F sz_dc = m_d2dc.get_size();
 
 	int hs = GetScrollPos(SB_HORZ);
@@ -1731,7 +1734,14 @@ BOOL CUXStudioView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	{
 		m_zoom += (zDelta < 0 ? -0.1f : 0.1f);
 		Clamp(m_zoom, 0.1f, 10.0f);
-		SetScrollSizes(MM_TEXT, CSize((float)(pDoc->m_sz_canvas.cx) * m_zoom, (float)(pDoc->m_sz_canvas.cy) * m_zoom));
+		float cx = (float)(pDoc->m_sz_canvas.cx) * m_zoom;
+		float cy = (float)(pDoc->m_sz_canvas.cy) * m_zoom;
+		TRACE(_T("%f, %f, %f\n"), m_zoom, cx, cy);
+		SetScrollSizes(MM_TEXT, CSize(cx, cy));
+		CSize sz;
+		int min, max;
+		GetScrollRange(SB_HORZ, &min, &max);
+		GetScrollRange(SB_VERT, &min, &max);
 		Invalidate();
 	}
 
