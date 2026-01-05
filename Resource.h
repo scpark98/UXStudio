@@ -93,6 +93,7 @@
 #define IDB_TEXT_ALIGN_MIDDLE           317
 #define IDB_TEXT_ALIGN_RIGHT            318
 #define IDB_TEXT_ALIGN_TOP              319
+#define IDD_MOVE_INDEX                  320
 #define IDC_BUTTON1                     1000
 #define IDC_STATIC_X                    1006
 #define IDC_STATIC_X1                   1006
@@ -137,12 +138,17 @@
 #define IDC_RADIO_ALIGN_LEFT            1039
 #define IDC_RADIO_ALIGN_CENTER          1040
 #define IDC_RADIO_ALIGN_RIGHT           1041
+#define IDC_STATIC_DESCRIPTION          1041
 #define IDC_RADIO_VALIGN_TOP            1042
+#define IDC_RADIO_ONLY_CURRENT          1042
 #define IDC_RADIO_VALIGN_CENTER         1043
+#define IDC_EDIT_NEW_INDEX              1043
 #define IDC_RADIO_VALIGN_BOTTOM         1044
+#define IDC_RADIO_INCLUDE_FOLLOWS       1044
 #define IDC_STATIC_CANVAS_COLOR         1045
+#define IDC_EDIT_NEW_INDEX2             1045
+#define IDC_EDIT_END_INDEX              1045
 #define IDC_STATIC_GRID_COLOR           1046
-#define IDC_STATIC_IMG_PATH             1047
 #define IDC_STATIC_IMAGE_PATH           1047
 #define ID_VIEW_32771                   32771
 #define ID_MENU_VIEW_SEND_TO_END        32772
@@ -161,14 +167,16 @@
 #define ID_MENU_VIEW_SHOW_COORD         32785
 #define ID_VIEW_32786                   32786
 #define ID_MENU_VIEW_SORT               32787
+#define ID_VIEW_32788                   32788
+#define ID_MENU_VIEW_MOVE_INDEX         32789
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        320
-#define _APS_NEXT_COMMAND_VALUE         32788
-#define _APS_NEXT_CONTROL_VALUE         1040
+#define _APS_NEXT_RESOURCE_VALUE        322
+#define _APS_NEXT_COMMAND_VALUE         32790
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

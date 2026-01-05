@@ -320,6 +320,7 @@ public:
 	afx_msg void OnMenuViewSort();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnMenuViewMoveIndex();
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

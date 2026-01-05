@@ -16,6 +16,9 @@
 
 #include "Common/Functions.h"
 #include "Common/MemoryDC.h"
+//#include "Common/messagebox/Win32InputBox/Win32InputBox.h"
+
+#include "MoveIndexDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,6 +61,7 @@ ON_WM_TIMER()
 ON_COMMAND(ID_MENU_VIEW_SORT, &CUXStudioView::OnMenuViewSort)
 ON_WM_DROPFILES()
 ON_WM_MOUSEWHEEL()
+ON_COMMAND(ID_MENU_VIEW_MOVE_INDEX, &CUXStudioView::OnMenuViewMoveIndex)
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -261,8 +265,8 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 	m_resize_handle.clear();
 
-	//역순으로 그려줘야 z-order가 유효하다.
-	for (int i = pDoc->m_data.size() - 1; i >= 0; i--)
+	//0번부터 순차적으로 그려준다.
+	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
 		CSCUIElement* el = pDoc->m_data[i];
 		Gdiplus::RectF r = el->m_r;
@@ -661,8 +665,8 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 				return;
 			}
 
-			//가장 최종으로 그려진 항목이 가장 첫번째가 되어야 한다.
-			pDoc->m_data.push_front(new CSCUIElement(r));
+			//가장 마지막에 그려진 항목을 맨 뒤에 추가한다.
+			pDoc->m_data.push_back(new CSCUIElement(r));
 		}
 	}
 
@@ -1251,11 +1255,16 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	return CFormView::OnSetCursor(pWnd, nHitTest, message);
 }
 
+//명령은 "맨 뒤로" 이지만 실제로는 리스트의 맨 처음으로 보내야 제일 바닥에 그려진다.
 void CUXStudioView::OnMenuViewSendToBottom()
 {
 	if (m_selected_items.size() != 1)
 		return;
 
+	int cur_index = find_index(pDoc->m_data, m_selected_items[0]);
+	move_item(pDoc->m_data, cur_index, 0);
+
+	/*
 	//선택된 항목을 맨 뒤에 넣어주고 0 ~ n-1 중에 있던 해당 아이템을 deque에서 제거한다.
 	pDoc->m_data.push_back(m_selected_items[0]);
 	m_selected_items[0] = pDoc->m_data.back();
@@ -1263,6 +1272,7 @@ void CUXStudioView::OnMenuViewSendToBottom()
 
 	CSCUIElement* data = *res;
 	pDoc->m_data.erase(res);
+	*/
 
 	Invalidate();
 }
@@ -1272,12 +1282,12 @@ void CUXStudioView::OnMenuViewSendToBack()
 	if (m_selected_items.size() != 1)
 		return;
 
-	//바로 뒤에 있는 항목과 swap 시킨다. 현재 항목이 맨 끝이라면 아무 동작도 하지 않는다.
+	//바로 앞에 있는 항목과 swap 시킨다. 현재 항목이 맨 앞이라면 아무 동작도 하지 않는다.
 	auto res = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_selected_items[0]);
-	if (res == pDoc->m_data.end() - 1)
+	if (res == pDoc->m_data.begin())
 		return;
 
-	std::iter_swap(res, res + 1);
+	std::iter_swap(res, res - 1);
 
 	Invalidate();
 }
@@ -1287,21 +1297,29 @@ void CUXStudioView::OnMenuViewSendToFore()
 	if (m_selected_items.size() != 1)
 		return;
 
-	//바로 앞에 있는 항목과 swap 시킨다. 현재 항목이 맨 앞이라면 아무 동작도 하지 않는다.
+	//바로 뒤에 있는 항목과 swap 시킨다. 현재 항목이 맨 끝이라면 아무 동작도 하지 않는다.
 	auto res = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_selected_items[0]);
-	if (res == pDoc->m_data.begin())
+	if (res == pDoc->m_data.end() - 1)
 		return;
 
-	std::iter_swap(res - 1, res);
+	std::iter_swap(res + 1, res);
 
 	Invalidate();
 }
 
+//명령은 "맨 앞으로"이지만 실제로는 맨 마지막으로 보내야 맨 마지막에 그려진다.
 void CUXStudioView::OnMenuViewSendToTop()
 {
 	if (m_selected_items.size() != 1)
 		return;
 
+	//0, 1, ... n, n+1, ...end
+	//n번째 항목을 맨 나중으로 보내려면 n+1 ~ end 항목을 n 앞으로 이동시키는 것이 가장 효율이 좋다.
+	//std::rotate()
+
+	int cur_index = find_index(pDoc->m_data, m_selected_items[0]);
+	move_item(pDoc->m_data, cur_index, pDoc->m_data.size() - 1);
+	/*
 	//선택된 항목을 맨 앞에 넣어주고 1 ~ n 중에 있던 해당 아이템을 deque에서 제거한다.
 	pDoc->m_data.push_front(m_selected_items[0]);
 	m_selected_items[0] = *(pDoc->m_data.begin());
@@ -1309,6 +1327,7 @@ void CUXStudioView::OnMenuViewSendToTop()
 
 	CSCUIElement* data = *res;
 	pDoc->m_data.erase(res);
+	*/
 	
 	Invalidate();
 }
@@ -1511,6 +1530,7 @@ void CUXStudioView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pH
 		return;
 
 	SetScrollSizes(MM_TEXT, pDoc->m_sz_canvas);
+	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_zoom_info(m_zoom);
 
 	m_d2dc.init(m_hWnd, pDoc->m_sz_canvas.cx, pDoc->m_sz_canvas.cy);
 
@@ -1733,17 +1753,72 @@ BOOL CUXStudioView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	if (IsCtrlPressed() || IsShiftPressed())
 	{
 		m_zoom += (zDelta < 0 ? -0.1f : 0.1f);
-		Clamp(m_zoom, 0.1f, 10.0f);
+		std::clamp(m_zoom, 0.1f, 10.0f);
 		float cx = (float)(pDoc->m_sz_canvas.cx) * m_zoom;
 		float cy = (float)(pDoc->m_sz_canvas.cy) * m_zoom;
 		TRACE(_T("%f, %f, %f\n"), m_zoom, cx, cy);
 		SetScrollSizes(MM_TEXT, CSize(cx, cy));
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_zoom_info(m_zoom);
+
 		CSize sz;
 		int min, max;
 		GetScrollRange(SB_HORZ, &min, &max);
 		GetScrollRange(SB_VERT, &min, &max);
 		Invalidate();
+		return TRUE;
 	}
 
 	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+void CUXStudioView::OnMenuViewMoveIndex()
+{
+	if (m_selected_items.size() == 0)
+		return;
+
+	int cur_index = get_index(m_selected_items[0]);
+	int end_index = -1;
+	int new_index = -1;
+
+	CMoveIndexDlg dlg;
+	dlg.m_cur_index = cur_index;
+
+	if (dlg.DoModal() == IDCANCEL)
+		return;
+
+	new_index = dlg.m_new_index;
+	end_index = dlg.m_end_index;
+
+	if (new_index <= 0 || new_index >= pDoc->m_data.size() - 1)
+	{
+		CString str;
+		str.Format(_T("1 ~ %d 범위의 값을 입력해야 합니다."), pDoc->m_data.size() - 2);
+		AfxMessageBox(str);
+		return;
+	}
+
+	if (end_index < 0)
+		end_index = cur_index + 1;
+	else
+		end_index++;
+
+	//56번 항목을 36번으로 이동. 두 항목의 위치를 swap하는게 아니라
+	//56번 위치에 있는 항목을 36번 항목의 앞으로 이동시키는 작업이므로
+	//원래 36번 항목 및 그 이후 항목들은 1개씩 밀림.
+	//이럴 경우 vector는 메모리 내에서 연속적으로 저장되기 때문에 단순히 항목을 삽입/삭제하면 그 위치 뒤의 모든 요소가 이동해야 하므로 비효율적이므로
+	//std::rotate()을 이용하는 것이 효율적이다.
+
+	//이동시키려는 항목의 현재 위치 (56)
+	auto cur_it = pDoc->m_data.begin() + cur_index;
+
+	//이동시키려는 항목 바로 다음 위치 (57)
+	auto middle_it = pDoc->m_data.begin() + end_index;
+
+	//이동하려는 대상 위치 (36)
+	auto target_it = pDoc->m_data.begin() + new_index;
+
+	//(36, 56, 57)
+	std::rotate(target_it, cur_it, middle_it);
+
+	Invalidate();
 }

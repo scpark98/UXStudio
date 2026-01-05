@@ -300,11 +300,11 @@ void CPropertyDlg::set_canvas_property(int canvas_cx, int canvas_cy, Gdiplus::Co
 {
 	m_static_canvas_size_cx.set_text_value(i2S(canvas_cx));
 	m_static_canvas_size_cy.set_text_value(i2S(canvas_cy));
-	m_static_canvas_color.set_text_value(get_RGB_str(cr_canvas));
+	m_static_canvas_color.set_text_value(get_color_str(cr_canvas, false));
 
 	m_static_grid_size_cx.set_text_value(i2S(grid_cx));
 	m_static_grid_size_cy.set_text_value(i2S(grid_cy));
-	m_static_grid_color.set_text_value(get_RGB_str(cr_grid));
+	m_static_grid_color.set_text_value(get_color_str(cr_grid, false));
 }
 
 LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
@@ -552,7 +552,7 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 		cr = (el.m_cr_fill.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_fill);
 		set_color(cr, 0, 255);
 		m_static_fill_color.set_text_color(cr);
-		str = get_RGB_str(cr);
+		str = get_color_str(cr, false);
 		m_static_fill_color.set_text_value(str);
 		m_static_fill_opacity.set_text_value(i2S(el.m_cr_fill.GetA()));
 
@@ -560,7 +560,7 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 		cr = (el.m_cr_stroke.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_stroke);
 		set_color(cr, 0, 255);
 		m_static_stroke_color.set_text_color(cr);
-		str = get_RGB_str(cr);
+		str = get_color_str(cr, false);
 		m_static_stroke_color.set_text_value(str);
 		m_static_stroke_opacity.set_text_value(i2S(el.m_cr_stroke.GetA()));
 		m_static_stroke_thickness.set_text_value(i2S(el.m_stroke_thickness));
@@ -569,7 +569,7 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 		cr = (el.m_cr_text.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_text);
 		set_color(cr, 0, 255);
 		m_static_text_color.set_text_color(cr);
-		str = get_RGB_str(cr);
+		str = get_color_str(cr, false);
 		m_static_text_color.set_text_value(str);
 		m_static_text_opacity.set_text_value(i2S(el.m_cr_text.GetA()));
 

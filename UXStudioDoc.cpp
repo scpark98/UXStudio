@@ -236,6 +236,50 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (get_part(lpszPathName, fn_ext).MakeLower() == _T("json"))
+		save_as_json(lpszPathName);
+	else if (get_part(lpszPathName, fn_ext).MakeLower() == _T("txt"))
+		save_as_txt(lpszPathName);
+	else
+		AfxMessageBox(_T("not yet supported format. only json or txt available."));
+
+	return TRUE;
+}
+
+//txt 파일로 저장하되 구분자는 '|' 기호를 사용한다.
+void CUXStudioDoc::save_as_txt(CString filepath)
+{
+	FILE* fp = NULL;
+	_tfopen_s(&fp, filepath, _T("wt")CHARSET);
+
+	_ftprintf(fp, _T("canvas size : %d, %d\n"), m_sz_canvas.cx, m_sz_canvas.cy);
+	_ftprintf(fp, _T("cr_canvas : %u (%s)\n"), (UINT)m_cr_canvas.GetValue(), get_color_str(m_cr_canvas));
+
+	_ftprintf(fp, _T("grid size : %d, %d\n"), m_sz_grid.cx, m_sz_grid.cy);
+	_ftprintf(fp, _T("cr_grid : %u (%s)\n\n"), (UINT)m_cr_grid.GetValue(), get_color_str(m_cr_grid));
+
+	_ftprintf(fp, _T("index|type|selected|x1|y1|x2|y2|width|height|round0|round1|round2|round3|")
+				  _T("label|image_path|label_align|label_valign|label_visible|cr_text|cr_text_argb|cr_back|cr_back_argb|")
+				  _T("font_name|font_size|font_weight|font_italic|stroke_thickness|cr_stroke|cr_stroke_argb|cr_fill|cr_fill_argb\n"));
+
+	for (int i = 0; i < m_data.size(); i++)
+	{
+		_ftprintf(fp, _T("%d|%d|%d|%.0f|%0.f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|"),
+			i, m_data[i]->m_type, m_data[i]->m_selected, m_data[i]->m_r.X, m_data[i]->m_r.Y, m_data[i]->m_r.GetRight(), m_data[i]->m_r.GetBottom(),
+			m_data[i]->m_r.Width, m_data[i]->m_r.Height, m_data[i]->m_round[0], m_data[i]->m_round[1], m_data[i]->m_round[2], m_data[i]->m_round[3]);
+		_ftprintf(fp, _T("%s|%s|%d|%d|%d|%u|%s|%u|%s|"),
+			m_data[i]->m_text, m_data[i]->m_image_path, m_data[i]->m_text_align, m_data[i]->m_text_valign, m_data[i]->m_text_visible,
+			m_data[i]->m_cr_text, get_color_str(m_data[i]->m_cr_text), m_data[i]->m_cr_back, get_color_str(m_data[i]->m_cr_back));
+		_ftprintf(fp, _T("%s|%d|%d|%d|%.1f|%u|%s|%u|%s\n"),
+			m_data[i]->m_font_name, m_data[i]->m_font_size, m_data[i]->m_font_weight, m_data[i]->m_font_italic, m_data[i]->m_stroke_thickness,
+			m_data[i]->m_cr_stroke, get_color_str(m_data[i]->m_cr_stroke), m_data[i]->m_cr_fill, get_color_str(m_data[i]->m_cr_fill));
+	}
+
+	fclose(fp);
+}
+
+void CUXStudioDoc::save_as_json(CString filepath)
+{
 	Json json;
 	rapidjson::Document::AllocatorType& allocator = json.doc.GetAllocator();
 
@@ -249,7 +293,7 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 
 	rapidjson::Value items(rapidjson::kArrayType);
 
-	m_filepath = lpszPathName;
+	m_filepath = filepath;
 
 	for (int i = 0; i < m_data.size(); i++)
 	{
@@ -307,8 +351,8 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	json.save(m_filepath);
 	AfxGetApp()->WriteProfileString(_T("setting"), _T("recent file"), m_filepath);
 
-	return TRUE;
-	return CDocument::OnSaveDocument(lpszPathName);
+	return;// TRUE;
+	//return CDocument::OnSaveDocument(lpszPathName);
 }
 
 void CUXStudioDoc::OnFileSave()
@@ -336,5 +380,6 @@ void CUXStudioDoc::OnFileSaveAs()
 	m_filepath = dlg.GetPathName();
 	OnSaveDocument(m_filepath);
 
-	SetPathName(m_filepath);
+	if (get_part(m_filepath, fn_ext).MakeLower() == _T("json"))
+		SetPathName(m_filepath);
 }

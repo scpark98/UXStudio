@@ -21,6 +21,8 @@ public:
 // 작업입니다.
 public:
 	void				set_cursor_info(CPoint pt);
+	void				set_zoom_info(float zoom);
+
 	CPropertyDlg		m_propertyDlg;
 	void				update_property(std::deque<CSCUIElement*>* items, int item_index);
 

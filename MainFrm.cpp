@@ -34,9 +34,10 @@ END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
-	ID_SEPARATOR,
-	ID_SEPARATOR,
-	ID_SEPARATOR,
+	ID_SEPARATOR,		//for status
+	ID_SEPARATOR,		//for selected item info
+	ID_SEPARATOR,		//for mouse pos
+	ID_SEPARATOR,		//for zoom ratio
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
@@ -110,6 +111,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 	m_wndStatusBar.SetPaneInfo(1, ID_SEPARATOR, SBPS_NORMAL, 240);
 	m_wndStatusBar.SetPaneInfo(2, ID_SEPARATOR, SBPS_NORMAL, 55);
+	m_wndStatusBar.SetPaneInfo(3, ID_SEPARATOR, SBPS_NORMAL, 55);
 	//m_wndStatusBar.SetPaneTextColor(1, red);
 
 	// TODO: 도구 모음 및 메뉴 모음을 도킹할 수 없게 하려면 이 다섯 줄을 삭제하십시오.
@@ -491,6 +493,14 @@ void CMainFrame::set_cursor_info(CPoint pt)
 
 	str.Format(_T("%d, %d"), pt.x, pt.y);
 	m_wndStatusBar.SetPaneText(2, str);
+}
+
+void CMainFrame::set_zoom_info(float zoom)
+{
+	CString str;
+
+	str.Format(_T("%d%%"), (int)(zoom * 100));
+	m_wndStatusBar.SetPaneText(3, str);
 }
 
 void CMainFrame::update_property(std::deque<CSCUIElement*>* items, int item_index)
