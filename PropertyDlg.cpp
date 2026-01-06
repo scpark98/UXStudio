@@ -505,17 +505,17 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 		m_static_label.set_text_value(el.m_text);
 		m_static_image_path.set_text_value(el.m_image_path);
 
-		m_static_x1.set_text_value(el.m_r.X == FLT_MAX ? _T("") : d2S(el.m_r.X, false, 1));
-		m_static_y1.set_text_value(el.m_r.Y == FLT_MAX ? _T("") : d2S(el.m_r.Y, false, 1));
-		m_static_x2.set_text_value((el.m_r.X == FLT_MAX || el.m_r.Width == FLT_MAX) ? _T("") : d2S(el.m_r.X + el.m_r.Width, false, 1));
-		m_static_y2.set_text_value((el.m_r.Y == FLT_MAX || el.m_r.Height == FLT_MAX) ? _T("") : d2S(el.m_r.Y + el.m_r.Height, false, 1));
-		m_static_w.set_text_value(el.m_r.Width == FLT_MAX ? _T("") : d2S(el.m_r.Width, false, 1));
-		m_static_h.set_text_value(el.m_r.Height == FLT_MAX ? _T("") : d2S(el.m_r.Height, false, 1));
+		m_static_x1.set_text_value(el.m_r.X == FLT_MAX ? CString() : d2S(el.m_r.X, false, 1));
+		m_static_y1.set_text_value(el.m_r.Y == FLT_MAX ? CString() : d2S(el.m_r.Y, false, 1));
+		m_static_x2.set_text_value((el.m_r.X == FLT_MAX || el.m_r.Width == FLT_MAX) ? CString() : d2S(el.m_r.X + el.m_r.Width, false, 1));
+		m_static_y2.set_text_value((el.m_r.Y == FLT_MAX || el.m_r.Height == FLT_MAX) ? CString() : d2S(el.m_r.Y + el.m_r.Height, false, 1));
+		m_static_w.set_text_value(el.m_r.Width == FLT_MAX ? CString() : d2S(el.m_r.Width, false, 1));
+		m_static_h.set_text_value(el.m_r.Height == FLT_MAX ? CString() : d2S(el.m_r.Height, false, 1));
 
-		m_static_round0.set_text_value(el.m_round[0] == FLT_MAX ? _T("") : d2S(el.m_round[0], false, 1));
-		m_static_round1.set_text_value(el.m_round[1] == FLT_MAX ? _T("") : d2S(el.m_round[1], false, 1));
-		m_static_round2.set_text_value(el.m_round[2] == FLT_MAX ? _T("") : d2S(el.m_round[2], false, 1));
-		m_static_round3.set_text_value(el.m_round[3] == FLT_MAX ? _T("") : d2S(el.m_round[3], false, 1));
+		m_static_round0.set_text_value(el.m_round[0] == FLT_MAX ? CString() : d2S(el.m_round[0], false, 1));
+		m_static_round1.set_text_value(el.m_round[1] == FLT_MAX ? CString() : d2S(el.m_round[1], false, 1));
+		m_static_round2.set_text_value(el.m_round[2] == FLT_MAX ? CString() : d2S(el.m_round[2], false, 1));
+		m_static_round3.set_text_value(el.m_round[3] == FLT_MAX ? CString() : d2S(el.m_round[3], false, 1));
 
 		switch (el.m_text_align)
 		{
@@ -575,7 +575,7 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 
 		//font
 		m_static_font_size.set_text_value(i2S(el.m_font_size));
-		m_static_font_weight.set_text_value(el.m_font_weight < DWRITE_FONT_WEIGHT_THIN ? _T("") : i2S(el.m_font_weight));
+		m_static_font_weight.set_text_value(el.m_font_weight < DWRITE_FONT_WEIGHT_THIN ? CString() : i2S(el.m_font_weight));
 		m_check_font_italic.SetCheck(el.m_font_italic ? BST_CHECKED : BST_UNCHECKED);
 
 		enable_window(true);

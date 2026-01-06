@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(CMoveIndexDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO_INCLUDE_FOLLOWS, &CMoveIndexDlg::OnBnClickedRadioIncludeFollows)
 	ON_BN_CLICKED(IDOK, &CMoveIndexDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CMoveIndexDlg::OnBnClickedCancel)
+	ON_EN_CHANGE(IDC_EDIT_NEW_INDEX, &CMoveIndexDlg::OnEnChangeEditNewIndex)
 END_MESSAGE_MAP()
 
 
@@ -76,11 +77,24 @@ void CMoveIndexDlg::OnBnClickedOk()
 
 	m_new_index = _ttoi(text);
 
+	if (m_new_index == m_cur_index)
+	{
+		m_edit_new_index.set_text_color(Gdiplus::Color::Red);
+		return;
+	}
 
 	text = m_edit_end_index.get_text();
 	text.Trim();
 	if (!text.IsEmpty())
+	{
 		m_end_index = _ttoi(text);
+		if (m_end_index <= m_cur_index)
+		{
+			AfxMessageBox(_T("끝 인덱스는 현재 인덱스보다 큰 값이어야 합니다."));
+			m_edit_end_index.set_text(_T(""));
+			return;
+		}
+	}
 
 	CDialogEx::OnOK();
 }
@@ -89,4 +103,13 @@ void CMoveIndexDlg::OnBnClickedCancel()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CDialogEx::OnCancel();
+}
+
+void CMoveIndexDlg::OnEnChangeEditNewIndex()
+{
+	//잘못된 값을 입력하면 red로 표시되는데
+	//이를 지운 경우 다시 원래 색인 black으로 되돌려준다.
+	CString text = m_edit_new_index.get_text();
+	if (text.IsEmpty())
+		m_edit_new_index.set_text_color(Gdiplus::Color::Black);
 }

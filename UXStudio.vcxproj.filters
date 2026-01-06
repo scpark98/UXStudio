@@ -120,6 +120,9 @@
     <ClInclude Include="MoveIndexDlg.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\office\xlnt\include\xlnt\xlnt.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UXStudio.cpp">

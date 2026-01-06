@@ -13,6 +13,9 @@
 #include "UXStudioDoc.h"
 
 #include <propkey.h>
+#include <format>
+
+#include "Common/office/xlnt/include/xlnt/xlnt.hpp"
 
 #include "Common/Functions.h"
 #include "Common/Json/rapid_json/json.h"
@@ -240,6 +243,8 @@ BOOL CUXStudioDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		save_as_json(lpszPathName);
 	else if (get_part(lpszPathName, fn_ext).MakeLower() == _T("txt"))
 		save_as_txt(lpszPathName);
+	else if (get_part(lpszPathName, fn_ext).MakeLower() == _T("xlsx"))
+		save_as_xlsx(lpszPathName);
 	else
 		AfxMessageBox(_T("not yet supported format. only json or txt available."));
 
@@ -252,21 +257,24 @@ void CUXStudioDoc::save_as_txt(CString filepath)
 	FILE* fp = NULL;
 	_tfopen_s(&fp, filepath, _T("wt")CHARSET);
 
-	_ftprintf(fp, _T("canvas size : %d, %d\n"), m_sz_canvas.cx, m_sz_canvas.cy);
+	_ftprintf(fp, _T("canvas size : %d x %d\n"), m_sz_canvas.cx, m_sz_canvas.cy);
 	_ftprintf(fp, _T("cr_canvas : %u (%s)\n"), (UINT)m_cr_canvas.GetValue(), get_color_str(m_cr_canvas));
 
-	_ftprintf(fp, _T("grid size : %d, %d\n"), m_sz_grid.cx, m_sz_grid.cy);
+	_ftprintf(fp, _T("grid size : %d x %d\n"), m_sz_grid.cx, m_sz_grid.cy);
 	_ftprintf(fp, _T("cr_grid : %u (%s)\n\n"), (UINT)m_cr_grid.GetValue(), get_color_str(m_cr_grid));
 
-	_ftprintf(fp, _T("index|type|selected|x1|y1|x2|y2|width|height|round0|round1|round2|round3|")
+	_ftprintf(fp, _T("index|type|selected|x1|y1|x2|y2|width|height|gapx_prec|gapy_prec|round0|round1|round2|round3|")
 				  _T("label|image_path|label_align|label_valign|label_visible|cr_text|cr_text_argb|cr_back|cr_back_argb|")
 				  _T("font_name|font_size|font_weight|font_italic|stroke_thickness|cr_stroke|cr_stroke_argb|cr_fill|cr_fill_argb\n"));
 
 	for (int i = 0; i < m_data.size(); i++)
 	{
-		_ftprintf(fp, _T("%d|%d|%d|%.0f|%0.f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|"),
+		_ftprintf(fp, _T("%d|%d|%d|%.0f|%0.f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|%.0f|"),
 			i, m_data[i]->m_type, m_data[i]->m_selected, m_data[i]->m_r.X, m_data[i]->m_r.Y, m_data[i]->m_r.GetRight(), m_data[i]->m_r.GetBottom(),
-			m_data[i]->m_r.Width, m_data[i]->m_r.Height, m_data[i]->m_round[0], m_data[i]->m_round[1], m_data[i]->m_round[2], m_data[i]->m_round[3]);
+			m_data[i]->m_r.Width, m_data[i]->m_r.Height,
+			(i == 0 ? 0.0f : m_data[i]->m_r.X - m_data[i - 1]->m_r.GetRight()),		//이전 X2와의 거리
+			(i == 0 ? 0.0f : m_data[i]->m_r.Y - m_data[i - 1]->m_r.GetBottom()),	//이전 Y2와의 거리
+			m_data[i]->m_round[0], m_data[i]->m_round[1], m_data[i]->m_round[2], m_data[i]->m_round[3]);
 		_ftprintf(fp, _T("%s|%s|%d|%d|%d|%u|%s|%u|%s|"),
 			m_data[i]->m_text, m_data[i]->m_image_path, m_data[i]->m_text_align, m_data[i]->m_text_valign, m_data[i]->m_text_visible,
 			m_data[i]->m_cr_text, get_color_str(m_data[i]->m_cr_text), m_data[i]->m_cr_back, get_color_str(m_data[i]->m_cr_back));
@@ -276,6 +284,176 @@ void CUXStudioDoc::save_as_txt(CString filepath)
 	}
 
 	fclose(fp);
+}
+
+//저장에 문제는 없으나 xlnt가 최신 버전이 아니라서인지 memory leak이 발생한다.
+//https://luckygg.tistory.com/235의 의견으로는 False memory일 수 있다고 한다.
+//다만 셀에 한글을 입력하면 정상적으로 저장되지 않는 치명적인 문제가 있다.
+void CUXStudioDoc::save_as_xlsx(CString filepath)
+{
+	//해당 파일이 열려있을 경우 에러가 발생하므로 미리 확인.
+	FILE* fp = NULL;
+	_tfopen_s(&fp, filepath, _T("wb"));
+	if (fp == NULL)
+	{
+		AfxMessageBox(filepath + _T("\n\n다른 프로세스에 의해 열려있으므로 파일을 저장할 수 없습니다.\n파일을 닫은 후 다시 시도해주세요."));
+		return;
+	}
+	fclose(fp);
+
+	xlnt::workbook wb;
+	xlnt::worksheet ws = wb.active_sheet();
+
+	ws.cell("A1").value("sz_canvas");
+	ws.cell("B1").value(string_format("%d x %d", m_sz_canvas.cx, m_sz_canvas.cy));
+	ws.cell("A2").value("cr_canvas");
+	ws.cell("B2").value(string_format("%u", m_cr_canvas.GetValue()));
+	ws.cell("C2").value(string_format("%s", get_color_str(m_cr_canvas)));
+
+	ws.cell("A3").value("sz_grid");
+	ws.cell("B3").value(string_format("%d x %d", m_sz_grid.cx, m_sz_grid.cy));
+	ws.cell("A4").value("cr_grid");
+	ws.cell("B4").value(string_format("%u", m_cr_grid.GetValue()));
+	ws.cell("C4").value(string_format("%s", get_color_str(m_cr_grid)));
+
+	//33 columns
+	CString title = _T("index|type|selected|x1|y1|x2|y2|width|height|gapx_prec|gapy_prec|round0|round1|round2|round3|")
+					_T("label|image_path|label_align|label_valign|label_visible|cr_text|cr_text_argb|cr_back|cr_back_argb|")
+					_T("font_name|font_size|font_weight|font_italic|stroke_thickness|cr_stroke|cr_stroke_argb|cr_fill|cr_fill_argb");
+
+	int i;
+	std::deque<CString> token;
+	get_token_str(title, token, _T("|"), false);
+	std::string cell_pos;
+	std::string sstr;
+
+	//6th 라인에 컬럼 타이틀 표시
+	for (i = 0; i < token.size(); i++)
+	{
+		//std::string cell_pos = std::format("{:s}6", get_excel_column(i).c_str());
+		cell_pos = string_format("%s6", get_excel_column(i).c_str());
+		ws.cell(cell_pos).value(CString2string(token[i]));
+	}
+
+	//틀고정
+	ws.freeze_panes("A7");
+
+	//7th 라인부터 실제 데이터 출력
+	int data_line_start = 7;
+	for (i = 0; i < m_data.size(); i++)
+	{
+		cell_pos = string_format("A%d", data_line_start);
+		ws.cell(cell_pos).value(i);
+
+		cell_pos = string_format("B%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_type);
+
+		cell_pos = string_format("C%d", data_line_start);
+		ws.cell(cell_pos).value((int)(m_data[i]->m_selected));
+
+		cell_pos = string_format("D%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_r.X);
+
+		cell_pos = string_format("E%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_r.Y);
+
+		cell_pos = string_format("F%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_r.GetRight());
+
+		cell_pos = string_format("G%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_r.GetBottom());
+
+		cell_pos = string_format("H%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_r.Width);
+
+		cell_pos = string_format("I%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_r.Height);
+
+		//현재 x와 바로 이전 항목의 right 간격 크기
+		cell_pos = string_format("J%d", data_line_start);
+		ws.cell(cell_pos).value(i == 0 ? 0.0f : (m_data[i]->m_r.X - m_data[i - 1]->m_r.GetRight()));
+
+		//현재 y와 바로 이전 항목의 bottom 간격 크기
+		cell_pos = string_format("K%d", data_line_start);
+		ws.cell(cell_pos).value(i == 0 ? 0.0f : (m_data[i]->m_r.Y - m_data[i - 1]->m_r.GetBottom()));
+
+		cell_pos = string_format("L%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_round[0]);
+
+		cell_pos = string_format("M%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_round[1]);
+
+		cell_pos = string_format("N%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_round[2]);
+
+		cell_pos = string_format("O%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_round[3]);
+
+		if (false)//m_data[i]->m_text.IsEmpty() == false)
+		{
+			sstr = CString2string(m_data[i]->m_text);
+			cell_pos = string_format("P%d", data_line_start);
+			ws.cell(cell_pos).value(sstr);
+		}
+
+		sstr = CString2string(m_data[i]->m_image_path);
+		cell_pos = string_format("Q%d", data_line_start);
+		ws.cell(cell_pos).value(sstr.c_str());
+
+		cell_pos = string_format("R%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_text_align);
+
+		cell_pos = string_format("S%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_text_valign);
+
+		cell_pos = string_format("T%d", data_line_start);
+		ws.cell(cell_pos).value((int)(m_data[i]->m_text_visible));
+
+		cell_pos = string_format("U%d", data_line_start);
+		ws.cell(cell_pos).value((UINT)(m_data[i]->m_cr_text.GetValue()));
+
+		cell_pos = string_format("V%d", data_line_start);
+		ws.cell(cell_pos).value(CString2string(get_color_str(m_data[i]->m_cr_text)).c_str());
+
+		cell_pos = string_format("W%d", data_line_start);
+		ws.cell(cell_pos).value((UINT)(m_data[i]->m_cr_back.GetValue()));
+
+		cell_pos = string_format("X%d", data_line_start);
+		ws.cell(cell_pos).value(CString2string(get_color_str(m_data[i]->m_cr_back)).c_str());
+
+		cell_pos = string_format("Y%d", data_line_start);
+		//ws.cell(cell_pos).value(CString2string(m_data[i]->m_font_name).c_str());
+
+		cell_pos = string_format("Z%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_font_size);
+
+		cell_pos = string_format("AA%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_font_weight);
+
+		cell_pos = string_format("AB%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_font_italic);
+
+		cell_pos = string_format("AC%d", data_line_start);
+		ws.cell(cell_pos).value(m_data[i]->m_stroke_thickness);
+
+		cell_pos = string_format("AD%d", data_line_start);
+		ws.cell(cell_pos).value((UINT)(m_data[i]->m_cr_stroke.GetValue()));
+
+		cell_pos = string_format("AE%d", data_line_start);
+		ws.cell(cell_pos).value(CString2string(get_color_str(m_data[i]->m_cr_stroke)).c_str());
+
+		cell_pos = string_format("AF%d", data_line_start);
+		ws.cell(cell_pos).value((UINT)(m_data[i]->m_cr_fill.GetValue()));
+
+		cell_pos = string_format("AG%d", data_line_start);
+		ws.cell(cell_pos).value(CString2string(get_color_str(m_data[i]->m_cr_fill)).c_str());
+
+		data_line_start++;
+	}
+
+	wb.save(CString2string(filepath));
+	//wb.save("d:\\result.xlsx");
+	SHELL_OPEN(filepath);
 }
 
 void CUXStudioDoc::save_as_json(CString filepath)
@@ -320,7 +498,7 @@ void CUXStudioDoc::save_as_json(CString filepath)
 
 
 		//CT2CA(m_data[i]->m_text)을 직접 파라미터로 넘기면 컴파일 에러가 발생한다.
-		std::string sstr = CT2CA(m_data[i]->m_text);
+		std::string sstr = CString2string(m_data[i]->m_text);
 		item.AddMember(rapidjson::Value("label", allocator).Move(), sstr, allocator);
 		sstr = CT2CA(m_data[i]->m_image_path);
 		item.AddMember(rapidjson::Value("image_path", allocator).Move(), sstr, allocator);
@@ -372,14 +550,15 @@ void CUXStudioDoc::OnFileSaveAs()
 		m_filepath.Format(_T("%s\\UXStudio.json"), get_exe_directory());
 	}
 
-	CString filter = _T("Json Files (*.json)|*.json|Text Files (*.txt)|*.txt|All Files (*.*)|*.*||");
+	CString filter = _T("Json Files (*.json)|*.json|Text Files (*.txt)|*.txt|Excel 파일(*.xlsx)|*.xlsx|All Files (*.*)|*.*||");
 	CFileDialog dlg(FALSE, _T("json"), m_filepath, OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY, filter);
 	if (dlg.DoModal() == IDCANCEL)
 		return;
 
-	m_filepath = dlg.GetPathName();
-	OnSaveDocument(m_filepath);
+	CString filepath = dlg.GetPathName();
+	OnSaveDocument(filepath);
 
-	if (get_part(m_filepath, fn_ext).MakeLower() == _T("json"))
-		SetPathName(m_filepath);
+	//json으로 저장할 경우에만 현재 문서 경로를 변경해준다.
+	if (get_part(filepath, fn_ext).MakeLower() == _T("json"))
+		SetPathName(filepath);
 }

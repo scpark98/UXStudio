@@ -32,6 +32,7 @@ public:
 	void							release_data();
 	void							save_as_txt(CString filepath);
 	void							save_as_json(CString filepath);
+	void							save_as_xlsx(CString filepath);
 
 // 재정의입니다.
 public:

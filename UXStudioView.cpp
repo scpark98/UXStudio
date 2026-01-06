@@ -1753,7 +1753,7 @@ BOOL CUXStudioView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	if (IsCtrlPressed() || IsShiftPressed())
 	{
 		m_zoom += (zDelta < 0 ? -0.1f : 0.1f);
-		std::clamp(m_zoom, 0.1f, 10.0f);
+		Clamp(m_zoom, 0.1f, 10.0f);
 		float cx = (float)(pDoc->m_sz_canvas.cx) * m_zoom;
 		float cy = (float)(pDoc->m_sz_canvas.cy) * m_zoom;
 		TRACE(_T("%f, %f, %f\n"), m_zoom, cx, cy);
