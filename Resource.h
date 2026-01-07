@@ -146,7 +146,6 @@
 #define IDC_RADIO_VALIGN_BOTTOM         1044
 #define IDC_RADIO_INCLUDE_FOLLOWS       1044
 #define IDC_STATIC_CANVAS_COLOR         1045
-#define IDC_EDIT_NEW_INDEX2             1045
 #define IDC_EDIT_END_INDEX              1045
 #define IDC_STATIC_GRID_COLOR           1046
 #define IDC_STATIC_IMAGE_PATH           1047
@@ -169,13 +168,15 @@
 #define ID_MENU_VIEW_SORT               32787
 #define ID_VIEW_32788                   32788
 #define ID_MENU_VIEW_MOVE_INDEX         32789
+#define ID_VIEW_32790                   32790
+#define ID_MENU_VIEW_AS_DEFAULT         32791
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        322
-#define _APS_NEXT_COMMAND_VALUE         32790
+#define _APS_NEXT_COMMAND_VALUE         32792
 #define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

@@ -76,6 +76,7 @@ protected: // serialization에서만 만들어집니다.
 	void							apply_canvas_property_changed(int canvas_cx, int canvas_cy, Gdiplus::Color cr_canvas, int grid_cx, int grid_cy, Gdiplus::Color cr_grid);
 
 	CSCUIElement*					m_item_hover = NULL;
+	CSCUIElement					m_item_default_style;
 	//CSCUIElement*					m_item_current = NULL;
 	std::deque<CSCUIElement*>		m_item_copy_src;
 
@@ -321,6 +322,7 @@ public:
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMenuViewMoveIndex();
+	afx_msg void OnMenuViewAsDefault();
 };
 
 #ifndef _DEBUG  // UXStudioView.cpp의 디버그 버전

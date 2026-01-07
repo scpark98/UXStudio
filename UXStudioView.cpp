@@ -62,6 +62,7 @@ ON_COMMAND(ID_MENU_VIEW_SORT, &CUXStudioView::OnMenuViewSort)
 ON_WM_DROPFILES()
 ON_WM_MOUSEWHEEL()
 ON_COMMAND(ID_MENU_VIEW_MOVE_INDEX, &CUXStudioView::OnMenuViewMoveIndex)
+ON_COMMAND(ID_MENU_VIEW_AS_DEFAULT, &CUXStudioView::OnMenuViewAsDefault)
 END_MESSAGE_MAP()
 
 // CUXStudioView 생성/소멸
@@ -279,11 +280,13 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		ID2D1PathGeometry* path = draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
 
 		//image path가 있다면 도형 모양으로 이미지를 그려준다.
+		//이미지를 도형 크기에 맞게 stretch할지, 원본크기로 그릴지, 
 		if (el->m_image)
 		{
 			d2dc->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), path), nullptr);
-
-			d2dc->DrawBitmap(el->m_image->get(), rf, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+			D2D1_SIZE_F sz_img = el->m_image->get_size();
+			D2D1_RECT_F new_rect = get_ratio_rect(rf, sz_img.width, sz_img.height);
+			d2dc->DrawBitmap(el->m_image->get(), new_rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 			d2dc->PopLayer();
 		}
 
@@ -460,7 +463,13 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 	//if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
 	//trace(m_selected_items);
 	trace(m_handle_index);
-	if (m_selected_items.size() && m_handle_index >= corner_inside)
+
+	//m_item_hover가 선택된 항목들 중에 있다면 이는 선택 항목의 inside에 있다는 것이고
+	//이를 눌러서 move or resize하려는 의도이다.
+	//만약 m_item_hover가 선택된 항목들 중에 없다면 이는 선택 항목 영역내의 다른 항목에 hover된 것이고
+	//이 상태에서 클릭되면 m_item_hover를 선택 상태로 변경하는 것이다.
+	//이렇게 처리해야만 큰 항목안에 존재하는 작은 항목을 선택하기 용이해진다.
+	if (find_index(m_selected_items, m_item_hover) >= 0 && m_handle_index >= corner_inside)
 	{
 		//Ctrl키를 누른채로 드래깅하면 복사모드로 동작한다.
 		//원래 선택된 항목들을 해제하고 복사된 항목들이 선택된 상태로 만들어줘야 한다.
@@ -606,7 +615,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 		if (hover != m_item_hover)
 		{
 			m_item_hover = get_hover_item(pt);
-			//TRACE(_T("hover = %p\n"), m_item_hover);
+			TRACE(_T("hover = %p\n"), m_item_hover);
 
 			//CRect rc;
 			//GetClientRect(rc);
@@ -666,7 +675,9 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 
 			//가장 마지막에 그려진 항목을 맨 뒤에 추가한다.
-			pDoc->m_data.push_back(new CSCUIElement(r));
+			CSCUIElement* new_item = new CSCUIElement(r);
+			//m_item_default_style.copy_style(new_item);
+			pDoc->m_data.push_back(new_item);
 		}
 	}
 
@@ -1027,7 +1038,7 @@ void CUXStudioView::move_or_resize_item(int key)
 CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 {
 	//기본적으로 rect안에 커서가 들어오면 hover로 인식하지만
-	//rect안에 또 다른 rect가 있을 경우, 순서가 나중인 rect는 hover로 판정될 수 없다.
+	//rect안에 또 다른 rect가 있을 경우, 순서가 앞인 rect는 hover로 판정될 수 없다.
 	//따라서 테두리 위에 커서가 위치하는 경우 먼저 hover 판정을 해야 하고
 	//그러한 rect가 없다면 커서가 위치한 rect를 hover 판정해야 한다.
 	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
@@ -1042,16 +1053,21 @@ CSCUIElement* CUXStudioView::get_hover_item(CPoint pt)
 
 	if (res == pDoc->m_data.end())
 	{
-		res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
+		//역방향으로 찾아야 큰 항목안의 작은 항목까지 hover됨을 판별할 수 있다.
+		auto rit = std::find_if(pDoc->m_data.rbegin(), pDoc->m_data.rend(),
 			[&](const auto& el)
 			{
 				Gdiplus::RectF r = el->m_r;
-				r.Inflate(3, 3);
+				r.Inflate(2, 2);
 				if (pt_in_rect(r, pt))
 				{
 					return el;
 				}
 			});
+
+		//역방향 iterator를 찾았다면 순방향 iterator에 다시 넣어주자.
+		if (rit != pDoc->m_data.rend())
+			res = std::prev(rit.base());
 	}
 
 	if (res != pDoc->m_data.end())
@@ -1364,8 +1380,8 @@ void CUXStudioView::OnMenuViewPaste()
 		m_item_copy_src[i]->copy(new_item);
 
 		new_item->m_r.Offset(20, 20);
-		//adjust_scroll_offset(new_item->m_r, false);
 
+		/*
 		//전체 element의 맨 처음에 넣지 않고 맨 마지막에 선택된 항목의 바로 다음 차례로 넣어준다.
 		auto it = std::find(pDoc->m_data.begin(), pDoc->m_data.end(), m_selected_items.back());
 		if (it == pDoc->m_data.end())
@@ -1373,6 +1389,9 @@ void CUXStudioView::OnMenuViewPaste()
 		else
 			pDoc->m_data.insert(it, new_item);
 		//pDoc->m_data.insert(m_selected_items.back(), new_item);
+		*/
+		//new_item을 어디에 insert하는가도 고민해봐야 하지만 우선 맨 뒤에 그냥 넣는다.
+		pDoc->m_data.push_back(new_item);
 
 		new_selected_items.push_back(new_item);
 	}
@@ -1721,10 +1740,10 @@ void CUXStudioView::OnDropFiles(HDROP hDropInfo)
 	if (get_filetype_from_filename(sfile) != FILE_TYPE_IMAGE)
 		return;
 	
-	//drop된 element를 찾는다.
+	//drop된 element를 찾는다. 역순으로 찾아야한다.
 	adjust_scroll_offset(pt, false);
 
-	auto res = std::find_if(pDoc->m_data.begin(), pDoc->m_data.end(),
+	auto res = std::find_if(pDoc->m_data.rbegin(), pDoc->m_data.rend(),
 		[&](const auto& el)
 		{
 			Gdiplus::RectF r = el->m_r;
@@ -1734,7 +1753,7 @@ void CUXStudioView::OnDropFiles(HDROP hDropInfo)
 			}
 		});
 
-	if (res == pDoc->m_data.end())
+	if (res == pDoc->m_data.rend())
 		return;
 
 	(*res)->m_image_path = sfile;
@@ -1821,4 +1840,14 @@ void CUXStudioView::OnMenuViewMoveIndex()
 	std::rotate(target_it, cur_it, middle_it);
 
 	Invalidate();
+}
+
+void CUXStudioView::OnMenuViewAsDefault()
+{
+	//현재 도형 스타일을 기본 스타일로 저장하고
+	//새로 그려지는 도형에 대해서는 위 스타일로 그려진다.
+	if (m_item_hover == NULL)
+		return;
+
+	m_item_hover->copy_style(&m_item_default_style);
 }
