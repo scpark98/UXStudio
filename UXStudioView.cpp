@@ -780,6 +780,10 @@ void CUXStudioView::get_fit_others_of_inside(CSCUIElement* el)
 
 	m_pt_align_fit.clear();
 
+	//shift키가 눌려진 상태에서는 다른 항목과의 align을 하지 않는다.
+	if (IsShiftPressed())
+		return;
+
 	//예를 들어 어떤 항목과 left fit이 발생했다면 다른 항목들과는 left fit인지 검사할 필요가 없다.
 	float fit[4] = { -1.0f, -1.0f, -1.0f, -1.0f };
 
@@ -870,6 +874,10 @@ void CUXStudioView::get_fit_others(int index, CSCUIElement* el, CPoint pt, CPoin
 	int extend = 16;		//fit line을 좀 더 늘려서 그려준다.
 
 	m_pt_align_fit.clear();
+
+	//shift키가 눌려진 상태에서는 다른 항목과의 align을 하지 않는다.
+	if (IsShiftPressed())
+		return;
 
 	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
