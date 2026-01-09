@@ -180,6 +180,8 @@ void CPropertyDlg::init_controls()
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
 	m_theme.cr_text = gGRAY(160);
 	m_theme.cr_back = gGRAY(44);
+	m_combo_font.set_text_color(Gdiplus::Color::Red);
+	m_combo_font.set_back_color(gGRAY(255));
 
 	m_static_canvas_size.set_text_color(m_theme.cr_text);
 	m_static_canvas_size.set_back_color(m_theme.cr_back);
