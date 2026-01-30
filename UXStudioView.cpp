@@ -280,15 +280,26 @@ void CUXStudioView::OnDraw(CDC* pDC)
 		ID2D1PathGeometry* path = draw_rect(d2dc, rf, el->m_cr_stroke, el->m_cr_fill, el->m_stroke_thickness, el->m_round[0], el->m_round[1], el->m_round[2], el->m_round[3]);
 
 		//image path가 있다면 도형 모양으로 이미지를 그려준다.
-		//이미지를 도형 크기에 맞게 stretch할지, 원본크기로 그릴지, 
-		if (el->m_image)
+		//이미지를 도형 크기에 맞게 stretch할지, 원본크기로 그릴지, 도형에 맞게 늘려 그린다.
+		if (el->m_image && el->m_image->is_valid())
 		{
+			//도형이 직사각형이 아닌 삼각형이라면 삼각형 모습으로 이미지가 표시되어야 한다.
 			d2dc->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), path), nullptr);
 			D2D1_SIZE_F sz_img = el->m_image->get_size();
 			D2D1_RECT_F new_rect = get_ratio_rect(rf, sz_img.width, sz_img.height);
 			d2dc->DrawBitmap(el->m_image->get(), new_rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 			d2dc->PopLayer();
 		}
+		//만약 이미지 경로 정보는 존재하지만 로딩에 실패한 경우는 x로 표시해준다.
+		else if (el->m_image_path.IsEmpty() == false)
+		{
+			draw_rect(d2dc, el->m_r, Gdiplus::Color::Red);
+			Gdiplus::PointF cp = center(el->m_r);
+			draw_line(d2dc, cp.X - 5, cp.Y - 5, cp.X + 5, cp.Y + 5, Gdiplus::Color::Red);
+			draw_line(d2dc, cp.X - 5, cp.Y + 5, cp.X + 5, cp.Y - 5, Gdiplus::Color::Red);
+			//draw_text(d2dc, el->m_r, _T("X"), _T("맑은 고딕"), 14.f, FW_NORMAL, Gdiplus::Color::Red);
+		}
+
 
 
 		//hover된 항목 highlight
@@ -1472,6 +1483,16 @@ void CUXStudioView::edit_end(bool valid)
 //속성창에서 값 변경 시 view에 적용시킨다.
 void CUXStudioView::apply_changed_property(std::deque<CSCUIElement*>* items)
 {
+	//다른 값들은 이미 자동으로 변경된 상태지만 m_image_path가 변경되었다면 m_image를 다시 불러줘야 한다.
+	for (int i = 0; i < items->size(); i++)
+	{
+		//m_image가 null인 경우 또는 null이 아니지만 m_image_path가 바뀐 경우는 다시 이미지를 불러온다.
+		if ((items->at(i)->m_image == nullptr) || (items->at(i)->m_image && items->at(i)->m_image_path != items->at(i)->m_image->get_filename()))
+		{
+			items->at(i)->load_image(m_d2dc.get_WICFactory(), m_d2dc.get_d2dc());
+		}
+	}
+
 	Invalidate();
 }
 

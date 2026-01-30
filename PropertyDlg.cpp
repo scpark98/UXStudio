@@ -344,6 +344,10 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 		{
 			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(m_text), msg->sValue);
 		}
+		else if (msg->pThis == &m_static_image_path)
+		{
+			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(m_image_path), msg->sValue);
+		}
 		//좌표값 또는 w, h를 변경하면 서로 영향을 주는데 이 때 기준은 좌표값을 유지시키도록 한다.
 		//즉, x2를 변경하면 x1을 변경시키는 것이 아니라 width를 변경시켜준다.
 		else if (msg->pThis == &m_static_x1)
@@ -420,7 +424,6 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 
 		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 	}
-
 
 	return 0;
 }

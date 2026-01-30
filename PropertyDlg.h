@@ -41,6 +41,11 @@ public:
 				CString* str = reinterpret_cast<CString*>(&value);
 				(*it)->m_text = *str;
 			}
+			else if (member == _T("m_image_path"))
+			{
+				CString* str = reinterpret_cast<CString*>(&value);
+				(*it)->m_image_path = *str;
+			}
 			else if (member == _T("m_r.X"))
 			{
 				float* f = reinterpret_cast<float*>(&value);
