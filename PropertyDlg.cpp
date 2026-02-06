@@ -627,7 +627,7 @@ void CPropertyDlg::OnBnClickedCheckFontItalic()
 
 void CPropertyDlg::OnCbnSelchangeComboFont()
 {
-	update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), m_combo_font.get_text());
+	update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), m_combo_font.get_cur_sel_text());
 	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
