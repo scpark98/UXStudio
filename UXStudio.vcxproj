@@ -106,11 +106,11 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;D:\0.Install\develop\libwebp-1.6.0-x64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);D:\0.Install\develop\libwebp-1.6.0-x64\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>xlntd.lib</AdditionalDependencies>
     </Link>
     <Midl>
@@ -132,11 +132,11 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;D:\0.Install\develop\libwebp-1.6.0-x64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);D:\0.Install\develop\libwebp-1.6.0-x64\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>xlntd.lib</AdditionalDependencies>
     </Link>
     <Midl>
@@ -160,13 +160,13 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;D:\0.Install\develop\libwebp-1.6.0-x64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);D:\0.Install\develop\libwebp-1.6.0-x64\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>xlnt.lib</AdditionalDependencies>
     </Link>
     <Midl>
@@ -190,13 +190,13 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common/office/xlnt_1.5/include;D:\0.Install\develop\libwebp-1.6.0-x64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../Common/office/xlnt_1.5/lib/$(PlatformTarget);D:\0.Install\develop\libwebp-1.6.0-x64\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>xlnt.lib</AdditionalDependencies>
     </Link>
     <Midl>

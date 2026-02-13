@@ -287,7 +287,7 @@ void CUXStudioView::OnDraw(CDC* pDC)
 			d2dc->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), path), nullptr);
 			D2D1_SIZE_F sz_img = el->m_image->get_size();
 			D2D1_RECT_F new_rect = get_ratio_rect(rf, sz_img.width, sz_img.height);
-			d2dc->DrawBitmap(el->m_image->get(), new_rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+			d2dc->DrawBitmap(el->m_image->get_cur_img(), new_rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 			d2dc->PopLayer();
 		}
 		//만약 이미지 경로 정보는 존재하지만 로딩에 실패한 경우는 x로 표시해준다.
