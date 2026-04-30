@@ -81,6 +81,8 @@ BEGIN_MESSAGE_MAP(CPropertyDlg, CPaneDialog)
 	ON_WM_PAINT()
 	ON_WM_CREATE()
 	ON_WM_SIZE()
+	ON_WM_DRAWITEM()
+	ON_WM_MEASUREITEM()
 	ON_REGISTERED_MESSAGE(Message_CSCStatic, &CPropertyDlg::on_message_CSCStatic)
 	ON_BN_CLICKED(IDC_CHECK_FONT_ITALIC, &CPropertyDlg::OnBnClickedCheckFontItalic)
 	ON_CBN_SELCHANGE(IDC_COMBO_FONT, &CPropertyDlg::OnCbnSelchangeComboFont)
@@ -111,6 +113,27 @@ LRESULT CPropertyDlg::OnInitDialog(WPARAM wParam, LPARAM lParam)
 	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
 }
 */
+
+void CPropertyDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	// CPaneDialog는 owner-draw 메시지를 자식에게 자동 리플렉션하지 않으므로 수동 처리
+	if (nIDCtl == IDC_COMBO_FONT)
+	{
+		m_combo_font.DrawItem(lpDrawItemStruct);
+		return;
+	}
+	CPaneDialog::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+
+void CPropertyDlg::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	if (nIDCtl == IDC_COMBO_FONT && m_combo_font.m_hWnd)
+	{
+		m_combo_font.MeasureItem(lpMeasureItemStruct);
+		return;
+	}
+	CPaneDialog::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+}
 
 void CPropertyDlg::enable_window(bool enable)
 {
@@ -178,10 +201,15 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_STROKE_THICKNESS, 50, 0, 50, 0);
 
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
-	m_theme.cr_text = gGRAY(160);
-	m_theme.cr_back = gGRAY(44);
-	m_combo_font.set_text_color(Gdiplus::Color::Red);
-	m_combo_font.set_back_color(gGRAY(255));
+	//m_theme.cr_text = gGRAY(160);
+	//m_theme.cr_back = gGRAY(44);
+	m_combo_font.set_color_theme(m_theme.get_color_theme());
+	m_combo_font.set_as_font_combo();
+	m_combo_font.set_line_height(14);
+	//m_combo_font.set_cur_sel(0);
+	//m_combo_font.AddString(_T("Arial"));
+	//m_combo_font.AddString(_T("Calibri"));
+
 
 	m_static_canvas_size.set_text_color(m_theme.cr_text);
 	m_static_canvas_size.set_back_color(m_theme.cr_back);
@@ -226,10 +254,6 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size_cx.copy_properties(m_static_round1);
 	m_static_canvas_size_cx.copy_properties(m_static_round2);
 	m_static_canvas_size_cx.copy_properties(m_static_round3);
-
-	m_combo_font.set_color_theme(m_theme.get_color_theme());
-	m_combo_font.set_as_font_combo();
-	m_combo_font.set_line_height(14);
 
 	m_static_grid_size_cx.copy_properties(m_static_font_size);
 	m_static_grid_size_cx.copy_properties(m_static_font_weight);
@@ -627,8 +651,8 @@ void CPropertyDlg::OnBnClickedCheckFontItalic()
 
 void CPropertyDlg::OnCbnSelchangeComboFont()
 {
-	update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), m_combo_font.get_cur_sel_text());
-	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	//update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), m_combo_font.get_cur_sel_text());
+	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignLeft()
