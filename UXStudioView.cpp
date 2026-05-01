@@ -27,12 +27,12 @@
 
 // CUXStudioView
 
-IMPLEMENT_DYNCREATE(CUXStudioView, CFormView)
+IMPLEMENT_DYNCREATE(CUXStudioView, CScrollView)
 
-BEGIN_MESSAGE_MAP(CUXStudioView, CFormView)
+BEGIN_MESSAGE_MAP(CUXStudioView, CScrollView)
 	// 표준 인쇄 명령입니다.
-	ON_COMMAND(ID_FILE_PRINT, &CFormView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CFormView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CUXStudioView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
@@ -68,10 +68,7 @@ END_MESSAGE_MAP()
 // CUXStudioView 생성/소멸
 
 CUXStudioView::CUXStudioView() noexcept
-	: CFormView(IDD_UXSTUDIO_FORM)
 {
-	// TODO: 여기에 생성 코드를 추가합니다.
-
 }
 
 CUXStudioView::~CUXStudioView()
@@ -97,24 +94,21 @@ CUXStudioView::~CUXStudioView()
 	}
 }
 
-void CUXStudioView::DoDataExchange(CDataExchange* pDX)
-{
-	CFormView::DoDataExchange(pDX);
-}
-
 BOOL CUXStudioView::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// TODO: CREATESTRUCT cs를 수정하여 여기에서
-	//  Window 클래스 또는 스타일을 수정합니다.
-	return CFormView::PreCreateWindow(cs);
+	return CScrollView::PreCreateWindow(cs);
 }
 
 void CUXStudioView::OnInitialUpdate()
 {
-	CFormView::OnInitialUpdate();
-	ResizeParentToFit();
-
 	pDoc = GetDocument();
+
+	//SetScrollSizes 는 OnUpdate 에서 canvas / canvas*zoom 으로 다시 설정.
+	//여기서는 base 호출 시 ASSERT 회피용 placeholder.
+	SetScrollSizes(MM_TEXT, CSize(1, 1));
+
+	CScrollView::OnInitialUpdate();
+
 	DragAcceptFiles();
 }
 
@@ -192,12 +186,12 @@ void CUXStudioView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 #ifdef _DEBUG
 void CUXStudioView::AssertValid() const
 {
-	CFormView::AssertValid();
+	CScrollView::AssertValid();
 }
 
 void CUXStudioView::Dump(CDumpContext& dc) const
 {
-	CFormView::Dump(dc);
+	CScrollView::Dump(dc);
 }
 
 CUXStudioDoc* CUXStudioView::GetDocument() const // 디버그되지 않은 버전은 인라인으로 지정됩니다.
@@ -222,23 +216,21 @@ void CUXStudioView::OnDraw(CDC* pDC)
 
 	D2D1_SIZE_F sz_dc = m_d2dc.get_size();
 
-	int hs = GetScrollPos(SB_HORZ);
-	int vs = GetScrollPos(SB_VERT);
-
-	//TRACE(_T("size = %.0f x %.0f, vs = %d, hs = %d\n"), sz_dc.width, sz_dc.height, vs, hs);
+	float hs = (float)GetScrollPos(SB_HORZ);
+	float vs = (float)GetScrollPos(SB_VERT);
 
 	d2dc->BeginDraw();
 
-	D2D1_POINT_2F offset = D2D1::Point2F(0.0f, 0.0f);
+	//D2D 는 row-vector 컨벤션 — A * B 는 "A 먼저 후 B" 적용.
+	//logical canvas → (Scale: ×zoom) → (Translate: -scroll screen px) → screen.
+	//순서가 바뀌면 scroll 까지 zoom 배 곱해져 max scroll 시 콘텐츠가 화면 밖으로 사라진다.
 	auto transform = D2D1::Matrix3x2F::Scale(m_zoom, m_zoom) *
-		D2D1::Matrix3x2F::Translation(offset.x, offset.y);
+		D2D1::Matrix3x2F::Translation(-hs, -vs);
 	d2dc->SetTransform(transform);
-	//d2dc->SetTransform(D2D1::Matrix3x2F::Identity());
 
-	//배경색으로 칠한 후
 	d2dc->Clear(get_d2color(pDoc->m_cr_canvas));
 
-	//grid dot 표시
+	//grid dot — 캔버스 logical 좌표 기준. transform 이 zoom·scroll 처리.
 	int ix = pDoc->m_sz_grid.cx;
 	int iy = pDoc->m_sz_grid.cy;
 	int x, y;
@@ -247,32 +239,23 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	{
 		for (y = iy; y < pDoc->m_sz_canvas.cy; y += iy)
 		{
-			d2dc->FillRectangle(D2D1::RectF(x - hs, y - vs, x - hs  + 1, y - vs + 1), m_br_grid.Get());
+			d2dc->FillRectangle(D2D1::RectF((float)x, (float)y, (float)x + 1, (float)y + 1), m_br_grid.Get());
 		}
 	}
 
-	//도형을 그리는 중에는 스크롤 보정된 실제 좌표이므로 그릴때는 역보정하여 화면에 그려줘야 한다.
+	//drag 중인 영역 — m_pt_lbutton_down/m_pt_cur 는 logical canvas 좌표.
 	if (m_lbutton_down && !m_spacebar_down && m_pt_lbutton_down.x >= 0 && m_pt_lbutton_down.y >= 0)
 	{
-		CPoint pt_lbutton_down = m_pt_lbutton_down;
-		adjust_scroll_offset(pt_lbutton_down, true, true);
-
-		CPoint pt_cur = m_pt_cur;
-		adjust_scroll_offset(pt_cur, true, true);
-
-		if (pt_lbutton_down != pt_cur)
-			d2dc->DrawRectangle(D2D1::RectF(pt_lbutton_down.x, pt_lbutton_down.y, pt_cur.x, pt_cur.y), m_br_draw.Get());
+		if (m_pt_lbutton_down != m_pt_cur)
+			d2dc->DrawRectangle(D2D1::RectF((float)m_pt_lbutton_down.x, (float)m_pt_lbutton_down.y, (float)m_pt_cur.x, (float)m_pt_cur.y), m_br_draw.Get());
 	}
 
 	m_resize_handle.clear();
 
-	//0번부터 순차적으로 그려준다.
 	for (int i = 0; i < pDoc->m_data.size(); i++)
 	{
 		CSCUIElement* el = pDoc->m_data[i];
 		Gdiplus::RectF r = el->m_r;
-
-		r.Offset(-hs, -vs);
 
 		D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
@@ -342,7 +325,6 @@ void CUXStudioView::OnDraw(CDC* pDC)
 			CSCUIElement* el = pDoc->m_data[i];
 			Gdiplus::RectF r = el->m_r;
 
-			r.Offset(-hs, -vs);
 			D2D1_RECT_F rf = { r.X, r.Y, r.GetRight(), r.GetBottom() };
 
 			CString text;
@@ -361,15 +343,10 @@ void CUXStudioView::OnDraw(CDC* pDC)
 	}
 
 	//move, resize시에 다른 항목과 일치했던 기록이 있다면 라인을 그려서 표시한다.
+	//m_pt_align_fit 은 logical canvas 좌표.
 	for (int i = 0; i < m_pt_align_fit.size(); i += 2)
 	{
-		D2D1_POINT_2F pt[2];
-		pt[0] = m_pt_align_fit[i];
-		pt[1] = m_pt_align_fit[i + 1];
-		adjust_scroll_offset(pt[0], false, true);
-		adjust_scroll_offset(pt[1], false, true);
-
-		d2dc->DrawLine(pt[0], pt[1], m_br_align_fit.Get(), 1.0f, m_stroke_style.Get());
+		d2dc->DrawLine(m_pt_align_fit[i], m_pt_align_fit[i + 1], m_br_align_fit.Get(), 1.0f, m_stroke_style.Get());
 	}
 
 
@@ -409,7 +386,7 @@ void CUXStudioView::draw_resize_handle(ID2D1DeviceContext* d2dc, std::vector<CRe
 
 void CUXStudioView::OnSize(UINT nType, int cx, int cy)
 {
-	CFormView::OnSize(nType, cx, cy);
+	CScrollView::OnSize(nType, cx, cy);
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	if (!m_d2dc.get_d2dc())
@@ -422,21 +399,21 @@ BOOL CUXStudioView::OnEraseBkgnd(CDC* pDC)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	return FALSE;
-	return CFormView::OnEraseBkgnd(pDC);
+	return CScrollView::OnEraseBkgnd(pDC);
 }
 
 void CUXStudioView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	Invalidate();
-	CFormView::OnHScroll(nSBCode, nPos, pScrollBar);
+	CScrollView::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 void CUXStudioView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	Invalidate();
-	CFormView::OnVScroll(nSBCode, nPos, pScrollBar);
+	CScrollView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 //가장 가까운 grid 좌표를 리턴한다.
@@ -461,8 +438,9 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 	if (m_spacebar_down)
 	{
 		m_lbutton_down = true;
-		adjust_scroll_offset(point, true);
-		m_pt_lbutton_down = point;
+		//spacebar drag 는 스크롤바 직접 조작이라 zoom 적용 없이 raw client + scroll(screen px) 로 anchor 저장.
+		//OnMouseMove 의 SetScrollPos(SB_HORZ, m_pt_lbutton_down.x - point.x) 와 짝을 이룸.
+		m_pt_lbutton_down = CPoint(point.x + GetScrollPos(SB_HORZ), point.y + GetScrollPos(SB_VERT));
 		return;
 	}
 
@@ -583,7 +561,7 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 	adjust_scroll_offset(pt, true);
 	m_pt_cur = m_pt_lbutton_down = pt;
 
-	CFormView::OnLButtonDown(nFlags, point);
+	CScrollView::OnLButtonDown(nFlags, point);
 }
 
 void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
@@ -635,7 +613,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 
-	CFormView::OnMouseMove(nFlags, point);
+	CScrollView::OnMouseMove(nFlags, point);
 }
 
 void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
@@ -696,7 +674,7 @@ void CUXStudioView::OnLButtonUp(UINT nFlags, CPoint point)
 
 	push_undo();
 
-	CFormView::OnLButtonUp(nFlags, point);
+	CScrollView::OnLButtonUp(nFlags, point);
 }
 
 void CUXStudioView::move_or_resize_item(CPoint pt)
@@ -1166,7 +1144,7 @@ BOOL CUXStudioView::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
-	return CFormView::PreTranslateMessage(pMsg);
+	return CScrollView::PreTranslateMessage(pMsg);
 }
 
 /*
@@ -1229,7 +1207,7 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 	//팝업메뉴가 표시중이거나 편집중이거나 선택항목이 없다면 커서의 변경은 없다.
 	if (m_is_context_menu_displaying || m_selected_items.size() == 0 || m_in_editing || m_spacebar_down)
-		return CFormView::OnSetCursor(pWnd, nHitTest, message);
+		return CScrollView::OnSetCursor(pWnd, nHitTest, message);
 
 	CPoint pt;
 	CRect rc;
@@ -1287,7 +1265,7 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		//return TRUE;
 	}
 
-	return CFormView::OnSetCursor(pWnd, nHitTest, message);
+	return CScrollView::OnSetCursor(pWnd, nHitTest, message);
 }
 
 //명령은 "맨 뒤로" 이지만 실제로는 리스트의 맨 처음으로 보내야 제일 바닥에 그려진다.
@@ -1700,7 +1678,7 @@ void CUXStudioView::OnTimer(UINT_PTR nIDEvent)
 		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->update_property(&m_selected_items, index);
 	}
 
-	CFormView::OnTimer(nIDEvent);
+	CScrollView::OnTimer(nIDEvent);
 }
 
 //item이 선택된 항목인지 판별한다.
@@ -1792,31 +1770,29 @@ void CUXStudioView::OnDropFiles(HDROP hDropInfo)
 	m_selected_items.push_back(*res);
 	update_property();
 
-	CFormView::OnDropFiles(hDropInfo);
+	CScrollView::OnDropFiles(hDropInfo);
 }
 
 BOOL CUXStudioView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	if (IsCtrlPressed() || IsShiftPressed())
 	{
-		m_zoom += (zDelta < 0 ? -0.1f : 0.1f);
+		if (zDelta < 0)
+			m_zoom /= 1.1f;
+		else
+			m_zoom *= 1.1f;
 		Clamp(m_zoom, 0.1f, 10.0f);
-		float cx = (float)(pDoc->m_sz_canvas.cx) * m_zoom;
-		float cy = (float)(pDoc->m_sz_canvas.cy) * m_zoom;
-		TRACE(_T("%f, %f, %f\n"), m_zoom, cx, cy);
-		SetScrollSizes(MM_TEXT, CSize(cx, cy));
-		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_zoom_info(m_zoom);
 
-		CSize sz;
-		int min, max;
-		GetScrollRange(SB_HORZ, &min, &max);
-		GetScrollRange(SB_VERT, &min, &max);
+		int cx = (int)((float)(pDoc->m_sz_canvas.cx) * m_zoom + 0.5f);
+		int cy = (int)((float)(pDoc->m_sz_canvas.cy) * m_zoom + 0.5f);
+		SetScrollSizes(MM_TEXT, CSize(cx, cy));
+
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_zoom_info(m_zoom);
 		Invalidate();
 		return TRUE;
 	}
 
-	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
+	return CScrollView::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 void CUXStudioView::OnMenuViewMoveIndex()

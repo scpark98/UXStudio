@@ -12,7 +12,7 @@
 #pragma comment(lib, "dwrite")
 
 
-class CUXStudioView : public CFormView
+class CUXStudioView : public CScrollView
 {
 protected: // serialization에서만 만들어집니다.
 	CUXStudioView() noexcept;
@@ -179,17 +179,50 @@ protected: // serialization에서만 만들어집니다.
 	//spacebar를 누른 채 화면을 드래그하면 스크롤된다.
 	bool							m_spacebar_down = false;
 
-	//point, rect 등을 현재 스크롤바 위치만큼 보정한다.
-	//invert = false이면 스크롤 오프셋만큼 더하는 것이고 true이면 적용했던 오프셋을 다시 빼준다.
+	//화면 client 좌표(픽셀)와 캔버스 logical 좌표 간 변환.
+	//invert = false : client px → canvas logical = (value + scroll) / zoom
+	//invert = true  : canvas logical → client px = value * zoom - scroll
+	//스크롤 범위는 SetScrollSizes(canvas * m_zoom) 으로 잡혀 screen px 단위.
 	template <class T> T adjust_scroll_offset(T& value, bool near_grid = true, bool invert = false)
 	{
-		CPoint sp((invert ? -1 : 1) * GetScrollPos(SB_HORZ), (invert ? -1 : 1) * GetScrollPos(SB_VERT));
+		float sx = (float)GetScrollPos(SB_HORZ);
+		float sy = (float)GetScrollPos(SB_VERT);
 
-		//((CPoint)value).Offset(sp);	//이렇게 하면 value가 변경되지 않는다.
+		auto convert_xy = [&](float& x, float& y)
+		{
+			if (invert)
+			{
+				x = x * m_zoom - sx;
+				y = y * m_zoom - sy;
+			}
+			else
+			{
+				x = (x + sx) / m_zoom;
+				y = (y + sy) / m_zoom;
+			}
+		};
+
+		auto convert_size = [&](float& w, float& h)
+		{
+			if (invert)
+			{
+				w *= m_zoom;
+				h *= m_zoom;
+			}
+			else
+			{
+				w /= m_zoom;
+				h /= m_zoom;
+			}
+		};
+
 		if constexpr (std::is_same_v<T, CPoint>)
 		{
-			CPoint pt = value;
-			pt.Offset(sp);
+			float x = (float)value.x;
+			float y = (float)value.y;
+			convert_xy(x, y);
+
+			CPoint pt((int)(x + 0.5f), (int)(y + 0.5f));
 			if (near_grid)
 				pt = get_near_grid(pt);
 			value = pt;
@@ -198,19 +231,22 @@ protected: // serialization에서만 만들어집니다.
 		else if constexpr (std::is_same_v<T, D2D1_POINT_2F>)
 		{
 			D2D1_POINT_2F pt = value;
-			pt.x += sp.x;
-			pt.y += sp.y;
-
+			convert_xy(pt.x, pt.y);
 			if (near_grid)
 				pt = get_near_grid(pt);
-
 			value = pt;
 			return value;
 		}
 		else if constexpr (std::is_same_v<T, Gdiplus::Rect>)
 		{
-			Gdiplus::Rect r = value;
-			r.Offset(sp.x, sp.y);
+			float x = (float)value.X;
+			float y = (float)value.Y;
+			float w = (float)value.Width;
+			float h = (float)value.Height;
+			convert_xy(x, y);
+			convert_size(w, h);
+
+			Gdiplus::Rect r((int)(x + 0.5f), (int)(y + 0.5f), (int)(w + 0.5f), (int)(h + 0.5f));
 			if (near_grid)
 				r = get_near_grid(r);
 			value = r;
@@ -219,10 +255,11 @@ protected: // serialization에서만 만들어집니다.
 		else if constexpr (std::is_same_v<T, Gdiplus::RectF>)
 		{
 			Gdiplus::RectF r = value;
-			r.Offset(sp.x, sp.y);
+			convert_xy(r.X, r.Y);
+			convert_size(r.Width, r.Height);
+
 			if (near_grid)
 				r = get_near_grid(r);
-
 			value = r;
 			return value;
 		}
@@ -231,23 +268,12 @@ protected: // serialization에서만 만들어집니다.
 	}
 
 public:
-#ifdef AFX_DESIGN_TIME
-	enum{ IDD = IDD_UXSTUDIO_FORM };
-#endif
-
-// 특성입니다.
-public:
 	CUXStudioDoc* GetDocument() const;
 
-// 작업입니다.
-public:
-
-// 재정의입니다.
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
-	virtual void OnInitialUpdate(); // 생성 후 처음 호출되었습니다.
+	virtual void OnInitialUpdate();
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);

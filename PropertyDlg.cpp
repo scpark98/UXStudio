@@ -165,7 +165,7 @@ void CPropertyDlg::enable_window(bool enable)
 void CPropertyDlg::init_controls()
 {
 	m_resize.Create(this);
-
+	/*
 	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CX, 0, 0, 25, 0);
 	m_resize.Add(IDC_STATIC_CANVAS_SIZE_CY, 25, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_CANVAS_COLOR, 50, 0, 50, 0);
@@ -199,13 +199,15 @@ void CPropertyDlg::init_controls()
 	m_resize.Add(IDC_STATIC_STROKE_COLOR, 0, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_STROKE_OPACITY, 50, 0, 50, 0);
 	m_resize.Add(IDC_STATIC_STROKE_THICKNESS, 50, 0, 50, 0);
+	*/
 
 	m_theme.set_color_theme(CSCColorTheme::color_theme_dark_gray);
 	//m_theme.cr_text = gGRAY(160);
 	//m_theme.cr_back = gGRAY(44);
 	m_combo_font.set_color_theme(m_theme.get_color_theme());
 	m_combo_font.set_as_font_combo();
-	m_combo_font.set_line_height(14);
+	m_combo_font.set_line_height(16);
+	m_combo_font.set_font_size(14);
 	//m_combo_font.set_cur_sel(0);
 	//m_combo_font.AddString(_T("Arial"));
 	//m_combo_font.AddString(_T("Calibri"));
@@ -267,6 +269,33 @@ void CPropertyDlg::init_controls()
 	m_radio_valign_top.add_image(IDB_TEXT_ALIGN_TOP);
 	m_radio_valign_center.add_image(IDB_TEXT_ALIGN_MIDDLE);
 	m_radio_valign_bottom.add_image(IDB_TEXT_ALIGN_BOTTOM);
+
+	//숫자값 편집 컨트롤 — Shift + Up/Down / Shift + MouseWheel 로 증감.
+	//color picker 와 label/image_path 같은 비숫자 항목은 제외.
+	m_static_canvas_size_cx.set_use_updown_key();
+	m_static_canvas_size_cy.set_use_updown_key();
+	m_static_grid_size_cx.set_use_updown_key();
+	m_static_grid_size_cy.set_use_updown_key();
+
+	m_static_x1.set_use_updown_key();
+	m_static_y1.set_use_updown_key();
+	m_static_x2.set_use_updown_key();
+	m_static_y2.set_use_updown_key();
+	m_static_w.set_use_updown_key();
+	m_static_h.set_use_updown_key();
+
+	m_static_round0.set_use_updown_key();
+	m_static_round1.set_use_updown_key();
+	m_static_round2.set_use_updown_key();
+	m_static_round3.set_use_updown_key();
+
+	m_static_font_size.set_use_updown_key();
+	m_static_font_weight.set_use_updown_key(true, 100.0f);
+
+	m_static_fill_opacity.set_use_updown_key();
+	m_static_stroke_opacity.set_use_updown_key();
+	m_static_text_opacity.set_use_updown_key();
+	m_static_stroke_thickness.set_use_updown_key(true, 0.5f);
 
 	enable_window(false);
 }
