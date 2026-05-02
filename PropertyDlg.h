@@ -100,8 +100,11 @@ public:
 			}
 			else if (member == _T("fill_color"))
 			{
+				//"R, G, B" 파싱 → get_color_from_token_str 가 alpha=255 로 생성하므로 기존 alpha 를 보존.
 				CString* str = reinterpret_cast<CString*>(&value);
+				BYTE prev_a = (*it)->m_cr_fill.GetA();
 				(*it)->m_cr_fill = get_color_from_token_str(*str, _T(", "));
+				set_color((*it)->m_cr_fill, 0, prev_a);
 			}
 			else if (member == _T("fill_opacity"))
 			{
@@ -111,7 +114,9 @@ public:
 			else if (member == _T("stroke_color"))
 			{
 				CString* str = reinterpret_cast<CString*>(&value);
+				BYTE prev_a = (*it)->m_cr_stroke.GetA();
 				(*it)->m_cr_stroke = get_color_from_token_str(*str, _T(", "));
+				set_color((*it)->m_cr_stroke, 0, prev_a);
 			}
 			else if (member == _T("stroke_opacity"))
 			{
@@ -125,7 +130,9 @@ public:
 			else if (member == _T("text_color"))
 			{
 				CString* str = reinterpret_cast<CString*>(&value);
+				BYTE prev_a = (*it)->m_cr_text.GetA();
 				(*it)->m_cr_text = get_color_from_token_str(*str, _T(", "));
+				set_color((*it)->m_cr_text, 0, prev_a);
 			}
 			else if (member == _T("text_opacity"))
 			{
@@ -194,10 +201,8 @@ public:
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	CSCStatic m_static_fill;
 	CSCStatic m_static_fill_color;
-	CSCStatic m_static_fill_opacity;
 	CSCStatic m_static_stroke;
 	CSCStatic m_static_stroke_color;
-	CSCStatic m_static_stroke_opacity;
 	CSCStatic m_static_stroke_thickness;
 	CSCStatic m_static_round;
 	CSCStatic m_static_round0;
@@ -217,7 +222,6 @@ public:
 	CGdiButton m_check_font_italic;
 	CSCStatic m_static_text_color;
 	afx_msg void OnBnClickedCheckFontItalic();
-	CSCStatic m_static_text_opacity;
 	afx_msg void OnCbnSelchangeComboFont();
 	afx_msg void OnBnClickedRadioAlignLeft();
 	afx_msg void OnBnClickedRadioAlignCenter();

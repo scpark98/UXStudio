@@ -217,7 +217,7 @@ BOOL CUXStudioDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		el->m_cr_text = Gdiplus::Color(json.get_array_member("items", i, "cr_text", (UINT)(Gdiplus::Color::Black)));
 		el->m_cr_back = Gdiplus::Color(json.get_array_member("items", i, "cr_back", (UINT)(Gdiplus::Color::Transparent)));
 
-		el->m_font_name = _T("나눔스퀘어 Bold");// json.get_array_member("items", i, "font_name", "Arial");
+		el->m_font_name = json.get_array_member("items", i, "font_name", "Segoe UI");
 		el->m_font_size = json.get_array_member("items", i, "font_size", 10);
 		int font_weight = json.get_array_member("items", i, "font_weight", (int)DWRITE_FONT_WEIGHT_BOLD);
 		Validate(font_weight, (int)DWRITE_FONT_WEIGHT_THIN, (int)DWRITE_FONT_WEIGHT_ULTRA_BLACK, (int)DWRITE_FONT_WEIGHT_NORMAL);

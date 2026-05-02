@@ -134,6 +134,8 @@
 #define IDC_STATIC_TEXT_COLOR           1036
 #define IDC_STATIC_FILL_OPACITY2        1037
 #define IDC_STATIC_TEXT_OPACITY         1037
+#define IDC_CHECK_FONT_ITALIC2          1037
+#define IDC_CHECK_FONT_UNDERLINE        1037
 #define IDC_STATIC_TEXT_ALIGN           1038
 #define IDC_RADIO_ALIGN_LEFT            1039
 #define IDC_RADIO_ALIGN_CENTER          1040

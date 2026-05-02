@@ -36,11 +36,9 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_H, m_static_h);
 	DDX_Control(pDX, IDC_STATIC_FILL, m_static_fill);
 	DDX_Control(pDX, IDC_STATIC_FILL_COLOR, m_static_fill_color);
-	DDX_Control(pDX, IDC_STATIC_FILL_OPACITY, m_static_fill_opacity);
 	DDX_Control(pDX, IDC_STATIC_FILL, m_static_fill);
 	DDX_Control(pDX, IDC_STATIC_STROKE, m_static_stroke);
 	DDX_Control(pDX, IDC_STATIC_STROKE_COLOR, m_static_stroke_color);
-	DDX_Control(pDX, IDC_STATIC_STROKE_OPACITY, m_static_stroke_opacity);
 	DDX_Control(pDX, IDC_STATIC_STROKE_THICKNESS, m_static_stroke_thickness);
 	DDX_Control(pDX, IDC_STATIC_ROUND0, m_static_round0);
 	DDX_Control(pDX, IDC_STATIC_ROUND1, m_static_round1);
@@ -59,7 +57,6 @@ void CPropertyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_FONT_WEIGHT, m_static_font_weight);
 	DDX_Control(pDX, IDC_CHECK_FONT_ITALIC, m_check_font_italic);
 	DDX_Control(pDX, IDC_STATIC_TEXT_COLOR, m_static_text_color);
-	DDX_Control(pDX, IDC_STATIC_TEXT_OPACITY, m_static_text_opacity);
 	DDX_Control(pDX, IDC_RADIO_ALIGN_LEFT, m_radio_align_left);
 	DDX_Control(pDX, IDC_RADIO_ALIGN_CENTER, m_radio_align_center);
 	DDX_Control(pDX, IDC_RADIO_ALIGN_RIGHT, m_radio_align_right);
@@ -213,8 +210,10 @@ void CPropertyDlg::init_controls()
 	//m_combo_font.AddString(_T("Calibri"));
 
 
-	m_static_canvas_size.set_text_color(m_theme.cr_text);
+	m_static_canvas_size.set_text_color(Gdiplus::Color::White);// m_theme.cr_text);
 	m_static_canvas_size.set_back_color(m_theme.cr_back);
+	m_static_canvas_size.set_font_name(_T("Segoe UI"));
+	m_static_canvas_size.set_font_weight(FW_SEMIBOLD);
 	m_static_canvas_size.copy_properties(m_static_grid_size);
 	m_static_canvas_size.copy_properties(m_static_text_align);
 	m_static_canvas_size.copy_properties(m_static_font);
@@ -223,7 +222,7 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size.copy_properties(m_static_round);
 
 	m_static_canvas_size_cx.set_text_color(m_theme.cr_text);
-	m_static_canvas_size_cx.set_back_color(gGRAY(64));
+	m_static_canvas_size_cx.set_back_color(get_weak_color(m_theme.cr_back, 8));
 	m_static_canvas_size_cx.set_prefix_space(2);
 	m_static_canvas_size_cx.set_round(4, m_theme.cr_back, m_theme.cr_back);
 	m_static_canvas_size_cx.set_use_edit();
@@ -237,6 +236,10 @@ void CPropertyDlg::init_controls()
 
 	m_static_canvas_size_cx.copy_properties(m_static_label);
 	m_static_canvas_size_cx.copy_properties(m_static_image_path);
+	m_static_label.set_value_halign(DT_LEFT);
+	m_static_image_path.set_value_halign(DT_LEFT);
+	m_static_label.set_label_width(50);
+	m_static_image_path.set_label_width(50);
 
 	m_static_canvas_size_cx.copy_properties(m_static_x1);
 	m_static_canvas_size_cx.copy_properties(m_static_y1);
@@ -246,10 +249,8 @@ void CPropertyDlg::init_controls()
 	m_static_canvas_size_cx.copy_properties(m_static_h);
 
 	m_static_canvas_size_cx.copy_properties(m_static_fill_color);
-	m_static_canvas_size_cx.copy_properties(m_static_fill_opacity);
 
 	m_static_canvas_size_cx.copy_properties(m_static_stroke_color);
-	m_static_canvas_size_cx.copy_properties(m_static_stroke_opacity);
 	m_static_canvas_size_cx.copy_properties(m_static_stroke_thickness);
 
 	m_static_canvas_size_cx.copy_properties(m_static_round0);
@@ -261,7 +262,6 @@ void CPropertyDlg::init_controls()
 	m_static_grid_size_cx.copy_properties(m_static_font_weight);
 	m_check_font_italic.set_color(m_theme.cr_text, m_theme.cr_back, false);
 	m_static_canvas_size_cx.copy_properties(m_static_text_color);
-	m_static_canvas_size_cx.copy_properties(m_static_text_opacity);
 
 	m_radio_align_left.add_image(IDB_TEXT_ALIGN_LEFT);
 	m_radio_align_center.add_image(IDB_TEXT_ALIGN_CENTER);
@@ -292,9 +292,6 @@ void CPropertyDlg::init_controls()
 	m_static_font_size.set_use_updown_key();
 	m_static_font_weight.set_use_updown_key(true, 100.0f);
 
-	m_static_fill_opacity.set_use_updown_key();
-	m_static_stroke_opacity.set_use_updown_key();
-	m_static_text_opacity.set_use_updown_key();
 	m_static_stroke_thickness.set_use_updown_key(true, 0.5f);
 
 	enable_window(false);
@@ -449,22 +446,12 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(m_round[3]), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_fill_color)
 			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(fill_color), msg->sValue);
-		else if (msg->pThis == &m_static_fill_opacity)
-			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(fill_opacity), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_stroke_color)
-			//m_cur_items->m_cr_stroke = get_color_from_token_str(msg->sValue, _T(", "));
 			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(stroke_color), msg->sValue);
-		else if (msg->pThis == &m_static_stroke_opacity)
-			//set_color(m_cur_items->m_cr_stroke, 0, _ttoi(msg->sValue));
-			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(stroke_opacity), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_stroke_thickness)
-			//m_cur_items->m_stroke_thickness = _ttof(msg->sValue);
 			update_all_values<float>(m_cur_items, VAR_TO_CSTRING(stroke_thickness), _ttof(msg->sValue));
 		else if (msg->pThis == &m_static_text_color)
-			//m_cur_items->m_cr_text = get_color_from_token_str(msg->sValue, _T(", "));
 			update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(text_color), msg->sValue);
-		else if (msg->pThis == &m_static_text_opacity)
-			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_opacity), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_font_size)
 			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(font_size), _ttoi(msg->sValue));
 		else if (msg->pThis == &m_static_font_weight)
@@ -474,6 +461,21 @@ LRESULT CPropertyDlg::on_message_CSCStatic(WPARAM wParam, LPARAM lParam)
 			m_static_font_weight.set_text_value(i2S(font_weight));
 			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(font_weight), _ttoi(msg->sValue));
 		}
+
+		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	}
+	else if (msg->msg == CSCStaticMsg::msg_alpha_value_changed)
+	{
+		//color picker 의 alpha 영역 편집 → element 의 fill/stroke/text opacity 갱신.
+		if (!m_cur_items || m_cur_items->size() == 0)
+			return 0;
+
+		if (msg->pThis == &m_static_fill_color)
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(fill_opacity), msg->nValue);
+		else if (msg->pThis == &m_static_stroke_color)
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(stroke_opacity), msg->nValue);
+		else if (msg->pThis == &m_static_text_color)
+			update_all_values<int>(m_cur_items, VAR_TO_CSTRING(text_opacity), msg->nValue);
 
 		((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 	}
@@ -601,37 +603,44 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 			break;
 		}
 
-		//"_color picker_"일 때 현재 색상값을 text_color로 설정하면 그 색으로 사각형을 그린다.
-		//그런데 만약 red 컬러인데 alpha값이 0일 경우, 투명하게 그려지게 되므로 문제가 된다.
-		//a를 255로 강제 세팅해서 그려줘야 한다.
+		//"_color picker_" 인 컨트롤은 alpha 를 색상값과 같이 별도 영역에 표시·편집한다.
+		//swatch 자체의 가시성(alpha=0 일 때도 보이도록) 은 CSCStatic OnPaint 에서 swatch 그릴 때만 강제 255 로 처리.
 		Gdiplus::Color cr;
 
-
 		cr = (el.m_cr_fill.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_fill);
-		set_color(cr, 0, 255);
 		m_static_fill_color.set_text_color(cr);
 		str = get_color_str(cr, false);
 		m_static_fill_color.set_text_value(str);
-		m_static_fill_opacity.set_text_value(i2S(el.m_cr_fill.GetA()));
 
 		//stroke color 적용
 		cr = (el.m_cr_stroke.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_stroke);
-		set_color(cr, 0, 255);
 		m_static_stroke_color.set_text_color(cr);
 		str = get_color_str(cr, false);
 		m_static_stroke_color.set_text_value(str);
-		m_static_stroke_opacity.set_text_value(i2S(el.m_cr_stroke.GetA()));
 		m_static_stroke_thickness.set_text_value(i2S(el.m_stroke_thickness));
 
 		//글자색 적용
 		cr = (el.m_cr_text.GetValue() == cr_unused.GetValue() ? Gdiplus::Color::DimGray : el.m_cr_text);
-		set_color(cr, 0, 255);
 		m_static_text_color.set_text_color(cr);
 		str = get_color_str(cr, false);
 		m_static_text_color.set_text_value(str);
-		m_static_text_opacity.set_text_value(i2S(el.m_cr_text.GetA()));
 
 		//font
+		//font_name 을 콤보박스에 반영. 다중선택으로 el.m_font_name 이 빈 문자열이면 선택해제.
+		//기존 find_string 은 src.Find(text) 방향이 거꾸로라 복합 폰트명에서 오작동 → FindStringExact 사용.
+		if (el.m_font_name.IsEmpty())
+		{
+			m_combo_font.set_cur_sel(-1);
+		}
+		else
+		{
+			int idx = m_combo_font.FindStringExact(-1, el.m_font_name);
+			if (idx != CB_ERR)
+				m_combo_font.set_cur_sel(idx);
+			else
+				m_combo_font.set_cur_sel(-1);
+		}
+
 		m_static_font_size.set_text_value(i2S(el.m_font_size));
 		m_static_font_weight.set_text_value(el.m_font_weight < DWRITE_FONT_WEIGHT_THIN ? CString() : i2S(el.m_font_weight));
 		m_check_font_italic.SetCheck(el.m_font_italic ? BST_CHECKED : BST_UNCHECKED);
@@ -657,16 +666,13 @@ void CPropertyDlg::update_property(std::deque<CSCUIElement*>* items)
 
 		m_static_fill_color.set_text_color(Gdiplus::Color::Gray);
 		m_static_fill_color.set_text_value();
-		m_static_fill_opacity.set_text_value();
 
 		m_static_stroke_color.set_text_color(Gdiplus::Color::Gray);
 		m_static_stroke_color.set_text_value();
-		m_static_stroke_opacity.set_text_value();
 		m_static_stroke_thickness.set_text_value();
 
 		m_static_text_color.set_text_color(Gdiplus::Color::Gray);
 		m_static_text_color.set_text_value();
-		m_static_text_opacity.set_text_value();
 
 		enable_window(false);
 	}
@@ -680,8 +686,15 @@ void CPropertyDlg::OnBnClickedCheckFontItalic()
 
 void CPropertyDlg::OnCbnSelchangeComboFont()
 {
-	//update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), m_combo_font.get_cur_sel_text());
-	//((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
+	if (!m_cur_items || m_cur_items->size() == 0)
+		return;
+
+	CString font_name = m_combo_font.get_cur_sel_text();
+	if (font_name.IsEmpty())
+		return;
+
+	update_all_values<CString>(m_cur_items, VAR_TO_CSTRING(font_name), font_name);
+	((CUXStudioApp*)(AfxGetApp()))->apply_changed_property(m_cur_items);
 }
 
 void CPropertyDlg::OnBnClickedRadioAlignLeft()
