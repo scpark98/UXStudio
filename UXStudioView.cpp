@@ -450,8 +450,8 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	//선택된 항목들을 이동, 크기를 변경 모드 시작
 	//if (!m_r_selected.IsEmptyArea() && m_handle_index >= corner_inside)
-	//trace(m_selected_items);
-	trace(m_handle_index);
+	//sctrace(m_selected_items);
+	sctrace(m_handle_index);
 
 	//m_item_hover가 선택된 항목들 중에 있다면 이는 선택 항목의 inside에 있다는 것이고
 	//이를 눌러서 move or resize하려는 의도이다.
@@ -483,13 +483,13 @@ void CUXStudioView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		m_pt_lbutton_down = adjust_scroll_offset(pt, false);
 		m_is_resizing = true;
-		trace(m_is_resizing);
+		sctrace(m_is_resizing);
 		return;
 	}
 	else
 	{
 		m_is_resizing = false;
-		trace(m_is_resizing);
+		sctrace(m_is_resizing);
 	}
 
 	if (m_item_hover)
@@ -571,7 +571,7 @@ void CUXStudioView::OnMouseMove(UINT nFlags, CPoint point)
 	adjust_scroll_offset(pt, false);
 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->set_cursor_info(pt);
 
-	//trace(m_handle_index);
+	//sctrace(m_handle_index);
 
 	//현재 move or resizing 중일때
 	if (m_is_resizing)
@@ -1229,7 +1229,7 @@ BOOL CUXStudioView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		}
 	}
 
-	//trace(m_handle_index);
+	//sctrace(m_handle_index);
 
 	if (m_handle_index != -1)
 	{
